@@ -14,7 +14,7 @@ const HomeNavBar = () => {
                     </li>
                     <li className="right-nav-bar-buttons">
                         <button onClick={() => navigate('/login')}>Login</button>
-                        <button onClick={() => navigate('/create-account')}>Sign Up</button>
+                        <button id="create-account-button" onClick={() => navigate('/create-account')}>Sign Up</button>
                     </li>
 
                 </ul>
