@@ -1,0 +1,37 @@
+.nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0, 0.1);
+    z-index: 100;
+}
+
+.nav-bar ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.left-nav-bar-buttons {
+    display: flex;
+}
+
+.right-nav-bar-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-bar button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: black;
+    margin-left: 10px;
+}
+.nav-bar button:hover {
+    color: #4e4e4e;
+}

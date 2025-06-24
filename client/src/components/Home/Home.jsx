@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
+import HomeNavBar from '../NavBar/HomeNavBar';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -8,7 +9,7 @@ const Home = () => {
     return (
         <>
             <div className="home-container">
-                {/* NavBar */}
+                <HomeNavBar />
                 <div className="welcome-banner">
                     <h1>Welcome to RoomMate!</h1>
                     <h2>Find your next roommate today!</h2>
