@@ -19,7 +19,7 @@ model User {
   name                        String
   email                       String
   password                    String
-  age                         Int
+  dob                         DateTime
   gender                      String
   intern_or_new_grad          String
   budget_min                  Int
