@@ -4,7 +4,7 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "age" INTEGER NOT NULL,
+    "dob" TIMESTAMP(3) NOT NULL,
     "gender" TEXT NOT NULL,
     "intern_or_new_grad" TEXT NOT NULL,
     "budget_min" INTEGER NOT NULL,
