@@ -15,16 +15,16 @@ router.post('/create-account', async (req, res) => {
 
     try {
         if (!email || !password) {
-            return res.status(400).json({ error: "Username and password are required." });
+            return res.status(400).json({ error: "Email and password are required." });
         }
 
         // check that email contains @ and ends in .edu (app tailored for students)
         if (!email.includes('@') || !email.endsWith('.edu')) {
-            return res.status(400).json({ error: "Must be valid student email address"});
+            return res.status(400).json({ error: "Must be valid student email address."});
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ error: "Password must be at least 8 characters" });
+            return res.status(400).json({ error: "Password must be at least 8 characters." });
         }
 
         // check if user email already exists
@@ -33,7 +33,7 @@ router.post('/create-account', async (req, res) => {
         });
 
         if (existingUser) {
-            return res.status(400).json({ error: "Username already exists" });
+            return res.status(400).json({ error: "Email already exists." });
         }
 
         // bcrypt automatically salts the password
@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
 
     try {
         if (!email || !password) {
-            return res.status(400).json({ error: "Username and password are required." });
+            return res.status(400).json({ error: "Email and password are required." });
         }
 
         const user = await prisma.user.findFirst({
@@ -78,7 +78,7 @@ router.post('/login', async (req, res) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: "Invalid username or password."});
+            return res.status(401).json({ error: "User not found."});
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -94,7 +94,7 @@ router.post('/login', async (req, res) => {
 
     } catch(err) {
         console.error(err);
-        res.status(500).json({ error: "Something went wrong during login" });
+        res.status(500).json({ error: "Something went wrong during login." });
     }
 })
 
@@ -102,11 +102,11 @@ router.post('/login', async (req, res) => {
 router.post('/logout/:id', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            return res.status(500).json({ error: "Failed to log out" });
+            return res.status(500).json({ error: "Failed to log out." });
         }
 
         res.clearCookie("connect.sid");
-        res.json({ message: "Logout successful" });
+        res.json({ message: "Logout successful." });
     });
 })
 
@@ -123,7 +123,7 @@ router.get("/", async (req, res, next) => {
 // [GET] - Check if user is logged in
 router.get('/login/:id', async(req, res) => {
     if (!req.session.userId) {
-        return res.status(401).json({ message: "Not logged in" });
+        return res.status(401).json({ message: "Not logged in." });
     }
 
     try {
@@ -134,7 +134,7 @@ router.get('/login/:id', async(req, res) => {
         res.json({ id: req.session.userId, email: user.email });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error fetching user session data" });
+        res.status(500).json({ error: "Error fetching user session data." });
     }
 })
 
@@ -149,7 +149,7 @@ router.delete('/delete-account/:id', async (req, res) => {
         res.json({deletedUser});
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Something went wrong during account deletion" });
+        res.status(500).json({ error: "Something went wrong during account deletion." });
     }
 })
 
