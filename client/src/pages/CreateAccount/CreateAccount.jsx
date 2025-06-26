@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from 'react';
-import LoggedOutNavBar from '../../components/LoggedOutNavBar/LoggedOutNavBar';
 import { useNavigate } from 'react-router-dom';
 import './CreateAccount.css';
 
@@ -31,7 +30,7 @@ const CreateAccount = () => {
 
     const createUser = async (userData) => {
         try {
-            const response = await fetch('http://localhost:3000/api/users/create-account', {
+            const response = await fetch('/api/users/create-account', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -90,7 +89,7 @@ const CreateAccount = () => {
         }
 
         // validate budget range
-        if (formState.budgetMin > formState.budgetMax) {
+        if (parseInt(formState.budgetMin) > parseInt(formState.budgetMax)) {
             setSubmitError('Budget minimum cannot be greater than maximum');
             setIsSubmitting(false);
             return;
@@ -131,7 +130,6 @@ const CreateAccount = () => {
 
     return (
         <>
-            <LoggedOutNavBar/>
             <div className="create-account-container">
                 <div className="create-account-form">
                     <h2>Create Account</h2>

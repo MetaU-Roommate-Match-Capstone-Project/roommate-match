@@ -1,0 +1,9 @@
+footer {
+    width: 100vw;
+    padding: 20px 0;
+    color: white;
+    background-color: #3066BE;
+    text-align: center;
+    margin-left: calc(-50vw + 50%);
+    margin-top: 50px;
+}

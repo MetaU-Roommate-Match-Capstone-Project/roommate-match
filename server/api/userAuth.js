@@ -128,7 +128,7 @@ router.get("/", async (req, res, next) => {
 })
 
 // [GET] - Check if user is logged in
-router.get('/login/:id', async(req, res) => {
+router.get('/me', async(req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: "Not logged in." });
     }
@@ -138,13 +138,12 @@ router.get('/login/:id', async(req, res) => {
             where: {id: req.session.userId},
             select: {email: true}
         })
-        res.json({ id: req.session.userId, email: user.email });
+        res.json({ id: req.session.userId, username: user.email });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Error fetching user session data." });
     }
 })
-
 
 // Delete user account
 router.delete('/delete-account/:id', async (req, res) => {
