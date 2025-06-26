@@ -4,30 +4,65 @@ import LoggedOutNavBar from '../../components/LoggedOutNavBar/LoggedOutNavBar';
 import { useNavigate } from 'react-router-dom';
 import './CreateAccount.css';
 
-const CreateAccount = ({ onSubmit }) => {
+const CreateAccount = () => {
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [name, setName] = useState('');
-    const [dobMonth, setDobMonth] = useState('');
-    const [dobDay, setDobDay] = useState('');
-    const [dobYear, setDobYear] = useState('');
-    const [gender, setGender] = useState('');
-    const [internOrNewGrad, setInternOrNewGrad] = useState('');
-    const [budgetMin, setBudgetMin] = useState('');
-    const [budgetMax, setBudgetMax] = useState('');
-    const [university, setUniversity] = useState('');
-    const [company, setCompany] = useState('');
-    const [groupId] = useState('');
+    const [formState, setFormState] = useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        name: '',
+        dobMonth: '',
+        dobDay: '',
+        dobYear: '',
+        gender: '',
+        internOrNewGrad: '',
+        budgetMin: '',
+        budgetMax: '',
+        university: '',
+        company: '',
+        groupId: ''
+    });
+
     const [step, setStep] = useState(1);
     const [passwordError, setPasswordError] = useState('');
+    const [submitError, setSubmitError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const createUser = async (userData) => {
+        try {
+            const response = await fetch('http://localhost:3000/api/users/create-account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to create account');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error creating user:', error);
+            throw error;
+        }
+    }
+
+    const updateFormField = (field, value) => {
+        setFormState(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
     const handleFirstStepSubmit = (e) => {
         e.preventDefault();
 
-        if (password !== confirmPassword) {
+        if (formState.password !== formState.confirmPassword) {
             setPasswordError('Passwords do not match');
             return;
         }
@@ -36,13 +71,62 @@ const CreateAccount = ({ onSubmit }) => {
         setStep(2);
     };
 
-    const handleFinalSubmit = (e) => {
+    const handleFinalSubmit = async (e) => {
         e.preventDefault();
-        const dob = `${dobMonth}/${dobDay}/${dobYear}`;
-        onSubmit({
-            email, password, confirmPassword, name, dob, gender,
-            internOrNewGrad, budgetMin, budgetMax, university, company, groupId
-        });
+        setSubmitError('');
+        setIsSubmitting(true);
+
+        // error messages for buttons not being selected because no required attribute for buttons
+        if (!formState.gender) {
+            setSubmitError('Please select a gender');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.internOrNewGrad) {
+            setSubmitError('Please select a status');
+            setIsSubmitting(false);
+            return;
+        }
+
+        // validate budget range
+        if (formState.budgetMin > formState.budgetMax) {
+            setSubmitError('Budget minimum cannot be greater than maximum');
+            setIsSubmitting(false);
+            return;
+        }
+
+
+        try {
+            const dobDate = new Date(
+                parseInt(formState.dobYear),
+                parseInt(formState.dobMonth) - 1,
+                parseInt(formState.dobDay)
+            );
+            const dob = dobDate.toISOString();
+
+            const userData = {
+                name: formState.name,
+                email: formState.email,
+                password: formState.password,
+                dob,
+                gender: formState.gender,
+                intern_or_new_grad: formState.internOrNewGrad,
+                budget_min: parseInt(formState.budgetMin),
+                budget_max: parseInt(formState.budgetMax),
+                university: formState.university,
+                company: formState.company
+            };
+
+            await createUser(userData);
+
+            navigate("/login");
+
+        } catch (error) {
+            setSubmitError(error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -58,8 +142,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="email"
                                     id="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={formState.email}
+                                    onChange={(e) => updateFormField('email', e.target.value)}
                                     required
                                 />
                             </div>
@@ -69,8 +153,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="password"
                                     id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={formState.password}
+                                    onChange={(e) => updateFormField('password', e.target.value)}
                                     required
                                 />
                             </div>
@@ -80,8 +164,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="password"
                                     id="confirmPassword"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    value={formState.confirmPassword}
+                                    onChange={(e) => updateFormField('confirmPassword', e.target.value)}
                                     required
                                 />
                             </div>
@@ -98,8 +182,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="text"
                                     id="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    value={formState.name}
+                                    onChange={(e) => updateFormField('name', e.target.value)}
                                     required
                                 />
                             </div>
@@ -111,8 +195,8 @@ const CreateAccount = ({ onSubmit }) => {
                                         type="text"
                                         placeholder="MM"
                                         maxLength="2"
-                                        value={dobMonth}
-                                        onChange={(e) => setDobMonth(e.target.value)}
+                                        value={formState.dobMonth}
+                                        onChange={(e) => updateFormField('dobMonth', e.target.value)}
                                         className="dob-input"
                                         required
                                     />
@@ -121,8 +205,8 @@ const CreateAccount = ({ onSubmit }) => {
                                         type="text"
                                         placeholder="DD"
                                         maxLength="2"
-                                        value={dobDay}
-                                        onChange={(e) => setDobDay(e.target.value)}
+                                        value={formState.dobDay}
+                                        onChange={(e) => updateFormField('dobDay', e.target.value)}
                                         className="dob-input"
                                         required
                                     />
@@ -131,8 +215,8 @@ const CreateAccount = ({ onSubmit }) => {
                                         type="text"
                                         placeholder="YYYY"
                                         maxLength="4"
-                                        value={dobYear}
-                                        onChange={(e) => setDobYear(e.target.value)}
+                                        value={formState.dobYear}
+                                        onChange={(e) => updateFormField('dobYear', e.target.value)}
                                         className="dob-input-year"
                                         required
                                     />
@@ -144,22 +228,22 @@ const CreateAccount = ({ onSubmit }) => {
                                 <div className="button-group">
                                     <button
                                         type="button"
-                                        className={`option-button ${gender === 'female' ? 'selected' : ''}`}
-                                        onClick={() => setGender('female')}
+                                        className={`option-button ${formState.gender === 'female' ? 'selected' : ''}`}
+                                        onClick={() => updateFormField('gender', 'female')}
                                     >
                                         Female
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${gender === 'male' ? 'selected' : ''}`}
-                                        onClick={() => setGender('male')}
+                                        className={`option-button ${formState.gender === 'male' ? 'selected' : ''}`}
+                                        onClick={() => updateFormField('gender', 'male')}
                                     >
                                         Male
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${gender === 'non-binary' ? 'selected' : ''}`}
-                                        onClick={() => setGender('non-binary')}
+                                        className={`option-button ${formState.gender === 'non-binary' ? 'selected' : ''}`}
+                                        onClick={() => updateFormField('gender', 'non-binary')}
                                     >
                                         Non-Binary
                                     </button>
@@ -171,15 +255,15 @@ const CreateAccount = ({ onSubmit }) => {
                                 <div className="button-group">
                                     <button
                                         type="button"
-                                        className={`option-button ${internOrNewGrad === 'intern' ? 'selected' : ''}`}
-                                        onClick={() => setInternOrNewGrad('intern')}
+                                        className={`option-button ${formState.internOrNewGrad === 'intern' ? 'selected' : ''}`}
+                                        onClick={() => updateFormField('internOrNewGrad', 'intern')}
                                     >
                                         Intern
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${internOrNewGrad === 'new grad' ? 'selected' : ''}`}
-                                        onClick={() => setInternOrNewGrad('new grad')}
+                                        className={`option-button ${formState.internOrNewGrad === 'new grad' ? 'selected' : ''}`}
+                                        onClick={() => updateFormField('internOrNewGrad', 'new grad')}
                                     >
                                         New Grad
                                     </button>
@@ -191,8 +275,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="text"
                                     id="university"
-                                    value={university}
-                                    onChange={(e) => setUniversity(e.target.value)}
+                                    value={formState.university}
+                                    onChange={(e) => updateFormField('university', e.target.value)}
                                     required
                                 />
                             </div>
@@ -202,8 +286,8 @@ const CreateAccount = ({ onSubmit }) => {
                                 <input
                                     type="text"
                                     id="company"
-                                    value={company}
-                                    onChange={(e) => setCompany(e.target.value)}
+                                    value={formState.company}
+                                    onChange={(e) => updateFormField('company', e.target.value)}
                                     required
                                 />
                             </div>
@@ -214,8 +298,8 @@ const CreateAccount = ({ onSubmit }) => {
                                     <input
                                         type="number"
                                         placeholder="Min"
-                                        value={budgetMin}
-                                        onChange={(e) => setBudgetMin(e.target.value)}
+                                        value={formState.budgetMin}
+                                        onChange={(e) => updateFormField('budgetMin', e.target.value)}
                                         className="budget-input"
                                         required
                                     />
@@ -223,23 +307,34 @@ const CreateAccount = ({ onSubmit }) => {
                                     <input
                                         type="number"
                                         placeholder="Max"
-                                        value={budgetMax}
-                                        onChange={(e) => setBudgetMax(e.target.value)}
+                                        value={formState.budgetMax}
+                                        onChange={(e) => updateFormField('budgetMax', e.target.value)}
                                         className="budget-input"
                                         required
                                     />
                                 </div>
                             </div>
 
+                            {submitError && (
+                                <div className="error-message">{submitError}</div>
+                            )}
+
                             <div className="button-group">
                                 <button
                                     type="button"
                                     className="back-button"
                                     onClick={() => setStep(1)}
+                                    disabled={isSubmitting}
                                 >
                                     Back
                                 </button>
-                                <button type="submit" className="submit-button" onClick={() => navigate("/login")}>Create Account</button>
+                                <button
+                                    type="submit"
+                                    className="submit-button"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                                </button>
                             </div>
                         </form>
                     )}
