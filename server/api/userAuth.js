@@ -11,7 +11,7 @@ router.use(cors());
 
 // [POST] - Create Account Route
 router.post('/create-account', async (req, res) => {
-    const {name, email, password, dob, gender, intern_or_new_grad, budget_min, budget_max, university, company, group_id} = req.body;
+    const {name, email, password, dob, gender, intern_or_new_grad, budget_min, budget_max, university, company} = req.body;
 
     try {
         if (!email || !password) {
@@ -25,6 +25,14 @@ router.post('/create-account', async (req, res) => {
 
         if (password.length < 8) {
             return res.status(400).json({ error: "Password must be at least 8 characters." });
+        }
+
+        if (gender !== 'male' && gender !=='female' && gender !== 'non-binary') {
+            return res.status(400).json({ error: "Gender must be male, female, or non-binary." });
+        }
+
+        if (intern_or_new_grad !== 'intern' && intern_or_new_grad !== 'new grad') {
+            return res.status(400).json({ error: "Status must be intern or new grad." });
         }
 
         // check if user email already exists
@@ -51,8 +59,7 @@ router.post('/create-account', async (req, res) => {
                 budget_min,
                 budget_max,
                 university,
-                company,
-                group_id
+                company
             }
         })
         res.status(201).json({newUser})
