@@ -5,13 +5,10 @@ const Dashboard = () => {
     const { user } = useUser();
 
     if (!user) {
-        console.log('No user found');
         return;
     }
 
-    return (
-        console.log('User found', user)
-    )
+    return;
 }
 
 export default Dashboard;
