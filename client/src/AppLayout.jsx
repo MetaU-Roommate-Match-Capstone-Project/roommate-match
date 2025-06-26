@@ -1,18 +1,20 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import HomeNavBar from './components/HomeNavBar/HomeNavBar';
+import NavBar from './components/NavBar/NavBar';
 import Footer from './components/Footer/Footer';
+import { useUser } from './contexts/UserContext';
+import './App.css'
+
 
 const AppLayout = () => {
     return (
-            <div>
-                <HomeNavBar />
-                <main>
-                    <Outlet />
-                </main>
-                <Footer />
-            </div>
-
+        <>
+            <NavBar/>
+            <main>
+                <Outlet />
+            </main>
+            <Footer />
+        </>
     );
 }
 
