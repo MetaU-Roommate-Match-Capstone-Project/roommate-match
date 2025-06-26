@@ -31,7 +31,7 @@ const CreateAccount = () => {
 
     const createUser = async (userData) => {
         try {
-            const response = await fetch('http://localhost:3000/api/users/create-account', {
+            const response = await fetch('/api/users/create-account', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ const CreateAccount = () => {
         }
 
         // validate budget range
-        if (formState.budgetMin > formState.budgetMax) {
+        if (parseInt(formState.budgetMin) > parseInt(formState.budgetMax)) {
             setSubmitError('Budget minimum cannot be greater than maximum');
             setIsSubmitting(false);
             return;
