@@ -14,17 +14,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Cleanliness {
+  VERY_DIRTY
+  DIRTY
+  MEDIUM
+  CLEAN
+  VERY_CLEAN
+}
+
+enum Pets {
+  NO_PETS
+  CATS_ONLY
+  DOGS_ONLY
+  CATS_AND_DOGS
+  OKAY_WITH_ANY_PET
+}
+
+enum GenderPreference {
+  NO_PREFERENCE
+  MALE
+  FEMALE
+  NONBINARY
+}
+
+enum RoomType {
+  PRIVATE_ROOM_IN_APARTMENT
+  SHARED_ROOM
+  PRIVATE_ROOM_IN_HOUSE
+}
+
+enum SleepSchedule {
+  EARLY_RISER
+  LATE_SLEEPER
+  NO_PREFERENCE
+}
+
+enum NoiseTolerance {
+  QUIET
+  SOMEWHAT_QUIET
+  SOMEWHAT_NOISY
+  NOISY
+}
+
+enum Socialness {
+  LONER
+  SOMEWHAT_SOCIAL
+  SOCIAL
+  VERY_SOCIAL
+}
+
 model User {
-  id                          Int  @id @default(autoincrement())
-  name                        String
-  email                       String
-  password                    String
-  dob                         DateTime
-  gender                      String
-  intern_or_new_grad          String
-  budget_min                  Int
-  budget_max                  Int
-  university                  String
-  company                     String
-  group_id                    Int @default(0)
+  id                 Int              @id @default(autoincrement())
+  name               String
+  email              String
+  password           String
+  dob                DateTime
+  gender             String
+  intern_or_new_grad String
+  budget_min         Int
+  budget_max         Int
+  university         String
+  company            String
+  group_id           Int              @default(0)
+  roommate_profile   RoommateProfile?
+}
+
+model RoommateProfile {
+  id                Int              @id @default(autoincrement())
+  user              User             @relation(fields: [user_id], references: [id])
+  user_id           Int              @unique
+  city              String
+  state             String
+  cleanliness       Cleanliness
+  smokes            Boolean
+  pets              Pets
+  gender_preference GenderPreference
+  room_type         RoomType
+  num_roommates     Int
+  lease_duration    Int
+  move_in_date      DateTime
+  sleep_schedule    SleepSchedule
+  noise_tolerance   NoiseTolerance
+  socialness        Socialness
+  hobbies           String
+  favorite_music    String
+  bio               String
 }

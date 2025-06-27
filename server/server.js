@@ -21,6 +21,9 @@ app.use(cors({
 const userAuthRoutes = require('./api/userAuth.js');
 app.use('/api/users', userAuthRoutes)
 
+const roommateProfileRoutes = require('./api/roommateProfile.js');
+app.use('/api/roommate-profile', roommateProfileRoutes)
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 })
