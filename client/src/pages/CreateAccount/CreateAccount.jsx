@@ -89,8 +89,8 @@ const CreateAccount = () => {
         }
 
         // validate budget range
-        if (parseInt(formState.budgetMin) > parseInt(formState.budgetMax)) {
-            setSubmitError('Budget minimum cannot be greater than maximum');
+        if (parseInt(formState.budgetMin) >= parseInt(formState.budgetMax)) {
+            setSubmitError('Budget minimum cannot be greater than or equal to maximum');
             setIsSubmitting(false);
             return;
         }
