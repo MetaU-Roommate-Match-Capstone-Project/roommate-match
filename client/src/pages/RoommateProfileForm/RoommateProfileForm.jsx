@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
 import WithAuth from '../../components/WithAuth/WithAuth';
 import './RoommateProfileForm.css';
 import { useUser } from '../../contexts/UserContext';
@@ -9,15 +8,6 @@ import { useUser } from '../../contexts/UserContext';
 const RoommateProfileForm = () => {
     const { user } = useUser();
 
-    if (!user) {
-        console.log('No user found for roommate profile form');
-        return;
-    }
-
-    if (user) {
-        console.log(user.id);
-    }
-    //const navigate = useNavigate();
     const [formState, setFormState] = useState({
         id: user.id,
         city: '',
@@ -87,9 +77,7 @@ const RoommateProfileForm = () => {
                 parseInt(formState.moveInDay)
             );
             const moveIn = moveInDate.toISOString();
-            console.log(moveIn);
 
-            console.log('formstate', formState.id);
             const userData = {
                 id: formState.id,
                 city: formState.city,
