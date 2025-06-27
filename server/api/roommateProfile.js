@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
             return res.status(401).json({ error: "You must be logged in to create a roommate profile." });
         }
 
-        const { city, state, cleanliness, smokes, pets, gender_preference, room_type, num_roommates, lease_duration, move_in_date, sleep_schedule, noise_tolerance, socialness, hobbies, favorite_music, bio } = req.body;
+        const { city, state, cleanliness, smokes, pets, genderPreference, roomType, numRoommates, leaseDuration, moveInDate, sleepSchedule, noiseTolerance, socialness, hobbies, favoriteMusic, bio } = req.body;
 
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId }
@@ -41,16 +41,16 @@ router.post('/', async (req, res) => {
                 cleanliness,
                 smokes,
                 pets,
-                gender_preference,
-                room_type,
-                num_roommates,
-                lease_duration,
-                move_in_date,
-                sleep_schedule,
-                noise_tolerance,
+                gender_preference: genderPreference,
+                room_type: roomType,
+                num_roommates: numRoommates,
+                lease_duration: leaseDuration,
+                move_in_date: moveInDate,
+                sleep_schedule: sleepSchedule,
+                noise_tolerance: noiseTolerance,
                 socialness,
                 hobbies,
-                favorite_music,
+                favorite_music: favoriteMusic,
                 bio
             }
         })
