@@ -11,20 +11,31 @@ router.use(cors());
 // [POST] - create a new roommate profile
 router.post('/', async (req, res) => {
     try {
-        const { user_id, city, state, cleanliness, smokes, pets, gender_preference, room_type, num_roommates, lease_duration, move_in_date, sleep_schedule, noise_tolerance, socialness, hobbies, favorite_music, bio } = req.body;
+        if (!req.session.userId) {
+            return res.status(401).json({ error: "You must be logged in to create a roommate profile." });
+        }
+
+        const { city, state, cleanliness, smokes, pets, gender_preference, room_type, num_roommates, lease_duration, move_in_date, sleep_schedule, noise_tolerance, socialness, hobbies, favorite_music, bio } = req.body;
 
         const user = await prisma.user.findUnique({
-            where: { id: user_id }
+            where: { id: req.session.userId }
         });
 
         if (!user) {
-            res.status(404).json("User not found");
-            return;
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const existingProfile = await prisma.roommateProfile.findUnique({
+            where: { user_id: req.session.userId }
+        });
+
+        if (existingProfile) {
+            return res.status(400).json({ error: "User already has a roommate profile" });
         }
 
         const newRoommateProfile = await prisma.roommateProfile.create({
             data: {
-                user_id,
+                user_id: req.session.userId,
                 city,
                 state,
                 cleanliness,
@@ -34,7 +45,7 @@ router.post('/', async (req, res) => {
                 room_type,
                 num_roommates,
                 lease_duration,
-                move_in_date: new Date(move_in_date),
+                move_in_date,
                 sleep_schedule,
                 noise_tolerance,
                 socialness,
@@ -47,7 +58,7 @@ router.post('/', async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json("Error creating roommate profile");
+        res.status(500).json("Error creating roommate profile" );
     }
 });
 
