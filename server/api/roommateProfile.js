@@ -101,7 +101,23 @@ router.get('/me', async (req, res) => {
         }
 
         const roommateProfile = await prisma.roommateProfile.findUnique({
-            where: { user_id: req.session.userId }
+            where: { user_id: req.session.userId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        dob: true,
+                        gender: true,
+                        intern_or_new_grad: true,
+                        budget_min: true,
+                        budget_max: true,
+                        university: true,
+                        company: true
+                    }
+                }
+            }
         });
 
         if (!roommateProfile) {
@@ -109,7 +125,6 @@ router.get('/me', async (req, res) => {
         }
 
         res.status(200).json(roommateProfile);
-
     } catch (err) {
         console.error(err);
         res.status(500).json("Error fetching roommate profile");
