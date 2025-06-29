@@ -84,6 +84,7 @@ router.post('/', async (req, res) => {
                 bio
             }
         })
+
         res.status(201).json(newRoommateProfile);
 
     } catch (err) {
@@ -91,6 +92,29 @@ router.post('/', async (req, res) => {
         res.status(500).json("Error creating roommate profile" );
     }
 });
+
+// [GET] - get profile of the user that is signed in
+router.get('/me', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: "You must be logged in to view your profile." });
+        }
+
+        const roommateProfile = await prisma.roommateProfile.findUnique({
+            where: { user_id: req.session.userId }
+        });
+
+        if (!roommateProfile) {
+            return res.status(404).json({ error: "Roommate profile not found" });
+        }
+
+        res.status(200).json(roommateProfile);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json("Error fetching roommate profile");
+    }
+})
 
 // [GET] - get all roommate profiles
 router.get('/', async (req, res) => {
