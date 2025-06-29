@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateAccount.css';
 
 const CreateAccount = () => {
     const navigate = useNavigate();
@@ -130,14 +129,15 @@ const CreateAccount = () => {
 
     return (
         <>
-            <div className="create-account-container">
-                <div className="create-account-form">
+            <div className="form-container">
+                <div className="form-card">
                     <h2>Create Account</h2>
                     {step === 1 ? (
                         <form onSubmit={handleFirstStepSubmit}>
                             <div className="form-group">
-                                <label htmlFor="email">Email</label>
+                                <label className="form-label" htmlFor="email">Email</label>
                                 <input
+                                    className="form-input"
                                     type="email"
                                     id="email"
                                     value={formState.email}
@@ -147,8 +147,9 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="password">Password</label>
+                                <label className="form-label" htmlFor="password">Password</label>
                                 <input
+                                    className="form-input"
                                     type="password"
                                     id="password"
                                     value={formState.password}
@@ -158,8 +159,9 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="confirmPassword">Confirm Password</label>
+                                <label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
                                 <input
+                                    className="form-input"
                                     type="password"
                                     id="confirmPassword"
                                     value={formState.confirmPassword}
@@ -171,13 +173,14 @@ const CreateAccount = () => {
                             {passwordError && (
                                 <div className="error-message">{passwordError}</div>
                             )}
-                            <button type="submit" className="submit-button">Continue</button>
+                            <button type="submit" className="btn-primary">Continue</button>
                         </form>
                     ) : (
                         <form onSubmit={handleFinalSubmit}>
                             <div className="form-group">
-                                <label htmlFor="name">Full Name</label>
+                                <label className="form-label" htmlFor="name">Full Name</label>
                                 <input
+                                    className="form-input"
                                     type="text"
                                     id="name"
                                     value={formState.name}
@@ -187,60 +190,60 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Date of Birth</label>
-                                <div className="dob-container">
+                                <label className="form-label">Date of Birth</label>
+                                <div className="date-container">
                                     <input
                                         type="text"
                                         placeholder="MM"
                                         maxLength="2"
                                         value={formState.dobMonth}
                                         onChange={(e) => updateFormField('dobMonth', e.target.value)}
-                                        className="dob-input"
+                                        className="form-input-small"
                                         required
                                     />
-                                    <span className="dob-slash">/</span>
+                                    <span className="date-separator">/</span>
                                     <input
                                         type="text"
                                         placeholder="DD"
                                         maxLength="2"
                                         value={formState.dobDay}
                                         onChange={(e) => updateFormField('dobDay', e.target.value)}
-                                        className="dob-input"
+                                        className="form-input-small"
                                         required
                                     />
-                                    <span className="dob-slash">/</span>
+                                    <span className="date-separator">/</span>
                                     <input
                                         type="text"
                                         placeholder="YYYY"
                                         maxLength="4"
                                         value={formState.dobYear}
                                         onChange={(e) => updateFormField('dobYear', e.target.value)}
-                                        className="dob-input-year"
+                                        className="form-input-year"
                                         required
                                     />
                                 </div>
                             </div>
 
                             <div className="form-group">
-                                <label>Gender</label>
+                                <label className="form-label">Gender</label>
                                 <div className="button-group">
                                     <button
                                         type="button"
-                                        className={`option-button ${formState.gender === 'female' ? 'selected' : ''}`}
+                                        className={`btn-option ${formState.gender === 'female' ? 'btn-option-selected' : ''}`}
                                         onClick={() => updateFormField('gender', 'female')}
                                     >
                                         Female
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${formState.gender === 'male' ? 'selected' : ''}`}
+                                        className={`btn-option ${formState.gender === 'male' ? 'btn-option-selected' : ''}`}
                                         onClick={() => updateFormField('gender', 'male')}
                                     >
                                         Male
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${formState.gender === 'non-binary' ? 'selected' : ''}`}
+                                        className={`btn-option ${formState.gender === 'non-binary' ? 'btn-option-selected' : ''}`}
                                         onClick={() => updateFormField('gender', 'non-binary')}
                                     >
                                         Non-Binary
@@ -249,18 +252,18 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Status</label>
+                                <label className="form-label">Status</label>
                                 <div className="button-group">
                                     <button
                                         type="button"
-                                        className={`option-button ${formState.internOrNewGrad === 'intern' ? 'selected' : ''}`}
+                                        className={`btn-option ${formState.internOrNewGrad === 'intern' ? 'btn-option-selected' : ''}`}
                                         onClick={() => updateFormField('internOrNewGrad', 'intern')}
                                     >
                                         Intern
                                     </button>
                                     <button
                                         type="button"
-                                        className={`option-button ${formState.internOrNewGrad === 'new grad' ? 'selected' : ''}`}
+                                        className={`btn-option ${formState.internOrNewGrad === 'new grad' ? 'btn-option-selected' : ''}`}
                                         onClick={() => updateFormField('internOrNewGrad', 'new grad')}
                                     >
                                         New Grad
@@ -269,8 +272,9 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="university">University</label>
+                                <label className="form-label" htmlFor="university">University</label>
                                 <input
+                                    className="form-input"
                                     type="text"
                                     id="university"
                                     value={formState.university}
@@ -280,8 +284,9 @@ const CreateAccount = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="company">Company</label>
+                                <label className="form-label" htmlFor="company">Company</label>
                                 <input
+                                    className="form-input"
                                     type="text"
                                     id="company"
                                     value={formState.company}
@@ -290,24 +295,24 @@ const CreateAccount = () => {
                                 />
                             </div>
 
-                            <div className="form-group budget-group">
-                                <label>Budget Range</label>
+                            <div className="form-group">
+                                <label className="form-label">Budget Range</label>
                                 <div className="budget-container">
                                     <input
                                         type="number"
                                         placeholder="Min"
                                         value={formState.budgetMin}
                                         onChange={(e) => updateFormField('budgetMin', e.target.value)}
-                                        className="budget-input"
+                                        className="form-input-small"
                                         required
                                     />
-                                    <span className="budget-dash">-</span>
+                                    <span className="budget-separator">-</span>
                                     <input
                                         type="number"
                                         placeholder="Max"
                                         value={formState.budgetMax}
                                         onChange={(e) => updateFormField('budgetMax', e.target.value)}
-                                        className="budget-input"
+                                        className="form-input-small"
                                         required
                                     />
                                 </div>
@@ -320,7 +325,7 @@ const CreateAccount = () => {
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className="back-button"
+                                    className="btn-back"
                                     onClick={() => setStep(1)}
                                     disabled={isSubmitting}
                                 >
@@ -328,7 +333,7 @@ const CreateAccount = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="submit-button"
+                                    className="btn-primary"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? 'Creating Account...' : 'Create Account'}

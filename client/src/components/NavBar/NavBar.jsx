@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
-import './NavBar.css';
 
 const NavBar = () => {
     const { user, setUser } = useUser();
@@ -28,24 +27,24 @@ const NavBar = () => {
     };
 
     return (
-        <nav className="nav-bar">
-            <ul>
-                <li className="left-nav-bar-buttons">
-                    <button onClick={() => navigate('/')}> App Logo</button>
-                    <button onClick={() => navigate('/')}> App Title</button>
+        <nav className="nav-container">
+            <ul className="nav-list">
+                <li className="nav-left">
+                    <button className="btn-nav font-bold" onClick={() => navigate('/')}>App Logo</button>
+                    <button className="btn-nav font-bold" onClick={() => navigate('/')}>Roomify</button>
                 </li>
                 {(
-                    <li className="right-nav-bar-buttons">
+                    <li className="nav-right">
                         {!user ? (
                             <>
-                                <button onClick={() => navigate('/login')}>Login</button>
-                                <button id="create-account-button" onClick={() => navigate('/create-account')}>Sign Up</button>
+                                <button className="btn-nav font-medium" onClick={() => navigate('/login')}>Login</button>
+                                <button className="btn-secondary font-medium" onClick={() => navigate('/create-account')}>Sign Up</button>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => navigate('/roommate-profile-form')}>Roomate Profile</button>
-                                <button onClick={() => navigate('/profile')}>Profile</button>
-                                <button onClick={handleLogout}>Logout</button>
+                                <button className="btn-nav font-medium" onClick={() => navigate('/roommate-profile-form')}>Roomate Profile</button>
+                                <button className="btn-nav font-medium" onClick={() => navigate('/profile')}>Profile</button>
+                                <button className="btn-nav font-medium" onClick={handleLogout}>Logout</button>
                             </>
                         )}
                     </li>

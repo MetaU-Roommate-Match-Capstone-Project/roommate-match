@@ -1,10 +1,9 @@
 import React from 'react';
-import './Footer.css';
 
 const Footer = () => {
   return (
     <>
-        <footer>
+        <footer className="footer">
             <p>Copyright © 2025. Created by Isabella Marin.</p>
         </footer>
     </>

@@ -1,54 +1,146 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.app-layout {
+  @apply min-h-screen flex flex-col;
+}
+
+.main-content {
+  @apply flex-1;
+}
+
+.btn-primary {
+  @apply bg-[#3066BE] text-white px-6 py-3 rounded font-medium hover:bg-[#6D9DC5] transition-colors cursor-pointer border-none;
+}
+
+.btn-secondary {
+  @apply bg-[#6D9DC5] text-white px-4 py-2 rounded font-medium hover:shadow-[inset_0_0_0_100vw_rgba(0,0,0,0.1)] transition-shadow cursor-pointer border-none;
+}
+
+.btn-nav {
+  @apply bg-transparent border-none cursor-pointer text-xl text-white ml-2 hover:text-gray-600 transition-colors;
+}
+
+.btn-option {
+  @apply text-black border border-gray-300 px-4 py-2 rounded font-medium hover:bg-gray-100 transition-colors cursor-pointer;
+}
+
+.btn-option-selected {
+  @apply bg-[#6D9DC5] text-white;
+}
+
+.form-container {
+  @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
+}
+
+.form-card {
+  @apply bg-white p-12 rounded-lg w-full max-w-2xl shadow-2xl;
+}
+
+.form-group {
+  @apply mb-5;
+}
+
+.form-label {
+  @apply block mb-2 font-semibold text-gray-800 text-left;
+}
+
+.form-input {
+  @apply w-full p-3 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
+}
+
+.form-input-small {
+  @apply w-16 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
+}
+
+.form-input-year {
+  @apply w-20 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
+}
+
+.button-group {
+  @apply flex flex-wrap gap-2;
+}
+
+.date-separator {
+  @apply text-lg font-bold text-gray-600;
+}
+
+.nav-container {
+  @apply fixed top-0 left-0 right-0 h-16 bg-[#3066BE] shadow-lg z-50;
+}
+
+.nav-list {
+  @apply list-none m-0 p-0 flex justify-between items-center h-full;
+}
+
+.nav-left {
+  @apply flex items-center;
+}
+
+.nav-right {
+  @apply flex items-center ml-auto px-2 mt-1 gap-4;
+}
+
+.error-message {
+  @apply text-red-600 text-sm mt-4 mb-4 p-2 bg-red-50 border border-red-200 rounded;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  @apply max-w-screen-xl mx-auto p-8 text-center;
 }
 
 main {
-  margin-top: 60px;
-  margin-bottom: 80px;
-  margin-left: 50px;
-  margin-right: 50px;
-  min-height: calc(100vh - 160px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  @apply mt-16 mb-20 mx-12 min-h-[calc(100vh-10rem)] flex flex-col justify-center items-center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+h1 {
+  @apply text-5xl leading-tight text-black;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h2 {
+  @apply text-3xl text-black mb-6;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+a {
+  @apply font-medium text-blue-600 no-underline hover:text-blue-700 transition-colors;
 }
 
-.card {
-  padding: 2em;
+/* Utility classes for components */
+.date-container {
+  @apply flex items-center gap-2;
 }
 
-.read-the-docs {
-  color: #888;
+.budget-container {
+  @apply flex items-center gap-2;
+}
+
+.budget-separator {
+  @apply text-lg font-bold text-gray-600;
+}
+
+.btn-back {
+  @apply bg-gray-500 text-white px-4 py-2 rounded font-medium hover:bg-gray-600 transition-colors cursor-pointer border-none;
+}
+
+.footer {
+  @apply w-screen py-5 text-white bg-[#3066BE] text-center mt-12 font-medium;
+  margin-left: calc(-50vw + 50%);
 }
