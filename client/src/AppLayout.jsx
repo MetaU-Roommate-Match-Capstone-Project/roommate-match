@@ -4,7 +4,6 @@ import NavBar from './components/NavBar/NavBar';
 import Footer from './components/Footer/Footer';
 import './App.css'
 
-
 const AppLayout = () => {
     return (
         <div className="app-layout">
