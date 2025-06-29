@@ -43,7 +43,7 @@ const NavBar = () => {
                         ) : (
                             <>
                                 <button className="btn-nav font-medium" onClick={() => navigate('/roommate-profile-form')}>Roomate Profile</button>
-                                <button className="btn-nav font-medium" onClick={() => navigate('/profile')}>Profile</button>
+                                <button className="btn-nav font-medium" onClick={() => navigate('/current-user-profile')}>Profile</button>
                                 <button className="btn-nav font-medium" onClick={handleLogout}>Logout</button>
                             </>
                         )}

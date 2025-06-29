@@ -5,6 +5,7 @@ import Login from './pages/Login/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import WithAuth from './components/WithAuth/WithAuth';
 import RoommateProfileForm from './pages/RoommateProfileForm/RoommateProfileForm';
+import CurrentUserProfile from './pages/CurrentUserProfile/CurrentUserProfile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
 
@@ -21,6 +22,7 @@ function AppRoutes() {
             <Route path='/login' element={<Login />} />
             <Route path='/dashboard' element={<ProtectedDashboard />} />
             <Route path='/roommate-profile-form' element={<RoommateProfileForm />} />
+            <Route path='/current-user-profile' element={<CurrentUserProfile />} />
           </Route>
         </Routes>
       </Router>
