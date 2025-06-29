@@ -33,6 +33,36 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: "User already has a roommate profile" });
         }
 
+        // input validation for enums
+        if (cleanliness !== "VERY_DIRTY" && cleanliness !== "DIRTY" && cleanliness !== "MEDIUM" && cleanliness !== "CLEAN" && cleanliness !== "VERY_CLEAN") {
+            return res.status(400).json({ error: "Invalid cleanliness" });
+        }
+
+        if (pets !== "NO_PETS" && pets !== "CATS_ONLY" && pets !== "DOGS_ONLY" && pets !== "CATS_AND_DOGS" && pets !== "OKAY_WITH_ANY_PET") {
+            return res.status(400).json({ error: "Invalid pets" });
+        }
+
+        if (genderPreference !== "NO_PREFERENCE" && genderPreference !== "MALE" && genderPreference !== "FEMALE" && genderPreference !== "NONBINARY") {
+            return res.status(400).json({ error: "Invalid gender preference" });
+        }
+
+        if (roomType !== "PRIVATE_ROOM_IN_APARTMENT" && roomType !== "PRIVATE_ROOM_IN_HOUSE" && roomType !== "SHARED_ROOM") {
+            return res.status(400).json({ error: "Invalid room type" });
+        }
+
+        if (sleepSchedule !== "NO_PREFERENCE" && sleepSchedule !== "EARLY_RISER" && sleepSchedule !== "LATE_SLEEPER") {
+            return res.status(400).json({ error: "Invalid sleep schedule" });
+        }
+
+        if (noiseTolerance !== "QUIET" && noiseTolerance !== "SOMEWHAT_QUIET" && noiseTolerance !== "SOMEWHAT_NOISY" && noiseTolerance !== "NOISY") {
+            return res.status(400).json({ error: "Invalid noise tolerance" });
+        }
+
+        if (socialness !== "LONER" && socialness !== "SOMEWHAT_SOCIAL" && socialness !== "SOCIAL" && socialness !== "VERY_SOCIAL") {
+            return res.status(400).json({ error: "Invalid socialness" });
+        }
+
+
         const newRoommateProfile = await prisma.roommateProfile.create({
             data: {
                 user_id: req.session.userId,

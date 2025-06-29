@@ -70,7 +70,6 @@ router.post('/create-account', async (req, res) => {
     }
 })
 
-
 // [POST] - Login route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;

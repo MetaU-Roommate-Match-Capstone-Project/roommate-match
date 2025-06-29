@@ -3,7 +3,6 @@ import { useState } from 'react';
 import WithAuth from '../../components/WithAuth/WithAuth';
 import { useUser } from '../../contexts/UserContext';
 
-
 const RoommateProfileForm = () => {
     const { user } = useUser();
 
@@ -12,7 +11,7 @@ const RoommateProfileForm = () => {
         city: '',
         state: '',
         cleanliness: '',
-        smokes: '',
+        smokes: null,
         pets: '',
         genderPreference: '',
         roomType: '',
@@ -67,7 +66,69 @@ const RoommateProfileForm = () => {
         setSubmitError('');
         setIsSubmitting(true);
 
-        // input validation error messages here
+        // input validation error messages
+        if (!formState.cleanliness) {
+            setSubmitError('Please select a cleanliness preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        // check that smokes has a value
+        if (formState.smokes === null) {
+            setSubmitError('Please select a smoking preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.pets) {
+            setSubmitError('Please select a pet preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.genderPreference) {
+            setSubmitError('Please select a gender preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.roomType) {
+            setSubmitError('Please select a room type preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!parseInt(formState.numRoommates)) {
+            setSubmitError('Please enter a number of roommates');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!parseInt(formState.leaseDuration)) {
+            setSubmitError('Please enter a lease duration');
+            setIsSubmitting(false);
+            return;
+        }
+
+
+        if (!formState.sleepSchedule) {
+            setSubmitError('Please select a sleep schedule preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.noiseTolerance) {
+            setSubmitError('Please select a noise tolerance preference');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!formState.socialness) {
+            setSubmitError('Please select a socialness preference');
+            setIsSubmitting(false);
+            return;
+        }
+
 
         try {
             const moveInDate = new Date(
@@ -488,7 +549,6 @@ const RoommateProfileForm = () => {
                             />
                         </div>
 
-
                         {submitError && (
                             <div className="error-message">{submitError}</div>
                         )}
@@ -504,7 +564,6 @@ const RoommateProfileForm = () => {
             </div>
         </div>
     </>
-
     )
 }
 
