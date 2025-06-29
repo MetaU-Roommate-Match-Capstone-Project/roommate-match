@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
 import WithAuth from '../../components/WithAuth/WithAuth';
-import './RoommateProfileForm.css';
 import { useUser } from '../../contexts/UserContext';
 
 
@@ -108,13 +107,14 @@ const RoommateProfileForm = () => {
     }
     return (
         <>
-        <div className="roommate-profile-container">
-            <div className="roommate-profile-form">
+        <div className="form-container">
+            <div className="form-card">
                 <h2>Build your roommate profile</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="city">City where you are looking to lease:</label>
+                            <label className="form-label" htmlFor="city">City where you are looking to lease:</label>
                             <input
+                                className="form-input"
                                 type="city"
                                 id="city"
                                 value={formState.city}
@@ -124,8 +124,9 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="state">State</label>
+                            <label className="form-label" htmlFor="state">State</label>
                             <input
+                                className="form-input"
                                 type="state"
                                 id="state"
                                 value={formState.state}
@@ -135,39 +136,39 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Cleanliness</label>
+                            <label className="form-label">Cleanliness</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.cleanliness === 'VERY_DIRTY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.cleanliness === 'VERY_DIRTY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('cleanliness', 'VERY_DIRTY')}
                                 >
                                     Very Dirty
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.cleanliness === 'DIRTY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.cleanliness === 'DIRTY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('cleanliness', 'DIRTY')}
                                 >
                                     Dirty
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.cleanliness === 'MEDIUM' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.cleanliness === 'MEDIUM' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('cleanliness', 'MEDIUM')}
                                 >
                                     Medium
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.cleanliness === 'CLEAN' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.cleanliness === 'CLEAN' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('cleanliness', 'CLEAN')}
                                 >
                                     Clean
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.cleanliness === 'VERY_CLEAN' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.cleanliness === 'VERY_CLEAN' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('cleanliness', 'VERY_CLEAN')}
                                 >
                                     Very Clean
@@ -176,18 +177,18 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Smokes</label>
+                            <label className="form-label">Smokes</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.smokes === true ? 'selected' : true}`}
+                                    className={`btn-option ${formState.smokes === true ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('smokes', true)}
                                 >
                                     Yes
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.smokes === false ? 'selected' : false}`}
+                                    className={`btn-option ${formState.smokes === false ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('smokes', false)}
                                 >
                                     No
@@ -196,39 +197,39 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>What pets are you comfortable with, if any?</label>
+                            <label className="form-label">What pets are you comfortable with, if any?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.pets === 'NO_PETS' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.pets === 'NO_PETS' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('pets', 'NO_PETS')}
                                 >
                                     No Pets
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.pets === 'CATS_ONLY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.pets === 'CATS_ONLY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('pets', 'CATS_ONLY')}
                                 >
                                     Cats Only
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.pets === 'DOGS_ONLY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.pets === 'DOGS_ONLY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('pets', 'DOGS_ONLY')}
                                 >
                                     Dogs Only
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.pets === 'CATS_AND_DOGS' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.pets === 'CATS_AND_DOGS' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('pets', 'CATS_AND_DOGS')}
                                 >
                                     Cats and Dogs
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.pets === 'OKAY_WITH_ANY_PET' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.pets === 'OKAY_WITH_ANY_PET' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('pets', 'OKAY_WITH_ANY_PET')}
                                 >
                                     Okay with any pet
@@ -237,32 +238,32 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>What is your gender preference for a roommate?</label>
+                            <label className="form-label">What is your gender preference for a roommate?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.genderPreference === 'NO_PREFERENCE' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.genderPreference === 'NO_PREFERENCE' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('genderPreference', 'NO_PREFERENCE')}
                                 >
                                     No Preference
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.genderPreference === 'MALE' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.genderPreference === 'MALE' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('genderPreference', 'MALE')}
                                 >
                                     Male
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.genderPreference === 'FEMALE' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.genderPreference === 'FEMALE' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('genderPreference', 'FEMALE')}
                                 >
                                     Female
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.genderPreference === 'NONBINARY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.genderPreference === 'NONBINARY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('genderPreference', 'NONBINARY')}
                                 >
                                     Non-binary
@@ -271,25 +272,25 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>What type of lease are you looking for?</label>
+                            <label className="form-label">What type of lease are you looking for?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.roomType === 'PRIVATE_ROOM_IN_APARTMENT' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.roomType === 'PRIVATE_ROOM_IN_APARTMENT' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('roomType', 'PRIVATE_ROOM_IN_APARTMENT')}
                                 >
                                     Private room in an apartment
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.roomType === 'SHARED_ROOM' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.roomType === 'SHARED_ROOM' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('roomType', 'SHARED_ROOM')}
                                 >
                                     Shared room
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.roomType === 'PRIVATE_ROOM_IN_HOUSE' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.roomType === 'PRIVATE_ROOM_IN_HOUSE' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('roomType', 'PRIVATE_ROOM_IN_HOUSE')}
                                 >
                                     Private room in a house
@@ -298,8 +299,9 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="numRoommates">How many roommates are you looking for?</label>
+                            <label className="form-label" htmlFor="numRoommates">How many roommates are you looking for?</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="numRoommates"
                                 value={formState.numRoommates}
@@ -309,43 +311,44 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Move in Date</label>
-                            <div className="move-in-date-container">
+                            <label className="form-label">Move in Date</label>
+                            <div className="date-container">
                                 <input
                                     type="text"
                                     placeholder="MM"
                                     maxLength="2"
                                     value={formState.moveInMonth}
                                     onChange={(e) => updateFormField('moveInMonth', e.target.value)}
-                                    className="move-in-input"
+                                    className="form-input-small"
                                     required
                                 />
-                                <span className="move-in-slash">/</span>
+                                <span className="date-separator">/</span>
                                 <input
                                     type="text"
                                     placeholder="DD"
                                     maxLength="2"
                                     value={formState.moveInDay}
                                     onChange={(e) => updateFormField('moveInDay', e.target.value)}
-                                    className="move-in-input"
+                                    className="form-input-small"
                                     required
                                 />
-                                <span className="move-in-slash">/</span>
+                                <span className="date-separator">/</span>
                                 <input
                                     type="text"
                                     placeholder="YYYY"
                                     maxLength="4"
                                     value={formState.moveInYear}
                                     onChange={(e) => updateFormField('moveInYear', e.target.value)}
-                                    className="move-in-input-year"
+                                    className="form-input-year"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="leaseDuration">How many months will you want to lease for?</label>
+                            <label className="form-label" htmlFor="leaseDuration">How many months will you want to lease for?</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="leaseDuration"
                                 value={formState.leaseDuration}
@@ -355,25 +358,25 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>What is your sleep schedule like?</label>
+                            <label className="form-label">What is your sleep schedule like?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.sleepSchedule === 'NO_PREFERENCE' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.sleepSchedule === 'NO_PREFERENCE' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('sleepSchedule', 'NO_PREFERENCE')}
                                 >
                                     No Preference
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.sleepSchedule === 'EARLY_RISER' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.sleepSchedule === 'EARLY_RISER' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('sleepSchedule', 'EARLY_RISER')}
                                 >
                                     Early riser
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.sleepSchedule === 'LATE_SLEEPER' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.sleepSchedule === 'LATE_SLEEPER' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('sleepSchedule', 'LATE_SLEEPER')}
                                 >
                                     Late sleeper
@@ -382,32 +385,32 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>What is your noise tolerance?</label>
+                            <label className="form-label">What is your noise tolerance?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.noiseTolerance === 'QUIET' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.noiseTolerance === 'QUIET' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('noiseTolerance', 'QUIET')}
                                 >
                                     Quiet
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.noiseTolerance === 'SOMEWHAT_QUIET' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.noiseTolerance === 'SOMEWHAT_QUIET' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('noiseTolerance', 'SOMEWHAT_QUIET')}
                                 >
                                     Somewhat Quiet
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.noiseTolerance === 'SOMEWHAT_NOISY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.noiseTolerance === 'SOMEWHAT_NOISY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('noiseTolerance', 'SOMEWHAT_NOISY')}
                                 >
                                     Somewhat Noisy
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.noiseTolerance === 'NOISY' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.noiseTolerance === 'NOISY' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('noiseTolerance', 'NOISY')}
                                 >
                                     Noisy
@@ -416,32 +419,32 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>How social are you?</label>
+                            <label className="form-label">How social are you?</label>
                             <div className="button-group">
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.socialness === 'LONER' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.socialness === 'LONER' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('socialness', 'LONER')}
                                 >
                                     Loner
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.socialness === 'SOMEWHAT_SOCIAL' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.socialness === 'SOMEWHAT_SOCIAL' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('socialness', 'SOMEWHAT_SOCIAL')}
                                 >
                                     Somewhat Social
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.socialness === 'SOCIAL' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.socialness === 'SOCIAL' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('socialness', 'SOCIAL')}
                                 >
                                     Social
                                 </button>
                                 <button
                                     type="button"
-                                    className={`option-button ${formState.socialness === 'VERY_SOCIAL' ? 'selected' : ''}`}
+                                    className={`btn-option ${formState.socialness === 'VERY_SOCIAL' ? 'btn-option-selected' : ''}`}
                                     onClick={() => updateFormField('socialness', 'VERY_SOCIAL')}
                                 >
                                     Very Social
@@ -450,8 +453,9 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="hobbies">What are some of your hobbies?</label>
+                            <label className="form-label" htmlFor="hobbies">What are some of your hobbies?</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="hobbies"
                                 value={formState.hobbies}
@@ -461,8 +465,9 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="favoriteMusic">What is your favorite music genre?</label>
+                            <label className="form-label" htmlFor="favoriteMusic">What is your favorite music genre?</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="favoriteMusic"
                                 value={formState.favoriteMusic}
@@ -472,8 +477,9 @@ const RoommateProfileForm = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="bio">Write a short bio about yourself:</label>
+                            <label className="form-label" htmlFor="bio">Write a short bio about yourself:</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="bio"
                                 value={formState.bio}
@@ -489,7 +495,7 @@ const RoommateProfileForm = () => {
 
                         <button
                             type="submit"
-                            className="submit-button"
+                            className="btn-primary"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Saving roommate profile preferences' : 'Save roommate profile preferences'}
@@ -503,4 +509,3 @@ const RoommateProfileForm = () => {
 }
 
 export default WithAuth(RoommateProfileForm);
-//export default RoommateProfileForm;

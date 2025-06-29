@@ -2,7 +2,6 @@ import React from 'react';
 import { useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
-import './Login.css';
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -68,13 +67,14 @@ const Login = () => {
 
     return (
         <>
-        <div className="login-container">
-                <div className="login-form">
+        <div className="form-container">
+                <div className="form-card">
                     <h2>Login</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="email">Email</label>
+                            <label className="form-label" htmlFor="email">Email</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="email"
                                 name="email"
@@ -85,8 +85,9 @@ const Login = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="password">Password</label>
+                            <label className="form-label" htmlFor="password">Password</label>
                             <input
+                                className="form-input"
                                 type="password"
                                 id="password"
                                 name="password"
@@ -102,7 +103,7 @@ const Login = () => {
 
                         <button
                             type="submit"
-                            className="submit-button"
+                            className="btn-primary"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Logging in...' : 'Login'}
