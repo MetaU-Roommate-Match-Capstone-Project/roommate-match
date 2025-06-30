@@ -6,26 +6,6 @@ const NavBar = () => {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
 
-    // this logout functionality is for testing purposes only
-    // it will be replaced with a real logout functionality when I have my profile page and the user will have a proper logout button within the profile page
-    const handleLogout = async () => {
-        try {
-            const response = await fetch(`/api/users/logout/${user.id}`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                setUser(null);
-                navigate('/login');
-            } else {
-                console.error('Logout failed');
-            }
-        } catch (error) {
-            console.error('Error during logout:', error);
-        }
-    };
-
     return (
         <nav className="nav-container">
             <ul className="nav-list">
@@ -44,7 +24,6 @@ const NavBar = () => {
                             <>
                                 <button className="btn-nav font-medium" onClick={() => navigate('/roommate-profile-form')}>Roomate Profile</button>
                                 <button className="btn-nav font-medium" onClick={() => navigate('/current-user-profile')}>Profile</button>
-                                <button className="btn-nav font-medium" onClick={handleLogout}>Logout</button>
                             </>
                         )}
                     </li>

@@ -6,10 +6,28 @@ import { useState, useEffect } from 'react';
 import { cleanlinessMap, petsMap, roomTypesMap, sleepScheduleMap, noiseToleranceMap, socialnessMap } from '../../utils/enums.jsx';
 
 const CurrentUserProfile = () => {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
     const navigate = useNavigate();
     const [roommateProfile, setRoommateProfile] = useState(null);
     const [error, setError] = useState('');
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`/api/users/logout/${user.id}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                setUser(null);
+                navigate('/login');
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    };
 
     // fetch user profile data from backend
     const fetchCurrentUserProfile = async () => {
@@ -111,6 +129,7 @@ const CurrentUserProfile = () => {
                         </div>
                 </div>
             </div>
+            <button className="btn-primary" onClick={handleLogout}>Logout</button>
         </>
     )
 }
