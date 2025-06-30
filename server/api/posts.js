@@ -48,4 +48,22 @@ router.post("/", async (req, res) => {
   }
 });
 
+// [GET] - get all posts
+router.get("/", async (req, res) => {
+    try {
+        const posts = await prisma.post.findMany({
+            include: {
+                user: true,
+            }
+        })
+        res.status(201).json(posts);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json("Error getting posts");
+    }
+})
+
+// [GET] - get all posts by user
+
+
 module.exports = router;
