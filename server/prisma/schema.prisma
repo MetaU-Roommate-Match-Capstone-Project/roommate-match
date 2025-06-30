@@ -77,6 +77,7 @@ model User {
   company            String
   group_id           Int              @default(0)
   roommate_profile   RoommateProfile?
+  posts              Post[]
 }
 
 model RoommateProfile {
@@ -99,4 +100,13 @@ model RoommateProfile {
   hobbies           String
   favorite_music    String
   bio               String
+}
+
+model Post {
+  id                Int              @id @default(autoincrement())
+  user              User             @relation(fields: [user_id], references: [id])
+  user_id           Int
+  city              String
+  state             String
+  content           String
 }

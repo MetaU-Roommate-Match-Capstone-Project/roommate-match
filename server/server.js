@@ -28,6 +28,9 @@ app.use("/api/users", userAuthRoutes);
 const roommateProfileRoutes = require("./api/roommateProfile.js");
 app.use("/api/roommate-profile", roommateProfileRoutes);
 
+const postRoutes = require("./api/posts.js");
+app.use("/api/post", postRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
