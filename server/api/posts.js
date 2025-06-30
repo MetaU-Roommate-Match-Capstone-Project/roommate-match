@@ -17,11 +17,7 @@ router.post("/", async (req, res) => {
         .json({ error: "You must be logged in to make a post." });
     }
 
-    const {
-        city,
-        state,
-        content
-    } = req.body;
+    const { city, state, content } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { id: req.session.userId },
@@ -32,16 +28,15 @@ router.post("/", async (req, res) => {
     }
 
     const newPost = await prisma.post.create({
-        data: {
-            user_id: req.session.userId,
-            city,
-            state,
-            content
-        },
+      data: {
+        user_id: req.session.userId,
+        city,
+        state,
+        content,
+      },
     });
 
     res.status(201).json(newPost);
-
   } catch (err) {
     console.error(err);
     res.status(500).json("Error creating post");
@@ -50,20 +45,118 @@ router.post("/", async (req, res) => {
 
 // [GET] - get all posts
 router.get("/", async (req, res) => {
-    try {
-        const posts = await prisma.post.findMany({
-            include: {
-                user: true,
-            }
-        })
-        res.status(201).json(posts);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json("Error getting posts");
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view other user's posts." });
     }
-})
+
+    const currentUserProfile = await prisma.roommateProfile.findUnique({
+      where: { user_id: req.session.userId },
+      select: { city: true, state: true },
+    });
+
+    let posts;
+
+    if (!currentUserProfile) {
+      posts = await prisma.post.findMany({
+        where: {
+          user_id: { not: req.session.userId },
+        },
+        include: {
+          user: true,
+        },
+        orderBy: [
+          {
+            id: "desc",
+          },
+        ],
+      });
+    } else {
+      // use mode: "insensitive" to match locations without case sensitivity
+      posts = await prisma.post.findMany({
+        where: {
+          city: {
+            equals: currentUserProfile.city,
+            mode: "insensitive",
+          },
+          state: {
+            equals: currentUserProfile.state,
+            mode: "insensitive",
+          },
+          user_id: { not: req.session.userId },
+        },
+        include: {
+          user: true,
+        },
+        orderBy: [
+          {
+            id: "desc",
+          },
+        ],
+      });
+    }
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Error getting posts");
+  }
+});
 
 // [GET] - get all posts by user
+router.get("/me", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view your posts." });
+    }
 
+    const userPosts = await prisma.post.findMany({
+      where: {
+        user_id: req.session.userId,
+      },
+      orderBy: [
+        {
+          id: "desc",
+        },
+      ],
+    });
+
+    if (!userPosts) {
+      return res
+        .status(404)
+        .json({ error: "User does not have any posts yet." });
+    }
+
+    res.status(200).json(userPosts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Error getting user's posts");
+  }
+});
+
+// [DELETE] - delete a post if user is signed in
+router.delete("/me/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to delete a post." });
+    }
+
+    const postId = parseInt(req.params.id);
+    const deletedPost = await prisma.post.delete({
+      where: { id: postId },
+    });
+
+    res.json(deletedPost);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Error deleting user's post");
+  }
+});
 
 module.exports = router;

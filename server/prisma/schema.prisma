@@ -105,7 +105,7 @@ model RoommateProfile {
 model Post {
   id                Int              @id @default(autoincrement())
   user              User             @relation(fields: [user_id], references: [id])
-  user_id           Int              @unique
+  user_id           Int
   city              String
   state             String
   content           String
