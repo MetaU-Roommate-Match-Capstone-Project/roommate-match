@@ -28,7 +28,7 @@ const RoommateProfileForm = () => {
         bio: ''
     });
 
-    const [submitError, setSubmitError] = useState('');
+    const [submitError, setSubmitError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const createRoommateProfile = async (userData) => {
@@ -63,7 +63,7 @@ const RoommateProfileForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitError('');
+        setSubmitError(null);
         setIsSubmitting(true);
 
         // input validation error messages
