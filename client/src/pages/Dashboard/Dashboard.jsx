@@ -1,14 +1,14 @@
-import React from 'react';
-import { useUser } from '../../contexts/UserContext';
+import React from "react";
+import { useUser } from "../../contexts/UserContext";
 
 const Dashboard = () => {
-    const { user } = useUser();
+  const { user } = useUser();
 
-    if (!user) {
-        return;
-    }
-
+  if (!user) {
     return;
-}
+  }
+
+  return;
+};
 
 export default Dashboard;
