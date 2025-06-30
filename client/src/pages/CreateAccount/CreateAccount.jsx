@@ -24,7 +24,7 @@ const CreateAccount = () => {
 
     const [step, setStep] = useState(1);
     const [passwordError, setPasswordError] = useState('');
-    const [submitError, setSubmitError] = useState('');
+    const [submitError, setSubmitError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const createUser = async (userData) => {
@@ -71,7 +71,7 @@ const CreateAccount = () => {
 
     const handleFinalSubmit = async (e) => {
         e.preventDefault();
-        setSubmitError('');
+        setSubmitError(null);
         setIsSubmitting(true);
 
         // error messages for buttons not being selected because no required attribute for buttons

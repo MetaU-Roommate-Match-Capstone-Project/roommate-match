@@ -5,7 +5,7 @@ import { useUser } from '../../contexts/UserContext';
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [submitError, setSubmitError] = useState('');
+    const [submitError, setSubmitError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { setUser } = useUser();
     const navigate = useNavigate();
@@ -45,7 +45,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitError('');
+        setSubmitError(null);
         setIsSubmitting(true);
 
         try {
