@@ -47,6 +47,27 @@ body {
   @apply bg-[#6D9DC5] text-white;
 }
 
+.profile-container {
+  @apply flex justify-center items-start min-h-[calc(100vh-4rem)] p-6 pt-8;
+}
+
+.profile-card {
+  @apply bg-white p-8 rounded shadow-2xl;
+  min-height: 80vh;
+}
+
+.profile-details {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mt-6;
+}
+
+.profile-details p {
+  @apply text-lg font-normal text-gray-800 mb-2 p-4 bg-gray-50 rounded-lg border-l-4 border-[#3066BE];
+}
+
+.profile-details strong {
+  @apply text-[#3066BE] font-semibold;
+}
+
 .form-container {
   @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
 }
@@ -116,11 +137,20 @@ h1 {
 }
 
 h2 {
-  @apply text-3xl text-black mb-6;
+  @apply text-3xl font-bold text-black mb-6;
 }
 
 a {
   @apply font-medium text-blue-600 no-underline hover:text-blue-700 transition-colors;
+}
+
+p {
+  @apply text-2xl font-medium text-black mb-6;
+
+}
+
+hr {
+  @apply border-t-2 border-[#3066BE] my-8;
 }
 
 /* Utility classes for components */
@@ -141,6 +171,11 @@ a {
 }
 
 .footer {
-  @apply w-screen py-5 text-white bg-[#3066BE] text-center mt-12 font-medium;
+  @apply w-screen py-5 bg-[#3066BE] text-center font-medium;
   margin-left: calc(-50vw + 50%);
+}
+
+.footer-text-important {
+  color: white !important;
+  font-size: 16px;
 }
