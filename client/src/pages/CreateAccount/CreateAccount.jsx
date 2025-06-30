@@ -94,6 +94,12 @@ const CreateAccount = () => {
             return;
         }
 
+        // validate date of birth year
+        if (parseInt(formState.dobYear) <= 1920) {
+            setSubmitError('Birth year must be after 1920');
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             const dobDate = new Date(
@@ -101,6 +107,7 @@ const CreateAccount = () => {
                 parseInt(formState.dobMonth) - 1,
                 parseInt(formState.dobDay)
             );
+
             const dob = dobDate.toISOString();
 
             const userData = {

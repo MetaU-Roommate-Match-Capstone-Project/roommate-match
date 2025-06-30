@@ -129,13 +129,21 @@ const RoommateProfileForm = () => {
             return;
         }
 
-
         try {
             const moveInDate = new Date(
                 parseInt(formState.moveInYear),
                 parseInt(formState.moveInMonth) - 1,
                 parseInt(formState.moveInDay)
             );
+
+            // check that move in date is in the future (not before date user fills out form)
+            let today = new Date();
+            if (moveInDate < today) {
+                setSubmitError('Please select a valid move in date');
+                setIsSubmitting(false);
+                return;
+            }
+
             const moveIn = moveInDate.toISOString();
 
             const userData = {
@@ -166,6 +174,7 @@ const RoommateProfileForm = () => {
             setIsSubmitting(false);
         }
     }
+
     return (
         <>
         <div className="form-container">
