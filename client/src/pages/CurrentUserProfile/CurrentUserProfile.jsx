@@ -104,6 +104,8 @@ const CurrentUserProfile = () => {
     let userNoiseTolerance = noiseToleranceMap[roommateProfile.noise_tolerance];
     let userSocialness = socialnessMap[roommateProfile.socialness];
     let favoriteMusic = roommateProfile.favorite_music;
+    let status = roommateProfile.user.intern_or_new_grad;
+    let budget = roommateProfile.user.budget_max;
 
     // render user profile if user already logged in + created one in /roommate-profile-form
     return (
@@ -113,6 +115,10 @@ const CurrentUserProfile = () => {
                     <h2>{roommateProfile.user.name}'s Profile</h2>
                         <div className="profile-details">
                             <p><strong>Location: </strong> {roommateProfile.city}, {roommateProfile.state}</p>
+                            <p><strong>Company: </strong> {roommateProfile.user.company}</p>
+                            <p><strong>University: </strong> {roommateProfile.user.university}</p>
+                            <p><strong>Status: </strong> {status}</p>
+                            <p><strong>Budget: </strong> ${budget}.00</p>
                             <p><strong>Cleanliness: </strong> {userCleanliness}</p>
                             <p><strong>Smokes: </strong>{roommateProfile.smoke ? 'Yes' : 'No'}</p>
                             <p><strong>Pets: </strong> {userPets}</p>
