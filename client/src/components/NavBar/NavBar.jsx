@@ -11,9 +11,6 @@ const NavBar = () => {
       <ul className="nav-list">
         <li className="nav-left">
           <button className="btn-nav font-bold" onClick={() => navigate("/")}>
-            App Logo
-          </button>
-          <button className="btn-nav font-bold" onClick={() => navigate("/")}>
             Roomify
           </button>
         </li>
