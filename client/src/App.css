@@ -89,7 +89,15 @@ body {
 }
 
 .post-content {
-  @apply text-gray-800 leading-relaxed text-left line-clamp-4;
+  @apply text-gray-800 leading-relaxed text-left;
+}
+
+.delete-btn {
+  @apply absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded text-lg flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer border-none;
+}
+
+.delete-btn:hover {
+  @apply shadow-md;
 }
 
 .form-container {
