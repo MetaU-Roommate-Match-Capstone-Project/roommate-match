@@ -38,7 +38,7 @@ const Dashboard = () => {
       return;
     }
     fetchPosts();
-  }, [user]);
+  }, [user], posts);
 
   return (
     <>

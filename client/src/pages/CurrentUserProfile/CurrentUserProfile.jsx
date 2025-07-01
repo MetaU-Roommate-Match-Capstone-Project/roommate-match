@@ -16,6 +16,7 @@ const CurrentUserProfile = () => {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
   const [roommateProfile, setRoommateProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
 
   const handleLogout = async () => {
@@ -72,12 +73,35 @@ const CurrentUserProfile = () => {
     }
   };
 
+  // fetch user posts
+  const fetchUserPosts = async () => {
+    try {
+      const response = await fetch("/api/post/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorInfo = await response.json();
+        throw new Error(errorInfo.error || "Failed to fetch user posts");
+      }
+      const currentUserPosts = await response.json();
+      setPosts(currentUserPosts);
+    } catch (error) {
+      console.error("Error fetching user posts: ", error);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       return;
     }
     fetchCurrentUserProfile();
-  }, [user]);
+    fetchUserPosts();
+  }, [user], posts);
 
   // render error message if user has not created a profile yet
   if (error) {
@@ -190,6 +214,23 @@ const CurrentUserProfile = () => {
             </p>
           </div>
         </div>
+      </div>
+      <div className="post-container">
+        {posts.length === 0 ? (
+          <p>No posts available.</p>
+        ) : (
+          posts.map((post) => (
+            <div key={post.id} className="post-card">
+              <div className="post-header">
+                <p className="post-username">{post.user.name}</p>
+              </div>
+              <p className="post-location">
+                📍{post.city}, {post.state}
+              </p>
+              <p className="post-content">{post.content}</p>
+            </div>
+          ))
+        )}
       </div>
       <button className="btn-primary" onClick={handleLogout}>
         Logout
