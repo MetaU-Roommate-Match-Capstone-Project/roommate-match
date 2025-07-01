@@ -118,6 +118,9 @@ router.get("/me", async (req, res) => {
       where: {
         user_id: req.session.userId,
       },
+      include: {
+        user: true,
+      },
       orderBy: [
         {
           id: "desc",
