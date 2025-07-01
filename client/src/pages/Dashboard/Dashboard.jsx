@@ -26,19 +26,22 @@ const Dashboard = () => {
       const postsFetched = await response.json();
       setPosts(postsFetched);
       setError(null);
-
     } catch (error) {
       console.error("Error fetching posts: ", error);
       setError(error.message);
     }
   };
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    fetchPosts();
-  }, [user], posts);
+  useEffect(
+    () => {
+      if (!user) {
+        return;
+      }
+      fetchPosts();
+    },
+    [user],
+    posts,
+  );
 
   return (
     <>

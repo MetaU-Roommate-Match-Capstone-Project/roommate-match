@@ -100,27 +100,31 @@ const CurrentUserProfile = () => {
       method: "DELETE",
       credentials: "include",
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Failed to delete post, error: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      setPosts(posts.filter(post => post.id !== postId));
-    })
-    .catch(error => {
-      console.error("Error deleting post:", error);
-    })
-  }
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to delete post, error: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPosts(posts.filter((post) => post.id !== postId));
+      })
+      .catch((error) => {
+        console.error("Error deleting post:", error);
+      });
+  };
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    fetchCurrentUserProfile();
-    fetchUserPosts();
-  }, [user], posts);
+  useEffect(
+    () => {
+      if (!user) {
+        return;
+      }
+      fetchCurrentUserProfile();
+      fetchUserPosts();
+    },
+    [user],
+    posts,
+  );
 
   // render error message if user has not created a profile yet
   if (error) {
@@ -254,7 +258,12 @@ const CurrentUserProfile = () => {
             ) : (
               posts.map((post) => (
                 <div key={post.id} className="post-card">
-                  <button className="delete-btn" onClick={() => deletePost(post.id)}>×</button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deletePost(post.id)}
+                  >
+                    ×
+                  </button>
                   <div className="post-header">
                     <p className="post-username">{post.user.name}</p>
                   </div>
@@ -276,7 +285,10 @@ const CurrentUserProfile = () => {
       </div>
 
       <section className="text-center pb-8">
-        <button className="btn-primary text-lg px-8 py-4" onClick={handleLogout}>
+        <button
+          className="btn-primary text-lg px-8 py-4"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </section>
