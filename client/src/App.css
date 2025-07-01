@@ -177,7 +177,7 @@ body {
 }
 
 #root {
-  @apply max-w-screen-xl mx-auto p-8 text-center;
+  @apply max-w-screen-xl mx-auto px-8 pt-8 text-center;
 }
 
 main {
