@@ -202,4 +202,33 @@ router.get("/", async (req, res) => {
   }
 });
 
+// [GET] - get a roommate profile by id
+router.get("/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view another user's profile."})
+    }
+    const otherUserId = parseInt(req.params.id);
+    const otherUserProfile = await prisma.roommateProfile.findUnique({
+      where: {
+        user_id: otherUserId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!otherUserProfile) {
+      return res.status(404).json({ error: "Roommate profile not found" });
+    }
+
+    res.status(200).json(otherUserProfile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Error fetching roommate profile");
+  }
+});
+
 module.exports = router;
