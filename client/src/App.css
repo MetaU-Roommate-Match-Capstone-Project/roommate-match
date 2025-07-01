@@ -47,6 +47,22 @@ body {
   @apply bg-[#6D9DC5] text-white;
 }
 
+.modal-overlay {
+  @apply fixed flex top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.3)] z-50 justify-center items-center;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative;
+}
+
+.new-post-modal {
+  @apply p-6;
+}
+
+.modal-flex-container {
+  @apply flex justify-between items-center mb-6;
+}
+
 .profile-container {
   @apply flex justify-center items-start min-h-[calc(100vh-4rem)] p-6 pt-8;
 }
@@ -92,11 +108,11 @@ body {
   @apply text-gray-800 leading-relaxed text-left;
 }
 
-.delete-btn {
+.x-btn {
   @apply absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded text-lg flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer border-none;
 }
 
-.delete-btn:hover {
+.x-btn:hover {
   @apply shadow-md;
 }
 
@@ -117,7 +133,11 @@ body {
 }
 
 .form-input {
-  @apply w-full p-3 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
+  @apply w-full p-4 border-2 border-gray-300 rounded-lg text-base transition-all bg-white text-black focus:outline-none focus:border-[#3066BE] focus:ring-2 focus:ring-[#3066BE]/20 hover:border-gray-400;
+}
+
+.form-textarea {
+  @apply w-full p-4 border-2 border-gray-300 rounded-lg text-base transition-all bg-white text-black focus:outline-none focus:border-[#3066BE] focus:ring-2 focus:ring-[#3066BE]/20 hover:border-gray-400 resize-none min-h-[120px];
 }
 
 .form-input-small {
