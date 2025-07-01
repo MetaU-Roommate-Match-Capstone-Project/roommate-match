@@ -1,6 +1,7 @@
 import React from "react";
 import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
+import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
@@ -16,6 +17,7 @@ const CurrentUserProfile = () => {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
   const [roommateProfile, setRoommateProfile] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
 
@@ -95,6 +97,29 @@ const CurrentUserProfile = () => {
     }
   };
 
+  const createPost = async (postContent) => {
+    try {
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postContent),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorInfo = await response.json();
+        throw new Error(errorInfo.error || "Failed to create post");
+      }
+
+      const newPost = await response.json();
+      setPosts([newPost, ...posts]);
+    } catch (error) {
+      console.error("Error creating post: ", error);
+    }
+  };
+
   const deletePost = async (postId) => {
     fetch(`/api/post/me/${postId}`, {
       method: "DELETE",
@@ -153,6 +178,18 @@ const CurrentUserProfile = () => {
       </div>
     );
   }
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmit = async (postContent) => {
+    await createPost(postContent);
+  };
 
   let userCleanliness = cleanlinessMap[roommateProfile.cleanliness];
   let userPets = petsMap[roommateProfile.pets];
@@ -258,10 +295,7 @@ const CurrentUserProfile = () => {
             ) : (
               posts.map((post) => (
                 <div key={post.id} className="post-card">
-                  <button
-                    className="delete-btn"
-                    onClick={() => deletePost(post.id)}
-                  >
+                  <button className="x-btn" onClick={() => deletePost(post.id)}>
                     ×
                   </button>
                   <div className="post-header">
@@ -276,6 +310,14 @@ const CurrentUserProfile = () => {
             )}
           </div>
         </div>
+        <button className="btn-primary mt-8" onClick={openModal}>
+          + Create a New Post
+        </button>
+        <NewPostModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSubmit={handleSubmit}
+        ></NewPostModal>
       </section>
 
       <div className="flex justify-center mb-8">

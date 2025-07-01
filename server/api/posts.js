@@ -34,6 +34,9 @@ router.post("/", async (req, res) => {
         state,
         content,
       },
+      include: {
+        user: true,
+      },
     });
 
     res.status(201).json(newPost);
