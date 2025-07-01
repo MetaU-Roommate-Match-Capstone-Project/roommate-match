@@ -5,7 +5,7 @@ const Footer = () => {
     <>
       <footer className="footer">
         <p className="footer-text-important">
-          Copyright © 2025. Created by Isabella Marin.
+          © 2025 Roomify, Inc. All rights reserved.
         </p>
       </footer>
     </>

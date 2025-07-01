@@ -222,7 +222,7 @@ hr {
 }
 
 .footer {
-  @apply w-screen py-5 bg-[#3066BE] text-center font-medium;
+  @apply w-screen pt-5 bg-[#3066BE] text-center font-medium;
   margin-left: calc(-50vw + 50%);
 }
 
