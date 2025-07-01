@@ -38,6 +38,12 @@ const NavBar = () => {
               <>
                 <button
                   className="btn-nav font-medium"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Posts
+                </button>
+                <button
+                  className="btn-nav font-medium"
                   onClick={() =>
                     navigate(
                       hasRoommateProfile

@@ -68,6 +68,30 @@ body {
   @apply text-[#3066BE] font-semibold;
 }
 
+.post-container {
+  @apply flex flex-wrap;
+}
+
+.post-card {
+  @apply m-4 p-6 shadow-lg rounded-xl flex flex-col w-full relative border border-[#3066BE];
+}
+
+.post-header {
+  @apply w-full flex justify-start items-center mb-4 border-b border-gray-100;
+}
+
+.post-username {
+  @apply text-lg font-bold text-[#3066BE];
+}
+
+.post-location {
+  @apply text-sm text-gray-600 font-medium mb-3 flex items-center gap-1;
+}
+
+.post-content {
+  @apply text-gray-800 leading-relaxed text-left line-clamp-4;
+}
+
 .form-container {
   @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
 }
