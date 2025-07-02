@@ -206,11 +206,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     if (!req.session.userId) {
-      return res
-        .status(401)
-        .json({
-          error: "You must be logged in to view another user's profile.",
-        });
+      return res.status(401).json({
+        error: "You must be logged in to view another user's profile.",
+      });
     }
     const otherUserId = parseInt(req.params.id);
     const otherUserProfile = await prisma.roommateProfile.findUnique({

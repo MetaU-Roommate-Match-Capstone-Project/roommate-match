@@ -208,9 +208,17 @@ const CurrentUserProfile = () => {
   return (
     <div>
       <section>
-        <div className="profile-container">
-          <div className="profile-card">
-            <h2>{roommateProfile.user.name}</h2>
+        <div className="profile-header">
+          <h1>{roommateProfile.user.name}</h1>
+        </div>
+
+        <div className="profile-main">
+          <div className="profile-col">
+            <img
+              className="profile-image"
+              src="https://picsum.photos/200/300"
+              alt="profile-picture"
+            />
             <div className="profile-details">
               <p>
                 <strong>Location: </strong> {roommateProfile.city},{" "}
@@ -228,6 +236,12 @@ const CurrentUserProfile = () => {
               <p>
                 <strong>Budget: </strong> ${budget}.00
               </p>
+            </div>
+          </div>
+
+          <div className="profile-col">
+            <h3 className="title">Roommate Preferences</h3>
+            <div className="profile-details">
               <p>
                 <strong>Cleanliness: </strong> {userCleanliness}
               </p>
@@ -250,7 +264,7 @@ const CurrentUserProfile = () => {
               </p>
               <p>
                 <strong>Lease Duration: </strong>
-                {leaseDuration}
+                {leaseDuration} months
               </p>
               <p>
                 <strong>Sleep Schedule: </strong> {userSleepSchedule}
@@ -285,8 +299,8 @@ const CurrentUserProfile = () => {
       </div>
 
       <section className="mb-12">
-        <div className="profile-card">
-          <h2>My Posts</h2>
+        <div>
+          <h3 className="title">My Posts</h3>
           <div className="post-container">
             {posts.length === 0 ? (
               <div className="text-center py-12">
