@@ -226,7 +226,7 @@ const CurrentUserProfile = () => {
                 <strong>Status: </strong> {status}
               </p>
               <p>
-                <strong>Budget: </strong> ${budget}.00
+                <strong>Budget: </strong> ${budget}
               </p>
               <p>
                 <strong>Cleanliness: </strong> {userCleanliness}

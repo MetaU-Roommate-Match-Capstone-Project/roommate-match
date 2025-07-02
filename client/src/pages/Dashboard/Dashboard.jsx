@@ -66,7 +66,6 @@ const Dashboard = () => {
         return;
       }
       fetchPosts();
-      fetchUserProfile();
     },
     [user],
     posts,
