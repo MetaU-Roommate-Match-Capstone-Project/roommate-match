@@ -4,19 +4,22 @@ import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
 import RoommateAttributes from "../../components/RoommateAttributes/RoommateAttributes.jsx";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getBasicUserInfo,
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
+import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 
 const CurrentUserProfile = () => {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
   const [roommateProfile, setRoommateProfile] = useState(null);
+  const [profilePicture, setProfilePicture] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -34,10 +37,77 @@ const CurrentUserProfile = () => {
     }
   };
 
+  // fetch user profile picture from backend
+  const fetchUserProfilePicture = async (
+    url,
+    method = "GET",
+    credentials = "include",
+    body = null,
+  ) => {
+    try {
+      const options = {
+        method,
+        credentials,
+      };
+
+      if (body) {
+        options.body = body;
+      }
+
+      const response = await fetch(url, options);
+
+      return response;
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const fetchProfilePicture = async () => {
+    try {
+      const imageToDisplay = await fetchUserProfilePicture(
+        `/api/roommate-profile/profile-picture/${user.id}`,
+        "GET",
+        "include",
+        null,
+      );
+
+      if (imageToDisplay.ok) {
+        const imageBlob = await imageToDisplay.blob();
+        setProfilePicture(URL.createObjectURL(imageBlob));
+      } else {
+        setProfilePicture("");
+      }
+    } catch (error) {
+      setProfilePicture("");
+    }
+  };
+
+  const handleProfilePictureChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+      await fetchUserProfilePicture(
+        `/api/roommate-profile/profile-picture/${user.id}`,
+        "PUT",
+        "include",
+        formData,
+      );
+      fetchProfilePicture();
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  };
+
   // fetch user profile data from backend
   const fetchCurrentUserProfile = async () => {
     try {
-      setError("");
+      setError(null);
       const response = await fetch("/api/roommate-profile/me", {
         method: "GET",
         headers: {
@@ -140,9 +210,11 @@ const CurrentUserProfile = () => {
       }
       fetchCurrentUserProfile();
       fetchUserPosts();
+      fetchProfilePicture();
     },
     [user],
     posts,
+    profilePicture,
   );
 
   // render error message if user has not created a profile yet
@@ -201,12 +273,27 @@ const CurrentUserProfile = () => {
           <div className="profile-col">
             <img
               className="profile-image"
-              src="https://picsum.photos/200/300"
+              src={profilePicture ? profilePicture : fallbackProfilePic}
               alt="profile-picture"
             />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfilePictureChange}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="btn-primary mb-6"
+            >
+              Change Profile Picture
+            </button>
             <div className="profile-details">
-              {basicUserInfo.map((preference) => (
+              {basicUserInfo.map((preference, index) => (
                 <RoommateAttributes
+                  key={index}
                   attribute={preference.attribute}
                   value={preference.value}
                 />
@@ -217,8 +304,9 @@ const CurrentUserProfile = () => {
           <div className="profile-col">
             <h3 className="title">Roommate Preferences</h3>
             <div className="profile-details">
-              {roommatePreferencesInfo.map((preference) => (
+              {roommatePreferencesInfo.map((preference, index) => (
                 <RoommateAttributes
+                  key={index}
                   attribute={preference.attribute}
                   value={preference.value}
                 />

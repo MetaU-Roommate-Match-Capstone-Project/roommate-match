@@ -31,6 +31,4 @@ app.use("/api/roommate-profile", roommateProfileRoutes);
 const postRoutes = require("./api/posts.js");
 app.use("/api/post", postRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT);
