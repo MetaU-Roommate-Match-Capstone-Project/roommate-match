@@ -2,16 +2,13 @@ import React from "react";
 import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
+import RoommateAttributes from "../../components/RoommateAttributes/RoommateAttributes.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
-  cleanlinessMap,
-  petsMap,
-  roomTypesMap,
-  sleepScheduleMap,
-  noiseToleranceMap,
-  socialnessMap,
-} from "../../utils/enums.jsx";
+  getBasicUserInfo,
+  getUserRoommatePreferencesInfo,
+} from "../../utils/profileAttributes.js";
 
 const CurrentUserProfile = () => {
   const { user, setUser } = useUser();
@@ -31,11 +28,9 @@ const CurrentUserProfile = () => {
       if (response.ok) {
         setUser(null);
         navigate("/login");
-      } else {
-        console.error("Logout failed");
       }
     } catch (error) {
-      console.error("Error during logout:", error);
+      setError(error.message);
     }
   };
 
@@ -70,7 +65,6 @@ const CurrentUserProfile = () => {
       const currentUserProfile = await response.json();
       setRoommateProfile(currentUserProfile);
     } catch (error) {
-      console.error("Error fetching currently signed in user profile: ", error);
       setError(error.message);
     }
   };
@@ -93,7 +87,7 @@ const CurrentUserProfile = () => {
       const currentUserPosts = await response.json();
       setPosts(currentUserPosts);
     } catch (error) {
-      console.error("Error fetching user posts: ", error);
+      setError(error.message);
     }
   };
 
@@ -116,7 +110,7 @@ const CurrentUserProfile = () => {
       const newPost = await response.json();
       setPosts([newPost, ...posts]);
     } catch (error) {
-      console.error("Error creating post: ", error);
+      setError(error.message);
     }
   };
 
@@ -135,7 +129,7 @@ const CurrentUserProfile = () => {
         setPosts(posts.filter((post) => post.id !== postId));
       })
       .catch((error) => {
-        console.error("Error deleting post:", error);
+        setError(error.message);
       });
   };
 
@@ -191,18 +185,9 @@ const CurrentUserProfile = () => {
     await createPost(postContent);
   };
 
-  let userCleanliness = cleanlinessMap[roommateProfile.cleanliness];
-  let userPets = petsMap[roommateProfile.pets];
-  let userRoomType = roomTypesMap[roommateProfile.room_type];
-  let numRoommates = roommateProfile.num_roommates;
-  let leaseDuration = roommateProfile.lease_duration;
-  let moveInDate = new Date(roommateProfile.move_in_date).toLocaleDateString();
-  let userSleepSchedule = sleepScheduleMap[roommateProfile.sleep_schedule];
-  let userNoiseTolerance = noiseToleranceMap[roommateProfile.noise_tolerance];
-  let userSocialness = socialnessMap[roommateProfile.socialness];
-  let favoriteMusic = roommateProfile.favorite_music;
-  let status = roommateProfile.user.intern_or_new_grad;
-  let budget = roommateProfile.user.budget_max;
+  const basicUserInfo = getBasicUserInfo(roommateProfile);
+  const roommatePreferencesInfo =
+    getUserRoommatePreferencesInfo(roommateProfile);
 
   // render user profile if user already logged in + created one in /roommate-profile-form
   return (
@@ -220,73 +205,24 @@ const CurrentUserProfile = () => {
               alt="profile-picture"
             />
             <div className="profile-details">
-              <p>
-                <strong>Location: </strong> {roommateProfile.city},{" "}
-                {roommateProfile.state}
-              </p>
-              <p>
-                <strong>Company: </strong> {roommateProfile.user.company}
-              </p>
-              <p>
-                <strong>University: </strong> {roommateProfile.user.university}
-              </p>
-              <p>
-                <strong>Status: </strong> {status}
-              </p>
-              <p>
-                <strong>Budget: </strong> ${budget}.00
-              </p>
+              {basicUserInfo.map((preference) => (
+                <RoommateAttributes
+                  attribute={preference.attribute}
+                  value={preference.value}
+                />
+              ))}
             </div>
           </div>
 
           <div className="profile-col">
             <h3 className="title">Roommate Preferences</h3>
             <div className="profile-details">
-              <p>
-                <strong>Cleanliness: </strong> {userCleanliness}
-              </p>
-              <p>
-                <strong>Smokes: </strong>
-                {roommateProfile.smoke ? "Yes" : "No"}
-              </p>
-              <p>
-                <strong>Pets: </strong> {userPets}
-              </p>
-              <p>
-                <strong>Room Type: </strong> {userRoomType}
-              </p>
-              <p>
-                <strong>Number of Roommates I am looking for: </strong>{" "}
-                {numRoommates}
-              </p>
-              <p>
-                <strong>Move In Date: </strong> {moveInDate}
-              </p>
-              <p>
-                <strong>Lease Duration: </strong>
-                {leaseDuration} months
-              </p>
-              <p>
-                <strong>Sleep Schedule: </strong> {userSleepSchedule}
-              </p>
-              <p>
-                <strong>Noise Tolerance: </strong> {userNoiseTolerance}
-              </p>
-              <p>
-                <strong>Socialness: </strong> {userSocialness}
-              </p>
-              <p>
-                <strong>Hobbies: </strong>
-                {roommateProfile.hobbies}
-              </p>
-              <p>
-                <strong>Favorite Music: </strong>
-                {favoriteMusic}
-              </p>
-              <p>
-                <strong>Bio: </strong>
-                {roommateProfile.bio}
-              </p>
+              {roommatePreferencesInfo.map((preference) => (
+                <RoommateAttributes
+                  attribute={preference.attribute}
+                  value={preference.value}
+                />
+              ))}
             </div>
           </div>
         </div>

@@ -142,7 +142,6 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(newRoommateProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error creating roommate profile");
   }
 });
@@ -182,7 +181,6 @@ router.get("/me", async (req, res) => {
 
     res.status(200).json(roommateProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching roommate profile");
   }
 });
@@ -197,7 +195,6 @@ router.get("/", async (req, res) => {
     });
     res.status(200).json(roommateProfiles);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching all roommate profiles");
   }
 });
@@ -226,7 +223,6 @@ router.get("/:id", async (req, res) => {
 
     res.status(200).json(otherUserProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching roommate profile");
   }
 });

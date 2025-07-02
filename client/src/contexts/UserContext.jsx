@@ -27,7 +27,6 @@ export const UserProvider = ({ children }) => {
         setHasRoommateProfile(false);
       }
     } catch (error) {
-      console.error("Error checking if user has roommate profile:", error);
       setHasRoommateProfile(false);
     }
   };
