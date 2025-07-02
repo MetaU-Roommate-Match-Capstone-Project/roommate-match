@@ -7,6 +7,9 @@ const cors = require("cors");
 router.use(helmet());
 router.use(express.json());
 router.use(cors());
+const multer = require("multer");
+const multerStorage = multer.memoryStorage();
+const upload = multer(multerStorage);
 
 // [POST] - create a new roommate profile
 router.post("/", async (req, res) => {
@@ -142,7 +145,6 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(newRoommateProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error creating roommate profile");
   }
 });
@@ -182,7 +184,6 @@ router.get("/me", async (req, res) => {
 
     res.status(200).json(roommateProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching roommate profile");
   }
 });
@@ -197,7 +198,6 @@ router.get("/", async (req, res) => {
     });
     res.status(200).json(roommateProfiles);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching all roommate profiles");
   }
 });
@@ -206,11 +206,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     if (!req.session.userId) {
-      return res
-        .status(401)
-        .json({
-          error: "You must be logged in to view another user's profile.",
-        });
+      return res.status(401).json({
+        error: "You must be logged in to view another user's profile.",
+      });
     }
     const otherUserId = parseInt(req.params.id);
     const otherUserProfile = await prisma.roommateProfile.findUnique({
@@ -228,9 +226,76 @@ router.get("/:id", async (req, res) => {
 
     res.status(200).json(otherUserProfile);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error fetching roommate profile");
   }
 });
+
+// [GET] - get profile picture by user id
+router.get("/profile-picture/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to see your profile picture" });
+    }
+
+    const userId = parseInt(req.params.id);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { profile_picture: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.profile_picture) {
+      return res.status(404).json({ error: "No profile picture found" });
+    }
+
+    res.set("Content-Type", "image/*");
+    res.send(user.profile_picture);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching profile picture" });
+  }
+});
+
+// [PUT] - upload a different profile picture
+router.put(
+  "/profile-picture/:id",
+  upload.single("profilePicture"),
+  async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({
+          error: "You must be logged in to upload a profile picture ",
+        });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const buffer = req.file.buffer;
+      const user = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const updatedProfilePicture = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profile_picture: buffer,
+        },
+      });
+      res.status(200).json(updatedProfilePicture);
+    } catch (error) {
+      res.status(500).json({ error: "Error uploading profile picture" });
+    }
+  },
+);
 
 module.exports = router;

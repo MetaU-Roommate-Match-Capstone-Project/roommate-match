@@ -38,7 +38,6 @@ const Login = () => {
 
       return data;
     } catch (error) {
-      console.error("Error logging in user:", error);
       throw error;
     }
   };

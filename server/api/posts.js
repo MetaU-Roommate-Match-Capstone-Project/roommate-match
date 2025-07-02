@@ -41,7 +41,6 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(newPost);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error creating post");
   }
 });
@@ -103,7 +102,6 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(posts);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error getting posts");
   }
 });
@@ -139,7 +137,6 @@ router.get("/me", async (req, res) => {
 
     res.status(200).json(userPosts);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error getting user's posts");
   }
 });
@@ -160,7 +157,6 @@ router.delete("/me/:id", async (req, res) => {
 
     res.json(deletedPost);
   } catch (err) {
-    console.error(err);
     res.status(500).json("Error deleting user's post");
   }
 });

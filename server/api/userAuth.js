@@ -85,7 +85,6 @@ router.post("/create-account", async (req, res) => {
     });
     res.status(201).json({ newUser });
   } catch (err) {
-    console.error(err);
     res
       .status(500)
       .json({ error: "Something went wrong during account creation." });
@@ -122,7 +121,6 @@ router.post("/login", async (req, res) => {
 
     res.json({ id: user.id, username: user.email });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Something went wrong during login." });
   }
 });
@@ -162,7 +160,6 @@ router.get("/me", async (req, res) => {
     });
     res.json({ id: req.session.userId, username: user.email });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Error fetching user session data." });
   }
 });
@@ -176,7 +173,6 @@ router.delete("/delete-account/:id", async (req, res) => {
     });
     res.json({ deletedUser });
   } catch (err) {
-    console.error(err);
     res
       .status(500)
       .json({ error: "Something went wrong during account deletion." });

@@ -27,7 +27,6 @@ const Dashboard = () => {
       setPosts(postsFetched);
       setError(null);
     } catch (error) {
-      console.error("Error fetching posts: ", error);
       setError(error.message);
     }
   };
