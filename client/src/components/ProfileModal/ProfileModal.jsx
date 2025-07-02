@@ -76,7 +76,7 @@ const ProfileModal = ({ userProfile, onClose }) => {
                   </p>
                   <p>
                     <strong>Lease Duration: </strong>
-                    {leaseDuration}
+                    {leaseDuration} months
                   </p>
                   <p>
                     <strong>Sleep Schedule: </strong> {userSleepSchedule}
