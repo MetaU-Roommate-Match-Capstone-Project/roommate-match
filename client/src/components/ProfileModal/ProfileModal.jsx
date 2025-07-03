@@ -7,62 +7,9 @@ import RoommateAttributes from "../RoommateAttributes/RoommateAttributes.jsx";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 
 const ProfileModal = ({ userProfile, onClose }) => {
-  const [profilePicture, setProfilePicture] = useState("");
-  const [error, setError] = useState(null);
-
   if (!userProfile) {
     return null;
   }
-
-  // fetch user profile picture from backend
-  const fetchUserProfilePicture = async (
-    url,
-    method = "GET",
-    credentials = "include",
-    body = null,
-  ) => {
-    try {
-      const options = {
-        method,
-        credentials,
-      };
-
-      if (body) {
-        options.body = body;
-      }
-
-      const response = await fetch(url, options);
-      return response;
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const fetchProfilePicture = async () => {
-    try {
-      const imageToDisplay = await fetchUserProfilePicture(
-        `/api/roommate-profile/profile-picture/${userProfile.user.id}`,
-        "GET",
-        "include",
-        null,
-      );
-
-      if (imageToDisplay && imageToDisplay.ok) {
-        const imageBlob = await imageToDisplay.blob();
-        setProfilePicture(URL.createObjectURL(imageBlob));
-      } else {
-        setProfilePicture("");
-      }
-    } catch (error) {
-      setProfilePicture("");
-    }
-  };
-
-  useEffect(() => {
-    if (userProfile?.user?.id) {
-      fetchProfilePicture();
-    }
-  }, [userProfile]);
 
   const basicUserInfo = getBasicUserInfo(userProfile);
   const roommatePreferencesInfo = getUserRoommatePreferencesInfo(userProfile);
@@ -82,8 +29,11 @@ const ProfileModal = ({ userProfile, onClose }) => {
             <div className="profile-col">
               <img
                 className="profile-image"
-                src={profilePicture ? profilePicture : fallbackProfilePic}
+                src={`/api/roommate-profile/profile-picture/${userProfile.user.id}`}
                 alt="profile-picture"
+                onError={(e) => {
+                  e.target.src = fallbackProfilePic;
+                }}
               />
               <div className="profile-details">
                 {basicUserInfo.map((info, index) => (

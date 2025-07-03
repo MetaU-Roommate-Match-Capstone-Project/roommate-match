@@ -135,6 +135,10 @@ body {
   @apply text-lg font-bold text-[#3066BE];
 }
 
+.post-profile-picture {
+  @apply w-8 h-8 m-1 rounded-full;
+}
+
 .post-location {
   @apply text-sm text-gray-600 font-medium mb-3 flex items-center gap-1;
 }

@@ -11,61 +11,6 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [userProfile, setUserProfile] = useState("");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [profilePictures, setProfilePictures] = useState({});
-
-  // fetch user profile picture from backend
-  const fetchUserProfilePicture = async (
-    url,
-    method = "GET",
-    credentials = "include",
-    body = null,
-  ) => {
-    try {
-      const options = {
-        method,
-        credentials,
-      };
-
-      if (body) {
-        options.body = body;
-      }
-
-      const response = await fetch(url, options);
-      return response;
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const fetchProfilePictureForUser = async (userId) => {
-    try {
-      const imageToDisplay = await fetchUserProfilePicture(
-        `/api/roommate-profile/profile-picture/${userId}`,
-        "GET",
-        "include",
-        null,
-      );
-
-      if (imageToDisplay && imageToDisplay.ok) {
-        const imageBlob = await imageToDisplay.blob();
-        const image = URL.createObjectURL(imageBlob);
-        setProfilePictures((prev) => ({
-          ...prev,
-          [userId]: image,
-        }));
-      }
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const fetchAllProfilePictures = async (posts) => {
-    const uniqueUserIds = [...new Set(posts.map((post) => post.user.id))];
-
-    for (const userId of uniqueUserIds) {
-      await fetchProfilePictureForUser(userId);
-    }
-  };
 
   const fetchPosts = async () => {
     try {
@@ -136,13 +81,12 @@ const Dashboard = () => {
             <div key={post.id} className="post-card">
               <div className="post-header">
                 <img
-                  className="w-8 h-8 m-1 rounded-full"
-                  src={
-                    profilePictures[post.user.id]
-                      ? profilePictures[post.user.id]
-                      : fallbackProfilePic
-                  }
+                  className="post-profile-picture"
+                  src={`/api/roommate-profile/profile-picture/${post.user.id}`}
                   alt="profile-picture"
+                  onError={(e) => {
+                    e.target.src = fallbackProfilePic;
+                  }}
                 />
                 <button
                   className="post-username"
