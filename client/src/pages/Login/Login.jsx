@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
+import { getUrl } from "../../utils/url";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -20,7 +21,7 @@ const Login = () => {
 
   const loginUser = async (userData) => {
     try {
-      const response = await fetch("/api/users/login", {
+      const response = await fetch(`${getUrl()}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

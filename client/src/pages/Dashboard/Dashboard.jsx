@@ -4,6 +4,7 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import { getUrl } from "../../utils/url";
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -14,7 +15,7 @@ const Dashboard = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("/api/post", {
+      const response = await fetch(`${getUrl()}/api/post`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +39,7 @@ const Dashboard = () => {
 
   const fetchUserProfile = async (id) => {
     try {
-      const response = await fetch(`api/roommate-profile/${id}`, {
+      const response = await fetch(`${getUrl()}/api/roommate-profile/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

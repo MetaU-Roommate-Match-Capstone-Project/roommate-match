@@ -10,6 +10,7 @@ import {
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import { getUrl } from "../../utils/url";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -23,7 +24,7 @@ const CurrentUserProfile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`/api/users/logout/${user.id}`, {
+      const response = await fetch(`${getUrl()}/api/users/logout/${user.id}`, {
         method: "POST",
         credentials: "include",
       });
@@ -65,7 +66,7 @@ const CurrentUserProfile = () => {
   const fetchProfilePicture = async () => {
     try {
       const imageToDisplay = await fetchUserProfilePicture(
-        `/api/roommate-profile/profile-picture/${user.id}`,
+        `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`,
         "GET",
         "include",
         null,
@@ -92,7 +93,7 @@ const CurrentUserProfile = () => {
       const formData = new FormData();
       formData.append("profilePicture", file);
       await fetchUserProfilePicture(
-        `/api/roommate-profile/profile-picture/${user.id}`,
+        `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`,
         "PUT",
         "include",
         formData,
@@ -108,7 +109,7 @@ const CurrentUserProfile = () => {
   const fetchCurrentUserProfile = async () => {
     try {
       setError(null);
-      const response = await fetch("/api/roommate-profile/me", {
+      const response = await fetch(`${getUrl()}/api/roommate-profile/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -142,7 +143,7 @@ const CurrentUserProfile = () => {
   // fetch user posts
   const fetchUserPosts = async () => {
     try {
-      const response = await fetch("/api/post/me", {
+      const response = await fetch(`${getUrl()}/api/post/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +164,7 @@ const CurrentUserProfile = () => {
 
   const createPost = async (postContent) => {
     try {
-      const response = await fetch("/api/post", {
+      const response = await fetch(`${getUrl()}/api/post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +186,7 @@ const CurrentUserProfile = () => {
   };
 
   const deletePost = async (postId) => {
-    fetch(`/api/post/me/${postId}`, {
+    fetch(`${getUrl()}/api/post/me/${postId}`, {
       method: "DELETE",
       credentials: "include",
     })

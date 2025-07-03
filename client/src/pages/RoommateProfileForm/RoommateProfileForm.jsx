@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
+import { getUrl } from "../../utils/url";
 
 const RoommateProfileForm = () => {
   const {
@@ -54,7 +55,7 @@ const RoommateProfileForm = () => {
 
   const createRoommateProfile = async (userData) => {
     try {
-      const response = await fetch("/api/roommate-profile", {
+      const response = await fetch(`${getUrl()}/api/roommate-profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
