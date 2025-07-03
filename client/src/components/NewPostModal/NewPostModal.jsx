@@ -51,7 +51,7 @@ const NewPostModal = ({ isOpen, onClose, onSubmit }) => {
           <span className="x-btn" onClick={onClose}>
             &times;
           </span>
-          <div className="new-post-modal">
+          <div className="modal">
             <h2>Create a New post</h2>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">

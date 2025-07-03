@@ -52,10 +52,10 @@ body {
 }
 
 .modal-content {
-  @apply bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative;
+  @apply bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative;
 }
 
-.new-post-modal {
+.modal {
   @apply p-6;
 }
 
@@ -97,12 +97,24 @@ body {
 }
 
 @media (max-width: 768px) {
-  .user-profile-main {
+  .profile-main {
     @apply flex-col;
   }
 
-  .user-profile-image {
+  .profile-image {
     @apply w-64 h-64 rounded-lg object-cover mx-auto mb-6 shadow-md;
+  }
+
+  .modal-content .profile-main {
+    @apply flex-col gap-4;
+  }
+
+  .modal-content .profile-col {
+    @apply w-full;
+  }
+
+  .modal-content .profile-image {
+    @apply w-32 h-32;
   }
 }
 
@@ -121,6 +133,10 @@ body {
 
 .post-username {
   @apply text-lg font-bold text-[#3066BE];
+}
+
+.post-profile-picture {
+  @apply w-8 h-8 m-1 rounded-full;
 }
 
 .post-location {

@@ -12,7 +12,7 @@ import {
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 
 const CurrentUserProfile = () => {
-  const { user, setUser } = useUser();
+  const { user, logout } = useUser();
   const navigate = useNavigate();
   const [roommateProfile, setRoommateProfile] = useState(null);
   const [profilePicture, setProfilePicture] = useState("");
@@ -29,7 +29,7 @@ const CurrentUserProfile = () => {
       });
 
       if (response.ok) {
-        setUser(null);
+        logout();
         navigate("/login");
       }
     } catch (error) {
@@ -340,7 +340,7 @@ const CurrentUserProfile = () => {
                     <p className="post-username">{post.user.name}</p>
                   </div>
                   <p className="post-location">
-                    📍{post.city}, {post.state}
+                    &#x1F4CD;{post.city}, {post.state}
                   </p>
                   <p className="post-content">{post.content}</p>
                 </div>

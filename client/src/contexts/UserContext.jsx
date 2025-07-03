@@ -31,6 +31,28 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // logout function to track user authentication state across tabs
+  const logout = () => {
+    localStorage.setItem("logout-event", Date.now().toString());
+    setUser(null);
+    setHasRoommateProfile(false);
+  };
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "logout-event") {
+        setUser(null);
+        setHasRoommateProfile(false);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   useEffect(() => {
     checkIfUserHasRoommateProfile();
   }, [user]);
@@ -43,6 +65,7 @@ export const UserProvider = ({ children }) => {
         hasRoommateProfile,
         setHasRoommateProfile,
         checkIfUserHasRoommateProfile,
+        logout,
       }}
     >
       {children}
