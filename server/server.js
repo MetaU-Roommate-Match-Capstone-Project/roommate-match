@@ -1,17 +1,28 @@
 const express = require("express");
 const PORT = process.env.PORT || 3000;
 const app = express();
-const session = require("express-session");
+const expressSession = require("express-session");
+const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
+const { PrismaClient } = require("./generated/prisma");
 const cors = require("cors");
 
 app.use(express.json());
 
 app.use(
-  session({
+  expressSession({
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 60, // 1 hour session
+    },
     secret: "roommate-match",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 * 60 }, // 1 hour session
+    store: new PrismaSessionStore(new PrismaClient(), {
+      checkPeriod: 2 * 60 * 1000,
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
   }),
 );
 
