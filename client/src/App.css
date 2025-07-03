@@ -97,12 +97,24 @@ body {
 }
 
 @media (max-width: 768px) {
-  .user-profile-main {
+  .profile-main {
     @apply flex-col;
   }
 
-  .user-profile-image {
+  .profile-image {
     @apply w-64 h-64 rounded-lg object-cover mx-auto mb-6 shadow-md;
+  }
+
+  .modal-content .profile-main {
+    @apply flex-col gap-4;
+  }
+
+  .modal-content .profile-col {
+    @apply w-full;
+  }
+
+  .modal-content .profile-image {
+    @apply w-32 h-32;
   }
 }
 
