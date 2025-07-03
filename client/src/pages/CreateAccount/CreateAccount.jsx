@@ -45,7 +45,6 @@ const CreateAccount = () => {
 
       return data;
     } catch (error) {
-      console.error("Error creating user:", error);
       throw error;
     }
   };

@@ -63,27 +63,50 @@ body {
   @apply flex justify-between items-center mb-6;
 }
 
-.profile-container {
-  @apply flex justify-center items-start min-h-[calc(100vh-4rem)] p-6 pt-8;
+/* Profile styles */
+.profile-header {
+  @apply text-center mb-8;
 }
 
-.profile-card {
-  @apply bg-white p-8 rounded shadow-2xl;
-  min-height: 80vh;
+.profile-main {
+  @apply flex gap-8 max-w-6xl mx-auto mb-8 flex-wrap;
+}
+
+.profile-col {
+  @apply flex-1 p-6 rounded-lg shadow-lg;
+}
+
+.profile-image {
+  @apply w-128 h-128 rounded-lg object-cover mx-auto mb-6 shadow-md;
 }
 
 .profile-details {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mt-6;
+  @apply space-y-3 bg-gray-50 rounded-lg border-l-4 border-[#3066BE];
 }
 
 .profile-details p {
-  @apply text-lg font-normal text-gray-800 mb-2 p-4 bg-gray-50 rounded-lg border-l-4 border-[#3066BE];
+  @apply text-base font-normal text-gray-800 p-3 mb-2;
 }
 
 .profile-details strong {
   @apply text-[#3066BE] font-semibold;
 }
 
+.title {
+  @apply text-2xl font-bold text-[#3066BE] mb-6 text-center;
+}
+
+@media (max-width: 768px) {
+  .user-profile-main {
+    @apply flex-col;
+  }
+
+  .user-profile-image {
+    @apply w-64 h-64 rounded-lg object-cover mx-auto mb-6 shadow-md;
+  }
+}
+
+/* Post styles */
 .post-container {
   @apply flex flex-wrap;
 }
@@ -108,6 +131,7 @@ body {
   @apply text-gray-800 leading-relaxed text-left;
 }
 
+/* Delete button and exit out of modal button styles */
 .x-btn {
   @apply absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded text-lg flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer border-none;
 }
@@ -116,6 +140,7 @@ body {
   @apply shadow-md;
 }
 
+/* Form styles */
 .form-container {
   @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
 }
@@ -185,7 +210,7 @@ main {
 }
 
 h1 {
-  @apply text-5xl leading-tight text-black;
+  @apply text-5xl leading-tight text-black font-bold;
 }
 
 h2 {

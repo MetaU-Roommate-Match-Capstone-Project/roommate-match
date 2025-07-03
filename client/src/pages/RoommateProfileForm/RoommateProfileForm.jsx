@@ -72,7 +72,6 @@ const RoommateProfileForm = () => {
       }
       return data;
     } catch (error) {
-      console.error("Error creating roommate profile");
       throw error;
     }
   };
