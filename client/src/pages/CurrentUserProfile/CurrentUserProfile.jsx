@@ -2,7 +2,7 @@ import React from "react";
 import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
-import RoommateAttributes from "../../components/RoommateAttributes/RoommateAttributes.jsx";
+import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -292,7 +292,7 @@ const CurrentUserProfile = () => {
             </button>
             <div className="profile-details">
               {basicUserInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
@@ -305,7 +305,7 @@ const CurrentUserProfile = () => {
             <h3 className="title">Roommate Preferences</h3>
             <div className="profile-details">
               {roommatePreferencesInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
