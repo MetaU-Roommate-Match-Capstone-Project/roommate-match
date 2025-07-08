@@ -8,6 +8,15 @@ const cors = require("cors");
 
 app.use(express.json());
 
+const corsConfig = cors({
+    origin: ["http://localhost:5173", "https://roomify-metau.onrender.com/"],
+    methods: ["GET","HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    credentials: true,
+  });
+
+app.use(corsConfig);
+app.options('*', corsConfig);
+
 app.use(
   expressSession({
     cookie: {
@@ -23,13 +32,6 @@ app.use(
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
-  }),
-);
-
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://roomify-metau.onrender.com/"],
-    credentials: true,
   }),
 );
 
