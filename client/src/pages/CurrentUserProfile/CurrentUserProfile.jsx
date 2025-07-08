@@ -2,7 +2,7 @@ import React from "react";
 import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
-import RoommateAttributes from "../../components/RoommateAttributes/RoommateAttributes.jsx";
+import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -37,69 +37,35 @@ const CurrentUserProfile = () => {
     }
   };
 
-  // fetch user profile picture from backend
-  const fetchUserProfilePicture = async (
-    url,
-    method = "GET",
-    credentials = "include",
-    body = null,
-  ) => {
-    try {
-      const options = {
-        method,
-        credentials,
-      };
-
-      if (body) {
-        options.body = body;
-      }
-
-      const response = await fetch(url, options);
-
-      return response;
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const fetchProfilePicture = async () => {
-    try {
-      const imageToDisplay = await fetchUserProfilePicture(
-        `/api/roommate-profile/profile-picture/${user.id}`,
-        "GET",
-        "include",
-        null,
-      );
-
-      if (imageToDisplay.ok) {
-        const imageBlob = await imageToDisplay.blob();
-        setProfilePicture(URL.createObjectURL(imageBlob));
-      } else {
-        setProfilePicture("");
-      }
-    } catch (error) {
-      setProfilePicture("");
-    }
-  };
-
   const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
     if (!file) {
       return;
     }
 
+    const localImageUrl = URL.createObjectURL(file);
+    setProfilePicture(localImageUrl);
+
     try {
       const formData = new FormData();
       formData.append("profilePicture", file);
-      await fetchUserProfilePicture(
+
+      const response = await fetch(
         `/api/roommate-profile/profile-picture/${user.id}`,
-        "PUT",
-        "include",
-        formData,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        },
       );
-      fetchProfilePicture();
+
+      if (!response.ok) {
+        setProfilePicture("");
+        throw new Error("Failed to upload profile picture");
+      }
     } catch (error) {
       setError(error.message);
+      setProfilePicture("");
       throw error;
     }
   };
@@ -210,7 +176,6 @@ const CurrentUserProfile = () => {
       }
       fetchCurrentUserProfile();
       fetchUserPosts();
-      fetchProfilePicture();
     },
     [user],
     posts,
@@ -273,8 +238,15 @@ const CurrentUserProfile = () => {
           <div className="profile-col">
             <img
               className="profile-image"
-              src={profilePicture ? profilePicture : fallbackProfilePic}
+              src={
+                profilePicture
+                  ? profilePicture
+                  : `/api/roommate-profile/profile-picture/${user.id}`
+              }
               alt="profile-picture"
+              onError={(e) => {
+                e.target.src = fallbackProfilePic;
+              }}
             />
             <input
               type="file"
@@ -292,7 +264,7 @@ const CurrentUserProfile = () => {
             </button>
             <div className="profile-details">
               {basicUserInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
@@ -305,7 +277,7 @@ const CurrentUserProfile = () => {
             <h3 className="title">Roommate Preferences</h3>
             <div className="profile-details">
               {roommatePreferencesInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
