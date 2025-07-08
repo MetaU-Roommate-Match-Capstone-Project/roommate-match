@@ -56,7 +56,7 @@ const CurrentUserProfile = () => {
           method: "PUT",
           credentials: "include",
           body: formData,
-        }
+        },
       );
 
       if (!response.ok) {
@@ -238,7 +238,11 @@ const CurrentUserProfile = () => {
           <div className="profile-col">
             <img
               className="profile-image"
-              src={profilePicture ? profilePicture : `/api/roommate-profile/profile-picture/${user.id}`}
+              src={
+                profilePicture
+                  ? profilePicture
+                  : `/api/roommate-profile/profile-picture/${user.id}`
+              }
               alt="profile-picture"
               onError={(e) => {
                 e.target.src = fallbackProfilePic;
