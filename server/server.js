@@ -15,7 +15,7 @@ const corsConfig = cors({
   });
 
 app.use(corsConfig);
-app.options('*', corsConfig);
+app.options('*', cors());
 
 app.use(
   expressSession({
