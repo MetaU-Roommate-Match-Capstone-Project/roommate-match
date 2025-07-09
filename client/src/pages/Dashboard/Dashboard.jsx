@@ -5,6 +5,7 @@ import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import PictureSlideshow from "../../components/PictureSlideshow/PictureSlideshow";
+import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay";
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -100,13 +101,7 @@ const Dashboard = () => {
                 &#x1F4CD;{post.city}, {post.state}
               </p>
               <p className="post-content">{post.content}</p>
-              {post.pictures && post.pictures.length > 0 && (
-                <PictureSlideshow
-                  images={post.pictures.map(
-                    (pic) => `/api/post/picture/${pic.id}`,
-                  )}
-                />
-              )}
+              <PostPictureDisplay pictures={post.pictures}/>
             </div>
           ))
         )}

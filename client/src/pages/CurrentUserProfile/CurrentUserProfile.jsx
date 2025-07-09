@@ -11,6 +11,7 @@ import {
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -316,13 +317,7 @@ const CurrentUserProfile = () => {
                     &#x1F4CD;{post.city}, {post.state}
                   </p>
                   <p className="post-content">{post.content}</p>
-                  {post.pictures && post.pictures.length > 0 && (
-                    <PictureSlideshow
-                      images={post.pictures.map(
-                        (pic) => `/api/post/picture/${pic.id}`,
-                      )}
-                    />
-                  )}
+                  <PostPictureDisplay pictures={post.pictures}/>
                 </div>
               ))
             )}
