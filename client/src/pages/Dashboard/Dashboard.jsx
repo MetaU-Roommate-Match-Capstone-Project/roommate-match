@@ -101,7 +101,7 @@ const Dashboard = () => {
                 &#x1F4CD;{post.city}, {post.state}
               </p>
               <p className="post-content">{post.content}</p>
-              <PostPictureDisplay pictures={post.pictures}/>
+              <PostPictureDisplay pictures={post.pictures} />
             </div>
           ))
         )}
