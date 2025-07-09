@@ -34,10 +34,14 @@ const Dashboard = () => {
         throw new Error(errorInfo.error || "Failed to fetch posts");
       }
 
-      const { posts: postsFetched, nextCursor: newCursor, hasNextPage: hasMore } = await response.json();
+      const {
+        posts: postsFetched,
+        nextCursor: newCursor,
+        hasNextPage: hasMore,
+      } = await response.json();
 
       if (append) {
-        setPosts(prevPosts => [...prevPosts, ...postsFetched]);
+        setPosts((prevPosts) => [...prevPosts, ...postsFetched]);
       } else {
         setPosts(postsFetched);
       }
