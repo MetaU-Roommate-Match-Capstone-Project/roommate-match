@@ -118,6 +118,19 @@ body {
   }
 }
 
+/* Current user posts section layout */
+.my-posts-header {
+  @apply flex flex-col sm:flex-row sm:items-center mb-8;
+}
+
+.my-posts-header-spacer {
+  @apply hidden sm:block sm:flex-1;
+}
+
+.my-posts-button-container {
+  @apply sm:flex-1 flex justify-center sm:justify-end;
+}
+
 /* Post styles */
 .post-container {
   @apply flex flex-wrap w-full max-w-full mx-auto px-4;
