@@ -69,6 +69,8 @@ router.get("/", async (req, res) => {
         .json({ error: "You must be logged in to view other user's posts." });
     }
 
+    const cursor = req.query.cursor ? parseInt(req.query.cursor) : 0;
+
     const currentUserProfile = await prisma.roommateProfile.findUnique({
       where: { user_id: req.session.userId },
       select: { city: true, state: true },
@@ -90,6 +92,13 @@ router.get("/", async (req, res) => {
             id: "desc",
           },
         ],
+        take: 21,
+        ...(cursor && {
+          cursor: {
+            id: cursor,
+          },
+          skip: 1,
+        }),
       });
     } else {
       // use mode: "insensitive" to match locations without case sensitivity
@@ -114,10 +123,28 @@ router.get("/", async (req, res) => {
             id: "desc",
           },
         ],
+        take: 21,
+        ...(cursor && {
+          cursor: {
+            id: cursor,
+          },
+          skip: 1,
+        }),
       });
     }
 
-    res.status(200).json(posts);
+    const hasNextPage = posts.length > 20;
+    if (hasNextPage) {
+      posts.pop();
+    }
+
+    const nextCursor = hasNextPage ? posts[posts.length - 1].id : null;
+
+    res.status(200).json({
+      posts,
+      nextCursor,
+      hasNextPage,
+    });
   } catch (err) {
     res.status(500).json("Error getting posts");
   }
