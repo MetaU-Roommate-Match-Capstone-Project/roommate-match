@@ -4,7 +4,6 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
-import PictureSlideshow from "../../components/PictureSlideshow/PictureSlideshow";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay";
 
 const Dashboard = () => {

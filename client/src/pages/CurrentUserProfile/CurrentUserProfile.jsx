@@ -298,7 +298,20 @@ const CurrentUserProfile = () => {
 
       <section className="mb-12">
         <div>
-          <h3 className="title">My Posts</h3>
+          <div className="my-posts-header">
+            <div className="my-posts-header-spacer"></div>
+            <h3 className="title">My Posts</h3>
+            <div className="my-posts-button-container">
+              <button className="btn-primary" onClick={openModal}>
+                + Create a New Post
+              </button>
+            </div>
+          </div>
+          <NewPostModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+          ></NewPostModal>
           <div className="post-container">
             {posts.length === 0 ? (
               <div className="text-center py-12">
@@ -323,14 +336,6 @@ const CurrentUserProfile = () => {
             )}
           </div>
         </div>
-        <button className="btn-primary mt-8" onClick={openModal}>
-          + Create a New Post
-        </button>
-        <NewPostModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSubmit={handleSubmit}
-        ></NewPostModal>
       </section>
 
       <div className="flex justify-center mb-8">
