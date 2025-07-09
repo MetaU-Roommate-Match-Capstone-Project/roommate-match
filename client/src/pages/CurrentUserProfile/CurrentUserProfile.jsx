@@ -3,6 +3,7 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
 import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
+import PictureSlideshow from "../../components/PictureSlideshow/PictureSlideshow.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -10,6 +11,7 @@ import {
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -127,14 +129,11 @@ const CurrentUserProfile = () => {
     }
   };
 
-  const createPost = async (postContent) => {
+  const createPost = async (formData) => {
     try {
       const response = await fetch("/api/post", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postContent),
+        body: formData,
         credentials: "include",
       });
 
@@ -143,10 +142,10 @@ const CurrentUserProfile = () => {
         throw new Error(errorInfo.error || "Failed to create post");
       }
 
-      const newPost = await response.json();
-      setPosts([newPost, ...posts]);
+      await fetchUserPosts();
     } catch (error) {
       setError(error.message);
+      throw error;
     }
   };
 
@@ -169,18 +168,13 @@ const CurrentUserProfile = () => {
       });
   };
 
-  useEffect(
-    () => {
-      if (!user) {
-        return;
-      }
-      fetchCurrentUserProfile();
-      fetchUserPosts();
-    },
-    [user],
-    posts,
-    profilePicture,
-  );
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    fetchCurrentUserProfile();
+    fetchUserPosts();
+  }, [user]);
 
   // render error message if user has not created a profile yet
   if (error) {
@@ -218,8 +212,16 @@ const CurrentUserProfile = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmit = async (postContent) => {
-    await createPost(postContent);
+  const handleSubmit = async (formState) => {
+    const formData = new FormData();
+    formData.append("city", formState.city);
+    formData.append("state", formState.state);
+    formData.append("content", formState.content);
+    formState.pictures.forEach((file) => {
+      formData.append("pictures", file);
+    });
+
+    await createPost(formData);
   };
 
   const basicUserInfo = getBasicUserInfo(roommateProfile);
@@ -315,6 +317,7 @@ const CurrentUserProfile = () => {
                     &#x1F4CD;{post.city}, {post.state}
                   </p>
                   <p className="post-content">{post.content}</p>
+                  <PostPictureDisplay pictures={post.pictures} />
                 </div>
               ))
             )}

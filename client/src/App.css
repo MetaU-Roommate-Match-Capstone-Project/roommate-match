@@ -120,11 +120,11 @@ body {
 
 /* Post styles */
 .post-container {
-  @apply flex flex-wrap;
+  @apply flex flex-wrap w-full max-w-full mx-auto px-4;
 }
 
 .post-card {
-  @apply m-4 p-6 shadow-lg rounded-xl flex flex-col w-full relative border border-[#3066BE];
+  @apply m-4 p-6 shadow-lg rounded-xl flex flex-col w-full relative border border-[#3066BE] max-w-2xl mx-auto;
 }
 
 .post-header {
@@ -145,6 +145,75 @@ body {
 
 .post-content {
   @apply text-gray-800 leading-relaxed text-left;
+}
+
+.post-slideshow-container {
+  @apply max-w-[1000px] h-[550px] w-full m-auto py-16 px-4 relative;
+}
+
+@media (max-width: 768px) {
+  .post-slideshow-container {
+    @apply max-w-full h-[300px] py-4 px-2;
+  }
+
+  .post-card {
+    @apply m-2 p-4 mx-2;
+  }
+
+  .post-header {
+    @apply flex-wrap gap-2;
+  }
+
+  .post-username {
+    @apply text-base;
+  }
+
+  .post-content {
+    @apply text-sm leading-relaxed;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-container {
+    @apply px-1;
+  }
+
+  .post-card {
+    @apply m-1 p-3 mx-1;
+  }
+
+  .post-slideshow-container {
+    @apply h-[250px] py-2;
+  }
+
+  .post-location {
+    @apply text-xs;
+  }
+}
+
+.post-slideshow-container:hover .post-slideshow-arrow-left,
+.post-slideshow-container:hover .post-slideshow-arrow-right {
+  display: block;
+}
+
+.post-slideshow-image {
+  @apply w-full h-full rounded-2xl bg-center bg-cover duration-500;
+}
+
+.post-slideshow-arrow-left {
+  @apply hidden absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer;
+}
+
+.post-slideshow-arrow-right {
+  @apply hidden absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer;
+}
+
+.post-slideshow-image-index {
+  @apply flex absolute bottom-4 left-1/2 transform -translate-x-1/2 justify-center py-2;
+}
+
+.post-slideshow-dot-cursor {
+  @apply text-2xl cursor-pointer;
 }
 
 /* Delete button and exit out of modal button styles */
@@ -243,6 +312,39 @@ p {
 
 hr {
   @apply border-t-2 border-[#3066BE] my-8;
+}
+
+/* New Post Modal styles */
+.new-post-form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 mb-5;
+}
+
+.new-post-pictures-section {
+  @apply mt-3;
+}
+
+.new-post-pictures-title {
+  @apply text-sm font-medium mb-2;
+}
+
+.new-post-pictures-grid {
+  @apply grid grid-cols-2 md:grid-cols-3 gap-2;
+}
+
+.new-post-picture-preview {
+  @apply relative;
+}
+
+.new-post-picture-image {
+  @apply w-full h-20 object-cover rounded border;
+}
+
+.new-post-picture-filename {
+  @apply text-xs text-gray-500 mt-1 truncate;
+}
+
+.new-post-file-instructions {
+  @apply text-sm text-gray-600 mt-1;
 }
 
 /* Utility classes for components */
