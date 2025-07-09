@@ -126,7 +126,9 @@ const NewPostModal = ({ isOpen, onClose, onSubmit }) => {
                   accept="image/*"
                   onChange={handlePictureUpload}
                 />
-                <p className="new-post-file-instructions">Select multiple images</p>
+                <p className="new-post-file-instructions">
+                  Select multiple images
+                </p>
 
                 {formState.pictures.length > 0 && (
                   <div className="new-post-pictures-section">
