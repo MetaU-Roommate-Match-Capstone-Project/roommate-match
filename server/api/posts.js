@@ -7,9 +7,12 @@ const cors = require("cors");
 router.use(helmet());
 router.use(express.json());
 router.use(cors());
+const multer = require("multer");
+const multerStorage = multer.memoryStorage();
+const upload = multer(multerStorage);
 
-// [POST] - create a new post when user signed in
-router.post("/", async (req, res) => {
+// [POST] - create a new post with optional multiple pictures
+router.post("/", upload.array("pictures"), async (req, res) => {
   try {
     if (!req.session.userId) {
       return res
@@ -18,6 +21,7 @@ router.post("/", async (req, res) => {
     }
 
     const { city, state, content } = req.body;
+    const files = req.files;
 
     const user = await prisma.user.findUnique({
       where: { id: req.session.userId },
@@ -38,6 +42,17 @@ router.post("/", async (req, res) => {
         user: true,
       },
     });
+
+    if (files && files.length > 0) {
+      const pictureData = files.map((file) => ({
+        post_id: newPost.id,
+        image: file.buffer,
+      }));
+
+      await prisma.picture.createMany({
+        data: pictureData,
+      });
+    }
 
     res.status(201).json(newPost);
   } catch (err) {
@@ -70,6 +85,7 @@ router.get("/", async (req, res) => {
         },
         include: {
           user: true,
+          pictures: true,
         },
         orderBy: [
           {
@@ -100,6 +116,7 @@ router.get("/", async (req, res) => {
         },
         include: {
           user: true,
+          pictures: true,
         },
         orderBy: [
           {
@@ -148,6 +165,7 @@ router.get("/me", async (req, res) => {
       },
       include: {
         user: true,
+        pictures: true,
       },
       orderBy: [
         {
@@ -168,6 +186,30 @@ router.get("/me", async (req, res) => {
   }
 });
 
+// [GET] - get picture by ID
+router.get("/picture/:id", async (req, res) => {
+  try {
+    const pictureId = parseInt(req.params.id);
+
+    const picture = await prisma.picture.findUnique({
+      where: { id: pictureId },
+    });
+
+    if (!picture) {
+      return res.status(404).json({ error: "Picture not found" });
+    }
+
+    res.set({
+      "Content-Type": "image/*",
+      "Content-Length": picture.image.length,
+    });
+
+    res.send(picture.image);
+  } catch (err) {
+    res.status(500).json("Error retrieving picture");
+  }
+});
+
 // [DELETE] - delete a post if user is signed in
 router.delete("/me/:id", async (req, res) => {
   try {
@@ -178,6 +220,13 @@ router.delete("/me/:id", async (req, res) => {
     }
 
     const postId = parseInt(req.params.id);
+
+    // delete all pictures associated with the post due to foreign key constraint
+    await prisma.picture.deleteMany({
+      where: { post_id: postId },
+    });
+
+    // delete post after deleting pictures on post
     const deletedPost = await prisma.post.delete({
       where: { id: postId },
     });

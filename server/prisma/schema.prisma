@@ -110,4 +110,12 @@ model Post {
   city              String
   state             String
   content           String
+  pictures          Picture[]
+}
+
+model Picture {
+  id                Int              @id @default(autoincrement())
+  post              Post             @relation(fields: [post_id], references: [id])
+  post_id           Int
+  image             Bytes
 }
