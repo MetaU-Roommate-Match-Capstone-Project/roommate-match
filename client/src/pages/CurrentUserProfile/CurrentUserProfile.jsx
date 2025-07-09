@@ -3,6 +3,7 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
 import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
+import PictureSlideshow from "../../components/PictureSlideshow/PictureSlideshow.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
