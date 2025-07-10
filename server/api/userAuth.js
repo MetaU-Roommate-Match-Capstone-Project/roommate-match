@@ -108,7 +108,7 @@ router.post("/login", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(401).header('Access-Control-Allow-Origin', "https://roomify-metau.onrender.com").json({ error: "User not found." });
+      return res.status(401).json({ error: "User not found." });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
