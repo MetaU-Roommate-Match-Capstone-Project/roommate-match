@@ -63,6 +63,20 @@ enum Socialness {
   VERY_SOCIAL
 }
 
+enum PreferenceType {
+  CLEANLINESS
+  SMOKES
+  PETS
+  GENDER_PREFERENCE
+  ROOM_TYPE
+  NUM_ROOMMATES
+  SLEEP_SCHEDULE
+  NOISE_TOLERANCE
+  SOCIALNESS
+  HOBBIES
+  FAVORITE_MUSIC
+}
+
 model User {
   id                 Int              @id @default(autoincrement())
   name               String
@@ -82,25 +96,33 @@ model User {
 }
 
 model RoommateProfile {
-  id                Int              @id @default(autoincrement())
-  user              User             @relation(fields: [user_id], references: [id])
-  user_id           Int              @unique
-  city              String
-  state             String
-  cleanliness       Cleanliness
-  smokes            Boolean
-  pets              Pets
-  gender_preference GenderPreference
-  room_type         RoomType
-  num_roommates     Int
-  lease_duration    Int
-  move_in_date      DateTime
-  sleep_schedule    SleepSchedule
-  noise_tolerance   NoiseTolerance
-  socialness        Socialness
-  hobbies           String
-  favorite_music    String
-  bio               String
+  id                        Int              @id @default(autoincrement())
+  user                      User             @relation(fields: [user_id], references: [id])
+  user_id                   Int              @unique
+  city                      String
+  state                     String
+  cleanliness               Cleanliness
+  smokes                    Boolean
+  pets                      Pets
+  gender_preference         GenderPreference
+  room_type                 RoomType
+  num_roommates             Int
+  lease_duration            Int
+  move_in_date              DateTime
+  sleep_schedule            SleepSchedule
+  noise_tolerance           NoiseTolerance
+  socialness                Socialness
+  hobbies                   String
+  favorite_music            String
+  bio                       String
+
+  top_preference_1          PreferenceType?
+  top_preference_2          PreferenceType?
+  top_preference_3          PreferenceType?
+
+  preference_1_weight       Int?
+  preference_2_weight       Int?
+  preference_3_weight       Int?
 }
 
 model Post {
