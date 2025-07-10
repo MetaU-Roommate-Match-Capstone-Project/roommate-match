@@ -10,7 +10,7 @@ app.use(express.json());
 
 const corsConfig = cors({
     // origin: [/*"http://localhost:5173",*/"https://roomify-metau.onrender.com"],
-    origin: true,
+    origin: function(origin,callback){callback(null, true)},
     methods: ["GET","HEAD", "PUT", "PATCH", "POST", "DELETE"],
     credentials: true,
   });
