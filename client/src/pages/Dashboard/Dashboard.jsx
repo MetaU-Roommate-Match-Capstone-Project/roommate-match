@@ -12,7 +12,8 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [userProfile, setUserProfile] = useState("");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const {fetchPosts, nextCursor, hasNextPage, loading} = useFetchPosts(setPosts);
+  const { fetchPosts, nextCursor, hasNextPage, loading } =
+    useFetchPosts(setPosts);
 
   const loadMorePosts = () => {
     if (nextCursor && hasNextPage && !loading) {
@@ -155,6 +156,6 @@ function useFetchPosts(setPosts) {
     } finally {
       setLoading(false);
     }
-  }
+  };
   return { fetchPosts, nextCursor, hasNextPage, loading };
 }
