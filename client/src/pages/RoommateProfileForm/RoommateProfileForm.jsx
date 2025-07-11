@@ -275,7 +275,7 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
-              <RankingSlider/>
+              <RankingSlider />
             </div>
 
             <div className="form-group">
