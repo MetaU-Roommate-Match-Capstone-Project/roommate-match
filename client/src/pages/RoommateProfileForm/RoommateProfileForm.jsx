@@ -463,7 +463,7 @@ const RoommateProfileForm = () => {
                   onChange={(e) =>
                     updateFormField("moveInYear", e.target.value)
                   }
-                  className="form-input-year"
+                  className="form-input-medium"
                   required
                 />
               </div>

@@ -267,7 +267,7 @@ body {
   @apply w-16 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
 }
 
-.form-input-year {
+.form-input-medium {
   @apply w-20 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
 }
 
@@ -277,6 +277,14 @@ body {
 
 .date-separator {
   @apply text-lg font-bold text-gray-600;
+}
+
+.address-container {
+  @apply flex flex-col gap-3;
+}
+
+.city-state-zip-layout {
+  @apply flex gap-3;
 }
 
 .nav-container {

@@ -19,6 +19,10 @@ const CreateAccount = () => {
     budgetMax: "",
     university: "",
     company: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    zipCode: "",
     groupId: "",
   });
 
@@ -111,6 +115,8 @@ const CreateAccount = () => {
 
       const dob = dobDate.toISOString();
 
+      const officeAddress = `${formState.streetAddress}, ${formState.city}, ${formState.state} ${formState.zipCode}`;
+
       const userData = {
         name: formState.name,
         email: formState.email,
@@ -122,6 +128,7 @@ const CreateAccount = () => {
         budget_max: parseInt(formState.budgetMax),
         university: formState.university,
         company: formState.company,
+        office_address: officeAddress,
       };
 
       await createUser(userData);
@@ -239,7 +246,7 @@ const CreateAccount = () => {
                     maxLength="4"
                     value={formState.dobYear}
                     onChange={(e) => updateFormField("dobYear", e.target.value)}
-                    className="form-input-year"
+                    className="form-input-medium"
                     required
                   />
                 </div>
@@ -325,6 +332,54 @@ const CreateAccount = () => {
               </div>
 
               <div className="form-group">
+                <label className="form-label">Office Address</label>
+                <div className="address-container">
+                  <input
+                    type="text"
+                    placeholder="Street Address"
+                    value={formState.streetAddress}
+                    onChange={(e) =>
+                      updateFormField("streetAddress", e.target.value)
+                    }
+                    className="form-input"
+                    required
+                  />
+                  <div className="city-state-zip-layout">
+                    <input
+                      type="text"
+                      placeholder="City"
+                      value={formState.city}
+                      onChange={(e) => updateFormField("city", e.target.value)}
+                      className="form-input flex-[2]"
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="State"
+                      maxLength="2"
+                      value={formState.state}
+                      onChange={(e) =>
+                        updateFormField("state", e.target.value.toUpperCase())
+                      }
+                      className="form-input flex-1"
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Zip Code"
+                      maxLength="5"
+                      value={formState.zipCode}
+                      onChange={(e) =>
+                        updateFormField("zipCode", e.target.value)
+                      }
+                      className="form-input flex-1"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group">
                 <label className="form-label">Budget Range</label>
                 <div className="budget-container">
                   <input
@@ -334,7 +389,7 @@ const CreateAccount = () => {
                     onChange={(e) =>
                       updateFormField("budgetMin", e.target.value)
                     }
-                    className="form-input-small"
+                    className="form-input-medium"
                     required
                   />
                   <span className="budget-separator">-</span>
@@ -345,7 +400,7 @@ const CreateAccount = () => {
                     onChange={(e) =>
                       updateFormField("budgetMax", e.target.value)
                     }
-                    className="form-input-small"
+                    className="form-input-medium"
                     required
                   />
                 </div>
