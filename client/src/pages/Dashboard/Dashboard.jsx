@@ -114,6 +114,7 @@ export default WithAuth(Dashboard);
 
 // custom hook to fetch posts
 function useFetchPosts(setPosts) {
+  const [error, setError] = useState(null);
   const [nextCursor, setNextCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [loading, setLoading] = useState(false);
