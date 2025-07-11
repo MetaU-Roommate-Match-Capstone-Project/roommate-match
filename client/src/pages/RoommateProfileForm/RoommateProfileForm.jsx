@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
-import RankingSlider from "../../components/RankingSlider/RankingSlider";
 
 const RoommateProfileForm = () => {
   const {
@@ -272,10 +271,6 @@ const RoommateProfileForm = () => {
                   Very Clean
                 </button>
               </div>
-            </div>
-
-            <div className="form-group">
-              <RankingSlider />
             </div>
 
             <div className="form-group">
