@@ -37,17 +37,6 @@ router.post("/", async (req, res) => {
       hobbies,
       favoriteMusic,
       bio,
-      cleanlinessWeight,
-      smokesWeight,
-      petsWeight,
-      genderPreferenceWeight,
-      roomTypeWeight,
-      numRoommatesWeight,
-      sleepScheduleWeight,
-      noiseToleranceWeight,
-      socialnessWeight,
-      hobbiesWeight,
-      favoriteMusicWeight,
     } = req.body;
 
     const user = await prisma.user.findUnique({
@@ -151,17 +140,6 @@ router.post("/", async (req, res) => {
         hobbies,
         favorite_music: favoriteMusic,
         bio,
-        cleanliness_weight: cleanlinessWeight,
-        smokes_weight: smokesWeight,
-        pets_weight: petsWeight,
-        gender_preference_weight: genderPreferenceWeight,
-        room_type_weight: roomTypeWeight,
-        num_roommates_weight: numRoommatesWeight,
-        sleep_schedule_weight: sleepScheduleWeight,
-        noise_tolerance_weight: noiseToleranceWeight,
-        socialness_weight: socialnessWeight,
-        hobbies_weight: hobbiesWeight,
-        favorite_music_weight: favoriteMusicWeight,
       },
     });
 
