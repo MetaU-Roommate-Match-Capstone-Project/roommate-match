@@ -223,6 +223,39 @@ function generateRoommateProfileData() {
     hobbies: selectedHobbies.join(", "),
     favoriteMusic: getRandomElement(MUSIC_GENRES),
     bio: faker.lorem.paragraph({ min: 2, max: 4 }),
+    cleanlinessWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    smokesWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    petsWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    genderPreferenceWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    roomTypeWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    numRoommatesWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    sleepScheduleWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    noiseToleranceWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    socialnessWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    hobbiesWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
+    favoriteMusicWeight: parseFloat(
+      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+    ),
   };
 }
 
