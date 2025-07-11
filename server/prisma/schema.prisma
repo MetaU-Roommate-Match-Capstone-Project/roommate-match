@@ -63,20 +63,6 @@ enum Socialness {
   VERY_SOCIAL
 }
 
-enum PreferenceType {
-  CLEANLINESS
-  SMOKES
-  PETS
-  GENDER_PREFERENCE
-  ROOM_TYPE
-  NUM_ROOMMATES
-  SLEEP_SCHEDULE
-  NOISE_TOLERANCE
-  SOCIALNESS
-  HOBBIES
-  FAVORITE_MUSIC
-}
-
 model User {
   id                 Int              @id @default(autoincrement())
   name               String
@@ -116,13 +102,17 @@ model RoommateProfile {
   favorite_music            String
   bio                       String
 
-  top_preference_1          PreferenceType?
-  top_preference_2          PreferenceType?
-  top_preference_3          PreferenceType?
-
-  preference_1_weight       Int?
-  preference_2_weight       Int?
-  preference_3_weight       Int?
+  cleanliness_weight        Decimal?          @db.Decimal(3, 2)
+  smokes_weight             Decimal?          @db.Decimal(3, 2)
+  pets_weight               Decimal?          @db.Decimal(3, 2)
+  gender_preference_weight  Decimal?          @db.Decimal(3, 2)
+  room_type_weight          Decimal?          @db.Decimal(3, 2)
+  num_roommates_weight      Decimal?          @db.Decimal(3, 2)
+  sleep_schedule_weight     Decimal?          @db.Decimal(3, 2)
+  noise_tolerance_weight    Decimal?          @db.Decimal(3, 2)
+  socialness_weight         Decimal?          @db.Decimal(3, 2)
+  hobbies_weight            Decimal?          @db.Decimal(3, 2)
+  favorite_music_weight     Decimal?          @db.Decimal(3, 2)
 }
 
 model Post {
