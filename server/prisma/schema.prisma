@@ -76,6 +76,7 @@ model User {
   budget_max         Int
   university         String
   company            String
+  office_address     String
   group_id           Int              @default(0)
   roommate_profile   RoommateProfile?
   posts              Post[]

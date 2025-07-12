@@ -20,7 +20,7 @@ router.post("/", upload.array("pictures"), async (req, res) => {
         .json({ error: "You must be logged in to make a post." });
     }
 
-    const { city, state, content } = req.body;
+    const { content } = req.body;
     const files = req.files;
 
     const user = await prisma.user.findUnique({
@@ -31,11 +31,22 @@ router.post("/", upload.array("pictures"), async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    const roommateProfile = await prisma.roommateProfile.findUnique({
+      where: { user_id: req.session.userId },
+      select: { city: true, state: true },
+    });
+
+    if (!roommateProfile) {
+      return res.status(400).json({
+        error: "You must create a roommate profile before making a post.",
+      });
+    }
+
     const newPost = await prisma.post.create({
       data: {
         user_id: req.session.userId,
-        city,
-        state,
+        city: roommateProfile.city,
+        state: roommateProfile.state,
         content,
       },
       include: {

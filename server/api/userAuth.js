@@ -22,6 +22,7 @@ router.post("/create-account", async (req, res) => {
     budget_max,
     university,
     company,
+    office_address,
   } = req.body;
 
   try {
@@ -81,6 +82,7 @@ router.post("/create-account", async (req, res) => {
         budget_max,
         university,
         company,
+        office_address,
       },
     });
     res.status(201).json({ newUser });
