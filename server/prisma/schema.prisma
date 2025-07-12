@@ -77,6 +77,8 @@ model User {
   university         String
   company            String
   office_address     String
+  office_latitude    Float?
+  office_longitude   Float?
   group_id           Int              @default(0)
   roommate_profile   RoommateProfile?
   posts              Post[]
