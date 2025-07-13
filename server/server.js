@@ -31,4 +31,7 @@ app.use("/api/roommate-profile", roommateProfileRoutes);
 const postRoutes = require("./api/posts.js");
 app.use("/api/post", postRoutes);
 
+const matchRoutes = require("./api/matches.js");
+app.use("/api/matches", matchRoutes);
+
 app.listen(PORT);
