@@ -23,6 +23,10 @@ const CreateAccount = () => {
     city: "",
     state: "",
     zipCode: "",
+    phoneFirstThree: "",
+    phoneMiddleThree: "",
+    phoneLastFour: "",
+    instagramHandle: "",
     groupId: "",
   });
 
@@ -117,6 +121,10 @@ const CreateAccount = () => {
 
       const officeAddress = `${formState.streetAddress}, ${formState.city}, ${formState.state} ${formState.zipCode}`;
 
+      const phoneNumber = `${formState.phoneFirstThree}-${formState.phoneMiddleThree}-${formState.phoneLastFour}`;
+
+      const instagramHandle = `@${formState.instagramHandle}`;
+
       const userData = {
         name: formState.name,
         email: formState.email,
@@ -129,6 +137,8 @@ const CreateAccount = () => {
         university: formState.university,
         company: formState.company,
         office_address: officeAddress,
+        phone_number: phoneNumber,
+        instagram_handle: instagramHandle,
       };
 
       await createUser(userData);
@@ -392,7 +402,7 @@ const CreateAccount = () => {
                     className="form-input-medium"
                     required
                   />
-                  <span className="budget-separator">-</span>
+                  <span className="separator">-</span>
                   <input
                     type="number"
                     placeholder="Max"
@@ -404,6 +414,58 @@ const CreateAccount = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Phone Number (optional) </label>
+                <div className="phone-container">
+                  <input
+                    type="text"
+                    placeholder="XXX"
+                    maxLength="3"
+                    value={formState.phoneFirstThree}
+                    onChange={(e) =>
+                      updateFormField("phoneFirstThree", e.target.value)
+                    }
+                    className="form-input-medium"
+                  />
+                  <span className="separator">-</span>
+                  <input
+                    type="text"
+                    placeholder="XXX"
+                    maxLength="3"
+                    value={formState.phoneMiddleThree}
+                    onChange={(e) => updateFormField("phoneMiddleThree", e.target.value)}
+                    className="form-input-medium"
+                    required
+                  />
+                  <span className="separator">-</span>
+                  <input
+                    type="text"
+                    placeholder="XXXX"
+                    maxLength="4"
+                    value={formState.phoneLastFour}
+                    onChange={(e) => updateFormField("phoneLastFour", e.target.value)}
+                    className="form-input-medium"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="instagramHandle">
+                  Instagram Handle (optional)
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="instagramHandle"
+                  value={formState.instagramHandle}
+                  onChange={(e) =>
+                    updateFormField("instagramHandle", e.target.value)
+                  }
+                  required
+                />
               </div>
 
               {submitError && (

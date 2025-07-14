@@ -188,6 +188,8 @@ router.get("/me", async (req, res) => {
             id: true,
             name: true,
             email: true,
+            phone_number: true,
+            instagram_handle: true,
             dob: true,
             gender: true,
             intern_or_new_grad: true,

@@ -15,6 +15,8 @@ router.post("/create-account", async (req, res) => {
   const {
     name,
     email,
+    phone_number,
+    instagram_handle,
     password,
     dob,
     gender,
@@ -76,6 +78,8 @@ router.post("/create-account", async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        phone_number,
+        instagram_handle,
         dob,
         gender,
         intern_or_new_grad,
