@@ -226,6 +226,7 @@ const RoommateProfileForm = () => {
               <input
                 className="form-input"
                 type="state"
+                maxLength="2"
                 id="state"
                 value={formState.state}
                 onChange={(e) => updateFormField("state", e.target.value)}

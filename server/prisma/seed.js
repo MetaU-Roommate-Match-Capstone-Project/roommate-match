@@ -89,7 +89,7 @@ const COMPANIES = [
   "Slack",
   "Zoom",
   "Snapchat",
-  "Twitter",
+  "X",
 ];
 
 const OFFICE_ADDRESSES = {
@@ -265,7 +265,7 @@ const OFFICE_ADDRESSES = {
     "New York, NY": "229 W 43rd St, New York, NY 10036",
     "Austin, TX": "500 W 2nd St, Austin, TX 78701",
   },
-  Twitter: {
+  X: {
     "San Francisco, CA": "1355 Market St, San Francisco, CA 94103",
     "New York, NY": "249 W 17th St, New York, NY 10011",
     "Austin, TX": "500 W 2nd St, Austin, TX 78701",
@@ -350,18 +350,13 @@ function generateUserData() {
   // get city and state from the randomly selected location
   const [city, stateAbbr] = selectedLocation.split(", ");
 
-  // map abbreviations back to full state names
-  const stateAbbreviations = {
-    CA: "California",
-    WA: "Washington",
-    NY: "New York",
-    TX: "Texas",
-    MA: "Massachusetts",
-    FL: "Florida",
-    IL: "Illinois",
-  };
+  const countryCode = "1";
+  const phoneFirstThree = faker.string.numeric(3);
+  const phoneMiddleThree = faker.string.numeric(3);
+  const phoneLastFour = faker.string.numeric(4);
+  const phoneNumber = `+${countryCode} (${phoneFirstThree})-${phoneMiddleThree}-${phoneLastFour}`;
 
-  const state = stateAbbreviations[stateAbbr] || stateAbbr;
+  const instagramHandle = `@${firstName.toLowerCase()}${lastName.toLowerCase()}`;
 
   return {
     name: `${firstName} ${lastName}`,
@@ -375,8 +370,10 @@ function generateUserData() {
     university: university,
     company: company,
     office_address: officeAddress,
+    phone_number: phoneNumber,
+    instagram_handle: instagramHandle,
     city: city,
-    state: state,
+    state: stateAbbr,
   };
 }
 
