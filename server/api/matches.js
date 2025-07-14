@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
     );
     const results = recommender.getTopKRecommendations(20);
 
-    res.json(results);
+    res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: "Error fetching recommendations" });
   }
@@ -114,7 +114,7 @@ router.get("/friend-requests", async (req, res) => {
       };
     });
 
-    res.json(friendRequestsWithSenders);
+    res.status(200).json(friendRequestsWithSenders);
   } catch (err) {
     res.status(500).json({ error: "Error fetching friend requests" });
   }
@@ -138,7 +138,7 @@ router.get("/accepted", async (req, res) => {
         ],
       },
     });
-    res.json(acceptedMatches);
+    res.status(200).json(acceptedMatches);
   } catch (err) {
     res.status(500).json({ error: "Error fetching accepted matches" });
   }
@@ -273,7 +273,7 @@ router.put("/", async (req, res) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       message: "Match status updated successfully",
       match: match,
     });
