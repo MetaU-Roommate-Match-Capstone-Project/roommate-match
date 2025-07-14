@@ -75,6 +75,8 @@ model User {
   id                              Int               @id @default(autoincrement())
   name                            String
   email                           String
+  phone_number                    String?
+  instagram_handle                String?
   dob                             DateTime
   password                        String
   gender                          String

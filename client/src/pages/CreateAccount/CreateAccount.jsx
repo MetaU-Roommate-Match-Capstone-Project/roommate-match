@@ -23,6 +23,7 @@ const CreateAccount = () => {
     city: "",
     state: "",
     zipCode: "",
+    countryCode: "",
     phoneFirstThree: "",
     phoneMiddleThree: "",
     phoneLastFour: "",
@@ -110,6 +111,43 @@ const CreateAccount = () => {
       return;
     }
 
+    // validate phone number if user has entered any one of the phone number fields (all or none should be filled)
+    const validateOptionalPhone = (phoneFields) => {
+      let hasAPhoneFieldFilled = false;
+      for (const field of phoneFields) {
+        if (field.trim() !== "") {
+          hasAPhoneFieldFilled = true;
+          break;
+        }
+      }
+
+      if (hasAPhoneFieldFilled) {
+        for (const field of phoneFields) {
+          if (field.trim() === "") {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      return true;
+    };
+
+    const phoneValidation = validateOptionalPhone([
+      formState.countryCode,
+      formState.phoneFirstThree,
+      formState.phoneMiddleThree,
+      formState.phoneLastFour,
+    ]);
+
+    if (!phoneValidation) {
+      setSubmitError(
+        "Please complete all phone number fields or leave them all empty",
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const dobDate = new Date(
         parseInt(formState.dobYear),
@@ -121,7 +159,7 @@ const CreateAccount = () => {
 
       const officeAddress = `${formState.streetAddress}, ${formState.city}, ${formState.state} ${formState.zipCode}`;
 
-      const phoneNumber = `${formState.phoneFirstThree}-${formState.phoneMiddleThree}-${formState.phoneLastFour}`;
+      const phoneNumber = `+${formState.countryCode} (${formState.phoneFirstThree})-${formState.phoneMiddleThree}-${formState.phoneLastFour}`;
 
       const instagramHandle = `@${formState.instagramHandle}`;
 
@@ -417,8 +455,18 @@ const CreateAccount = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Phone Number (optional) </label>
+                <label className="form-label">Phone Number (optional)</label>
                 <div className="phone-container">
+                  <input
+                    type="text"
+                    placeholder="+1"
+                    maxLength="3"
+                    value={formState.countryCode}
+                    onChange={(e) =>
+                      updateFormField("countryCode", e.target.value)
+                    }
+                    className="form-input-small"
+                  />
                   <input
                     type="text"
                     placeholder="XXX"
@@ -435,9 +483,10 @@ const CreateAccount = () => {
                     placeholder="XXX"
                     maxLength="3"
                     value={formState.phoneMiddleThree}
-                    onChange={(e) => updateFormField("phoneMiddleThree", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("phoneMiddleThree", e.target.value)
+                    }
                     className="form-input-medium"
-                    required
                   />
                   <span className="separator">-</span>
                   <input
@@ -445,9 +494,10 @@ const CreateAccount = () => {
                     placeholder="XXXX"
                     maxLength="4"
                     value={formState.phoneLastFour}
-                    onChange={(e) => updateFormField("phoneLastFour", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("phoneLastFour", e.target.value)
+                    }
                     className="form-input-medium"
-                    required
                   />
                 </div>
               </div>
@@ -464,7 +514,6 @@ const CreateAccount = () => {
                   onChange={(e) =>
                     updateFormField("instagramHandle", e.target.value)
                   }
-                  required
                 />
               </div>
 
