@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../components/Spinner/Spinner";
 
 const CreateAccount = () => {
   const navigate = useNavigate();
@@ -535,7 +536,7 @@ const CreateAccount = () => {
                   className="btn-primary"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Creating Account..." : "Create Account"}
+                  {isSubmitting ? <Spinner /> : "Create Account"}
                 </button>
               </div>
             </form>

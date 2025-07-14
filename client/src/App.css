@@ -389,6 +389,14 @@ hr {
   @apply bg-gray-500 text-white px-4 py-2 rounded font-medium hover:bg-gray-600 transition-colors cursor-pointer border-none;
 }
 
+.loading-container {
+  @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
+}
+
+.loading-spinner-positioning {
+  @apply flex flex-col items-center gap-4;
+}
+
 .footer {
   @apply w-screen pt-5 bg-[#3066BE] text-center font-medium;
   margin-left: calc(-50vw + 50%);
