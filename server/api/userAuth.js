@@ -140,7 +140,6 @@ router.post("/logout/:id", (req, res) => {
   });
 });
 
-
 // [GET] - get all users
 router.get("/", async (req, res, next) => {
   try {
@@ -155,12 +154,14 @@ router.get("/", async (req, res, next) => {
               ...user,
               officeCoordinates: {
                 latitude: user.office_latitude,
-                longitude: user.office_longitude
-              }
+                longitude: user.office_longitude,
+              },
             };
           } else {
             // otherwise fetch coordinates from Google Maps Geocoding API and store them
-            const coordinates = await fetchOfficeCoordinates(user.office_address);
+            const coordinates = await fetchOfficeCoordinates(
+              user.office_address,
+            );
 
             if (coordinates) {
               await prisma.user.update({
@@ -168,22 +169,22 @@ router.get("/", async (req, res, next) => {
                 data: {
                   office_latitude: coordinates.latitude,
                   office_longitude: coordinates.longitude,
-                }
+                },
               });
             }
 
             return {
               ...user,
-              officeCoordinates: coordinates
+              officeCoordinates: coordinates,
             };
           }
         } else {
           return {
             ...user,
-            officeCoordinates: null
+            officeCoordinates: null,
           };
         }
-      })
+      }),
     );
 
     res.status(200).json(usersWithCoordinates);
