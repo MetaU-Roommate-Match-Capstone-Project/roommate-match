@@ -8,7 +8,7 @@ async function fetchOfficeCoordinates(address) {
     const response = await fetch(endpointUrl);
     const data = await response.json();
 
-    if (data.status !== 'OK' || data.status === "ZERO_RESULTS") {
+    if (data.status !== "OK" || data.status === "ZERO_RESULTS") {
       throw new Error(`No results found for address: ${address}`);
     }
 
@@ -17,7 +17,6 @@ async function fetchOfficeCoordinates(address) {
       latitude: location.lat,
       longitude: location.lng,
     };
-
   } catch (error) {
     throw new Error(`Error fetching coordinates for address: ${error}`);
   }
