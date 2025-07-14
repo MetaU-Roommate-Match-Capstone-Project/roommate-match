@@ -114,13 +114,9 @@ const CreateAccount = () => {
 
     // validate phone number if user has entered any one of the phone number fields (all or none should be filled)
     const validateOptionalPhone = (phoneFields) => {
-      let hasAPhoneFieldFilled = false;
-      for (const field of phoneFields) {
-        if (field.trim() !== "") {
-          hasAPhoneFieldFilled = true;
-          break;
-        }
-      }
+      const hasAPhoneFieldFilled = phoneFields.some(
+        (field) => field.trim() !== "",
+      );
 
       if (hasAPhoneFieldFilled) {
         for (const field of phoneFields) {
