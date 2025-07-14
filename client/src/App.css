@@ -287,6 +287,10 @@ body {
   @apply flex gap-3;
 }
 
+.phone-container {
+  @apply flex flex-row gap-3;
+}
+
 .nav-container {
   @apply fixed top-0 left-0 right-0 h-16 bg-[#3066BE] shadow-lg z-50;
 }
@@ -377,7 +381,7 @@ hr {
   @apply flex items-center gap-2;
 }
 
-.budget-separator {
+.separator {
   @apply text-lg font-bold text-gray-600;
 }
 

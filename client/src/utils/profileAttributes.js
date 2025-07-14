@@ -10,6 +10,10 @@ import {
 export const getBasicUserInfo = (roommateProfile) => {
   return [
     {
+      attribute: "Gender",
+      value: roommateProfile.user.gender,
+    },
+    {
       attribute: "Location",
       value: `${roommateProfile.city}, ${roommateProfile.state}`,
     },
@@ -28,6 +32,14 @@ export const getBasicUserInfo = (roommateProfile) => {
     {
       attribute: "Budget",
       value: `$${roommateProfile.user.budget_max}`,
+    },
+    {
+      attribute: "Phone Number",
+      value: roommateProfile.user.phone_number,
+    },
+    {
+      attribute: "Instagram Handle",
+      value: roommateProfile.user.instagram_handle,
     },
   ];
 };

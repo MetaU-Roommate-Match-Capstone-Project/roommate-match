@@ -23,6 +23,11 @@ const CreateAccount = () => {
     city: "",
     state: "",
     zipCode: "",
+    countryCode: "",
+    phoneFirstThree: "",
+    phoneMiddleThree: "",
+    phoneLastFour: "",
+    instagramHandle: "",
     groupId: "",
   });
 
@@ -106,6 +111,43 @@ const CreateAccount = () => {
       return;
     }
 
+    // validate phone number if user has entered any one of the phone number fields (all or none should be filled)
+    const validateOptionalPhone = (phoneFields) => {
+      let hasAPhoneFieldFilled = false;
+      for (const field of phoneFields) {
+        if (field.trim() !== "") {
+          hasAPhoneFieldFilled = true;
+          break;
+        }
+      }
+
+      if (hasAPhoneFieldFilled) {
+        for (const field of phoneFields) {
+          if (field.trim() === "") {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      return true;
+    };
+
+    const phoneValidation = validateOptionalPhone([
+      formState.countryCode,
+      formState.phoneFirstThree,
+      formState.phoneMiddleThree,
+      formState.phoneLastFour,
+    ]);
+
+    if (!phoneValidation) {
+      setSubmitError(
+        "Please complete all phone number fields or leave them all empty",
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const dobDate = new Date(
         parseInt(formState.dobYear),
@@ -116,6 +158,10 @@ const CreateAccount = () => {
       const dob = dobDate.toISOString();
 
       const officeAddress = `${formState.streetAddress}, ${formState.city}, ${formState.state} ${formState.zipCode}`;
+
+      const phoneNumber = `+${formState.countryCode} (${formState.phoneFirstThree})-${formState.phoneMiddleThree}-${formState.phoneLastFour}`;
+
+      const instagramHandle = `@${formState.instagramHandle}`;
 
       const userData = {
         name: formState.name,
@@ -129,6 +175,8 @@ const CreateAccount = () => {
         university: formState.university,
         company: formState.company,
         office_address: officeAddress,
+        phone_number: phoneNumber,
+        instagram_handle: instagramHandle,
       };
 
       await createUser(userData);
@@ -392,7 +440,7 @@ const CreateAccount = () => {
                     className="form-input-medium"
                     required
                   />
-                  <span className="budget-separator">-</span>
+                  <span className="separator">-</span>
                   <input
                     type="number"
                     placeholder="Max"
@@ -404,6 +452,69 @@ const CreateAccount = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Phone Number (optional)</label>
+                <div className="phone-container">
+                  <input
+                    type="text"
+                    placeholder="+1"
+                    maxLength="3"
+                    value={formState.countryCode}
+                    onChange={(e) =>
+                      updateFormField("countryCode", e.target.value)
+                    }
+                    className="form-input-small"
+                  />
+                  <input
+                    type="text"
+                    placeholder="XXX"
+                    maxLength="3"
+                    value={formState.phoneFirstThree}
+                    onChange={(e) =>
+                      updateFormField("phoneFirstThree", e.target.value)
+                    }
+                    className="form-input-medium"
+                  />
+                  <span className="separator">-</span>
+                  <input
+                    type="text"
+                    placeholder="XXX"
+                    maxLength="3"
+                    value={formState.phoneMiddleThree}
+                    onChange={(e) =>
+                      updateFormField("phoneMiddleThree", e.target.value)
+                    }
+                    className="form-input-medium"
+                  />
+                  <span className="separator">-</span>
+                  <input
+                    type="text"
+                    placeholder="XXXX"
+                    maxLength="4"
+                    value={formState.phoneLastFour}
+                    onChange={(e) =>
+                      updateFormField("phoneLastFour", e.target.value)
+                    }
+                    className="form-input-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="instagramHandle">
+                  Instagram Handle (optional)
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="instagramHandle"
+                  value={formState.instagramHandle}
+                  onChange={(e) =>
+                    updateFormField("instagramHandle", e.target.value)
+                  }
+                />
               </div>
 
               {submitError && (
