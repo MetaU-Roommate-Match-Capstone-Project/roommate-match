@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
 import RankingSlider from "../../components/RankingSlider/RankingSlider";
+import Spinner from "../../components/Spinner/Spinner";
 
 const RoommateProfileForm = () => {
   const {
@@ -648,9 +649,7 @@ const RoommateProfileForm = () => {
               className="btn-primary"
               disabled={isSubmitting}
             >
-              {isSubmitting
-                ? "Saving roommate profile preferences"
-                : "Save roommate profile preferences"}
+              {isSubmitting ? <Spinner /> : "Match me!"}
             </button>
           </form>
         </div>

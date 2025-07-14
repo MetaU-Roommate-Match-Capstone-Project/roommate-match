@@ -5,6 +5,7 @@ import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay";
+import Spinner from "../../components/Spinner/Spinner";
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -12,17 +13,19 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [userProfile, setUserProfile] = useState("");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { fetchPosts, nextCursor, hasNextPage, loading } =
+  const [profileLoading, setProfileLoading] = useState(false);
+  const { fetchPosts, nextCursor, hasNextPage, postsLoading, pageLoading } =
     useFetchPosts(setPosts);
 
   const loadMorePosts = () => {
-    if (nextCursor && hasNextPage && !loading) {
+    if (nextCursor && hasNextPage && !postsLoading) {
       fetchPosts(nextCursor, true);
     }
   };
 
   const fetchUserProfile = async (id) => {
     try {
+      setProfileLoading(true);
       const response = await fetch(`api/roommate-profile/${id}`, {
         method: "GET",
         headers: {
@@ -42,6 +45,8 @@ const Dashboard = () => {
       setError(null);
     } catch (error) {
       setError(error.message);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -55,6 +60,16 @@ const Dashboard = () => {
     [user],
     posts,
   );
+
+  if (pageLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner-positioning">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -76,8 +91,9 @@ const Dashboard = () => {
                 <button
                   className="post-username"
                   onClick={() => fetchUserProfile(post.user.id)}
+                  disabled={profileLoading}
                 >
-                  {post.user.name}
+                  {profileLoading ? <Spinner /> : post.user.name}
                 </button>
               </div>
               <p className="post-location">
@@ -94,9 +110,9 @@ const Dashboard = () => {
         <button
           className="btn-primary"
           onClick={loadMorePosts}
-          disabled={loading}
+          disabled={postsLoading}
         >
-          {loading ? "Loading..." : "Load More"}
+          {postsLoading ? <Spinner /> : "Load More"}
         </button>
       )}
 
@@ -117,11 +133,12 @@ function useFetchPosts(setPosts) {
   const [error, setError] = useState(null);
   const [nextCursor, setNextCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const fetchPosts = async (cursor = null, append = false) => {
     try {
-      setLoading(true);
+      setPostsLoading(true);
       const url = cursor ? `/api/post?cursor=${cursor}` : "/api/post";
 
       const response = await fetch(url, {
@@ -155,8 +172,9 @@ function useFetchPosts(setPosts) {
     } catch (error) {
       setError(error.message);
     } finally {
-      setLoading(false);
+      setPostsLoading(false);
+      setPageLoading(false);
     }
   };
-  return { fetchPosts, nextCursor, hasNextPage, loading };
+  return { fetchPosts, nextCursor, hasNextPage, postsLoading, pageLoading };
 }
