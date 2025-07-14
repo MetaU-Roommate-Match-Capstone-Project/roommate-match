@@ -1,4 +1,4 @@
-// Utility methods used to calculate the similarity of individual roommate attributes
+// Utilities used to calculate the similarity of individual roommate attributes
 const ENUM_MAP = {
   cleanliness: { VERY_DIRTY: 0, DIRTY: 1, MEDIUM: 2, CLEAN: 3, VERY_CLEAN: 4 },
   pets: {

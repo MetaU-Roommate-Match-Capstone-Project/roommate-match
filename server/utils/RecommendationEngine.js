@@ -6,6 +6,12 @@ const {
   distanceBetweenCoordinates,
 } = require("./similarityCalculations.js");
 
+const POSITIVE_STATUSES = new Set(["ACCEPTED", "FRIEND_REQUEST_SENT"]);
+const NEGATIVE_STATUSES = new Set([
+  "REJECTED_BY_RECIPIENT",
+  "REJECTED_RECOMMENDATION",
+]);
+
 class RecommendationEngine {
   constructor(currentProfile, currentUser, others, otherUsers) {
     this.currentProfile = currentProfile;
@@ -148,6 +154,26 @@ class RecommendationEngine {
     }
 
     return weightedSum / totalWeight;
+  }
+
+  changeWeightsOnFeedback(similarity, matchStatus) {
+    const delta = 0.05;
+    const weights = this.getWeights();
+
+    for (const key in similarity) {
+      const sim = similarity[key];
+      if (POSITIVE_STATUSES.has(matchStatus)) {
+        if (sim > 0.7) {
+          weights[key] = Math.min(weights[key] + delta, 1);
+        }
+      } else if (NEGATIVE_STATUSES.has(matchStatus)) {
+        if (sim > 0.7) {
+          weights[key] = Math.max(weights[key] - delta, 0.05);
+        }
+      }
+    }
+
+    return weights;
   }
 
   getTopKRecommendations(k) {
