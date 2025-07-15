@@ -1,10 +1,15 @@
 const RecommendationEngine = require("../utils/RecommendationEngine");
+const {
+  buildPreferenceSimilarityMatrix,
+  getMultipleGroupOptions,
+  formatMultipleGroupOptions,
+} = require("../utils/matchingGroups");
 const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
-// [GET] /matches - gets all recommendations for the current user signed in
+// [GET] /matches - gets all recommendations for the current user signed in using KNN to find the top 20 most similar users
 router.get("/", async (req, res) => {
   if (!req.session.userId) {
     return res
@@ -39,6 +44,35 @@ router.get("/", async (req, res) => {
     res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: "Error fetching recommendations" });
+  }
+});
+
+// [GET] /matches/groups - gets multiple ranked group options for the current user signed in using Gale-Shapley algorithm
+router.get("/groups", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ error: "You must be logged in to view stable groups" });
+  }
+
+  try {
+    const userPreferences = await buildPreferenceSimilarityMatrix();
+    const multipleGroupOptions = getMultipleGroupOptions(userPreferences, 50);
+    const formattedOptions = formatMultipleGroupOptions(multipleGroupOptions);
+
+    // filter each option to only return groups that contain the current user
+    const userGroupOptions = formattedOptions
+      .map((option) => ({
+        ...option,
+        groups: option.groups.filter((group) =>
+          group.members.some((member) => member.userId === req.session.userId),
+        ),
+      }))
+      .filter((option) => option.groups.length > 0);
+
+    res.status(200).json(userGroupOptions);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching stable groups" });
   }
 });
 
