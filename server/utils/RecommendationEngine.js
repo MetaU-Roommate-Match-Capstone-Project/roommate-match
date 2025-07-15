@@ -104,6 +104,9 @@ class RecommendationEngine {
       roomType:
         1 /
         (1 + distanceBetweenEnumValues("roomType", a.room_type, b.room_type)),
+      numRoommates:
+        1 /
+        (1 + distanceBetweenNumericalValues(a.num_roommates, b.num_roommates)),
       sleepSchedule:
         1 /
         (1 +
