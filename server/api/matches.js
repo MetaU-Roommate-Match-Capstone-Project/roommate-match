@@ -9,7 +9,7 @@ const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
-// [GET] /matches - gets all recommendations for the current user signed in using KNN to find the top 20 most similar users
+// [GET] /matches - gets all recs for the current user signed in using KNN
 router.get("/", async (req, res) => {
   if (!req.session.userId) {
     return res
@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// [GET] /matches/groups - gets multiple ranked group options for the current user signed in using Gale-Shapley algorithm
+// [GET] /matches/groups - gets ranked group options using Gale-Shapley algorithm
 router.get("/groups", async (req, res) => {
   if (!req.session.userId) {
     return res
