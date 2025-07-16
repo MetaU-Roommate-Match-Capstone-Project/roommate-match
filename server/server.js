@@ -8,22 +8,6 @@ const { PrismaClient } = require("./generated/prisma");
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  const ALLOWED_ORIGINS = ['http://localhost:5173', 'https://roomify-metau.onrender.com'];
-
-  const origin = req.header('Origin');
-
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header("Access-Control-Allow-Headers", "content-type");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  }
-
-
-  next();
-});
-
 // const corsConfig = cors({
 //     // origin: [/*"http://localhost:5173",*/"https://roomify-metau.onrender.com"],
 //     origin: "https://roomify-metau.onrender.com",
@@ -51,6 +35,22 @@ app.use(
     }),
   }),
 );
+
+app.use((req, res, next) => {
+  const ALLOWED_ORIGINS = ['http://localhost:5173', 'https://roomify-metau.onrender.com'];
+
+  const origin = req.header('Origin');
+
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header("Access-Control-Allow-Headers", "content-type");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  }
+
+
+  next();
+});
 
 const userAuthRoutes = require("./api/userAuth.js");
 app.use("/api/users", userAuthRoutes);
