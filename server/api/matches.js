@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
       others,
       otherUsers,
     );
-    const results = recommender.getTopKRecommendations(20);
+    const results = await recommender.getTopKRecommendations(20);
 
     res.status(200).json(results);
   } catch (err) {

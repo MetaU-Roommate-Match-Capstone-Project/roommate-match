@@ -5,6 +5,8 @@ const {
   distanceBetweenStringValues,
   distanceBetweenCoordinates,
 } = require("./similarityCalculations.js");
+const { PrismaClient } = require("../generated/prisma");
+const prisma = new PrismaClient();
 
 const POSITIVE_STATUSES = new Set(["ACCEPTED", "FRIEND_REQUEST_SENT"]);
 const NEGATIVE_STATUSES = new Set([
@@ -179,20 +181,48 @@ class RecommendationEngine {
     return weights;
   }
 
-  getTopKRecommendations(k) {
-    return this.others
-      .map((otherProfile) => {
-        const otherUser = this.otherUsers.find(
-          (user) => user.id === otherProfile.user_id,
-        );
-        const similarity = this.computeSimilarity(otherProfile, otherUser);
-        return {
-          user_id: otherProfile.user_id,
-          similarity,
-          profile: otherProfile,
-          user: otherUser,
-        };
-      })
+  async getTopKRecommendations(k) {
+    // map over the other user profiles and compute similarity
+    const recommendations = this.others.map((otherProfile) => {
+      const otherUser = this.otherUsers.find(
+        (user) => user.id === otherProfile.user_id,
+      );
+      const similarity = this.computeSimilarity(otherProfile, otherUser);
+      return {
+        user_id: otherProfile.user_id,
+        similarity,
+        profile: otherProfile,
+        user: otherUser,
+      };
+    });
+
+    // exclude recommendations who have already been rejected by the user
+    const filteredRecommendations = [];
+    for (const rec of recommendations) {
+      // check match model for existing negative match status
+      const existingNegativeMatch = await prisma.matches.findFirst({
+        where: {
+          OR: [
+            {
+              user_id: this.currentUser.id,
+              recommended_id: rec.user_id,
+              status: { in: Array.from(NEGATIVE_STATUSES) },
+            },
+            {
+              user_id: rec.user_id,
+              recommended_id: this.currentUser.id,
+              status: { in: Array.from(NEGATIVE_STATUSES) },
+            },
+          ],
+        },
+      });
+
+      if (!existingNegativeMatch) {
+        filteredRecommendations.push(rec);
+      }
+    }
+
+    return filteredRecommendations
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, k);
   }
