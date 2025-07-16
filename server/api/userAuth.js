@@ -96,6 +96,8 @@ router.post("/create-account", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
+  res.header("Access-Control-Allow-Origin", "https://roomify-metau.onrender.com");
+
   try {
     if (!email || !password) {
       return res
