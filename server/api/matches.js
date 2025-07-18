@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
       others,
       otherUsers,
     );
-    const results = await recommender.getTopKRecommendations(20);
+    const results = await recommender.getTopKRecommendations(50);
 
     res.status(200).json(results);
   } catch (err) {
@@ -121,10 +121,22 @@ router.get("/friend-requests", async (req, res) => {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true, profile_picture: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
         },
         recommended_user: {
-          select: { id: true, name: true, email: true, profile_picture: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
         },
       },
     });
@@ -176,6 +188,7 @@ router.get("/friend-requests", async (req, res) => {
                 name: true,
                 email: true,
                 profile_picture: true,
+                friend_request_count: true,
               },
             },
             recommended_user: {
@@ -184,6 +197,7 @@ router.get("/friend-requests", async (req, res) => {
                 name: true,
                 email: true,
                 profile_picture: true,
+                friend_request_count: true,
               },
             },
           },
@@ -262,6 +276,7 @@ router.get("/accepted", async (req, res) => {
         university: true,
         office_address: true,
         roommate_profile: true,
+        friend_request_count: true,
       },
     });
 
@@ -294,7 +309,7 @@ router.put("/", async (req, res) => {
       .json({ error: "You must be logged in to update match status." });
   }
 
-  const { recommended_id, status } = req.body;
+  const { recommended_id, status, similarity_score } = req.body;
 
   if (!recommended_id || !status) {
     return res
@@ -348,6 +363,16 @@ router.put("/", async (req, res) => {
             friend_request_sent_at: new Date(),
             potential_group_id: potentialGroupId,
             similarity_score: similarity_score,
+          },
+        });
+
+        // increment friend request count for recommended user
+        await prisma.user.update({
+          where: { id: recommended_id },
+          data: {
+            friend_request_count: {
+              increment: 1,
+            },
           },
         });
       } else {
@@ -448,6 +473,17 @@ router.put("/groups", async (req, res) => {
               friend_request_sent_at: new Date(),
               potential_group_id: potentialGroupId,
               similarity_score: similarity_score,
+            },
+          }),
+        );
+        // increment friend request count for all users in the group
+        matchUpdates.push(
+          prisma.user.update({
+            where: { id: memberId },
+            data: {
+              friend_request_count: {
+                increment: 1,
+              },
             },
           }),
         );

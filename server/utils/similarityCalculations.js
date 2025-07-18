@@ -44,6 +44,7 @@ function convertStringToVector(str) {
 }
 
 // cosine similarity between two vectors to calculate distance between two strings
+// reference: https://www.youtube.com/watch?v=e9U0QAFbfLI
 function distanceBetweenStringValues(str1, str2) {
   const vector1 = convertStringToVector(str1);
   const vector2 = convertStringToVector(str2);
@@ -68,6 +69,7 @@ function distanceBetweenStringValues(str1, str2) {
 }
 
 // calculate distance between 2 coordinates using Haversine formula
+// reference: https://www.youtube.com/watch?v=t6NkBRQ2Fz0
 function distanceBetweenCoordinates(lat1, lon1, lat2, lon2) {
   const R = 6371; // earth radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
