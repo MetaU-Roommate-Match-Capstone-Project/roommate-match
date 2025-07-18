@@ -4,11 +4,9 @@ const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 const helmet = require("helmet");
-const cors = require("cors");
 const { fetchOfficeCoordinates } = require("./fetchCoordinates");
 router.use(helmet());
 router.use(express.json());
-router.use(cors());
 
 // [POST] - Create Account Route
 router.post("/create-account", async (req, res) => {
@@ -102,8 +100,6 @@ router.post("/create-account", async (req, res) => {
 // [POST] - Login route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
-  res.header("Access-Control-Allow-Origin", "https://roomify-metau.onrender.com");
 
   try {
     if (!email || !password) {
