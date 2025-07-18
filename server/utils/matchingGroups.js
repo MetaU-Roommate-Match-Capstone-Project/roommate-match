@@ -484,8 +484,40 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     }
   }
 
+  // find index of current user to access info about current user (e.g. capacity)
+  const currentUserIndex = users.findIndex((user) => user.id === currentUserId);
+  const currentUser = currentUserIndex !== -1 ? users[currentUserIndex] : null;
+
   // sort by stable pairs count (most stable to least stable - descending order)
-  groupOptions.sort((a, b) => b.stablePairs - a.stablePairs);
+  // if number of stable pairs are equal, use tiebreaker based on group size preference
+  groupOptions.sort((a, b) => {
+    if (b.stablePairs !== a.stablePairs) {
+      return b.stablePairs - a.stablePairs;
+    }
+
+    if (currentUser) {
+      // get the groups containing the current user in each option
+      const aUserGroup = a.groups.find((group) =>
+        group.members.some((member) => member.id === currentUserId),
+      );
+
+      const bUserGroup = b.groups.find((group) =>
+        group.members.some((member) => member.id === currentUserId),
+      );
+
+      if (aUserGroup && bUserGroup) {
+        // get the preferred size of the group for the current user
+        const preferredSize = currentUser.capacity + 1;
+
+        const aSizeDiff = Math.abs(aUserGroup.members.length - preferredSize);
+        const bSizeDiff = Math.abs(bUserGroup.members.length - preferredSize);
+
+        // return group with the closest group size to the user's preference
+        return aSizeDiff - bSizeDiff;
+      }
+    }
+    return 0;
+  });
 
   return groupOptions;
 }
