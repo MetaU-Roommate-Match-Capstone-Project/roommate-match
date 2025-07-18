@@ -6,6 +6,9 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("./generated/prisma");
 const cors = require("cors");
 
+// trust the first proxy when in production
+app.set('trust proxy', 1);
+
 app.use(express.json());
 
 const corsConfig = cors({
@@ -20,9 +23,10 @@ app.use(corsConfig);
 app.use(
   expressSession({
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "production", // use secure in production
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 60, // 1 hour session
+      sameSite: 'none', // allow cross-site cookies
     },
     secret: "roommate-match",
     resave: false,
