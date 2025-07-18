@@ -89,6 +89,7 @@ model User {
   office_address                  String
   office_latitude                 Float?
   office_longitude                Float?
+  friend_request_count            Int               @default(0)
   group                           Group?            @relation(fields: [group_id], references: [id])
   group_id                        Int?
   roommate_profile                RoommateProfile?
