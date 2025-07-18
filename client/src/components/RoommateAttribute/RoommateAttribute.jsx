@@ -1,6 +1,6 @@
 import React from "react";
 
-const RoommateAttributes = ({ attribute, value }) => {
+const RoommateAttribute = ({ attribute, value }) => {
   return (
     <p>
       <strong>{attribute}: </strong> {value}
@@ -8,4 +8,4 @@ const RoommateAttributes = ({ attribute, value }) => {
   );
 };
 
-export default RoommateAttributes;
+export default RoommateAttribute;

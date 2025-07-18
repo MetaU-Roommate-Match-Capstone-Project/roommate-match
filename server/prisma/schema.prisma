@@ -70,44 +70,74 @@ model Session {
   expiresAt           DateTime
 }
 
+enum MatchStatus {
+  PENDING
+  FRIEND_REQUEST_SENT
+  ACCEPTED
+  REJECTED_BY_RECIPIENT
+  REJECTED_RECOMMENDATION
+}
+
 model User {
-  id                 Int              @id @default(autoincrement())
-  name               String
-  email              String
-  password           String
-  dob                DateTime
-  gender             String
-  profile_picture    Bytes?
-  intern_or_new_grad String
-  budget_min         Int
-  budget_max         Int
-  university         String
-  company            String
-  group_id           Int              @default(0)
-  roommate_profile   RoommateProfile?
-  posts              Post[]
+  id                              Int               @id @default(autoincrement())
+  name                            String
+  email                           String
+  phone_number                    String?
+  instagram_handle                String?
+  dob                             DateTime
+  password                        String
+  gender                          String
+  profile_picture                 Bytes?
+  intern_or_new_grad              String
+  budget_min                      Int
+  budget_max                      Int
+  university                      String
+  company                         String
+  office_address                  String
+  office_latitude                 Float?
+  office_longitude                Float?
+  group                           Group?            @relation(fields: [group_id], references: [id])
+  group_id                        Int?
+  roommate_profile                RoommateProfile?
+  posts                           Post[]
+  received_matches                Matches[]         @relation("ReceivedMatches")
+  recommended_matches             Matches[]         @relation("RecommendedMatches")
+  sent_friend_requests            Matches[]         @relation("SentFriendRequests")
+
 }
 
 model RoommateProfile {
-  id                Int              @id @default(autoincrement())
-  user              User             @relation(fields: [user_id], references: [id])
-  user_id           Int              @unique
-  city              String
-  state             String
-  cleanliness       Cleanliness
-  smokes            Boolean
-  pets              Pets
-  gender_preference GenderPreference
-  room_type         RoomType
-  num_roommates     Int
-  lease_duration    Int
-  move_in_date      DateTime
-  sleep_schedule    SleepSchedule
-  noise_tolerance   NoiseTolerance
-  socialness        Socialness
-  hobbies           String
-  favorite_music    String
-  bio               String
+  id                        Int              @id @default(autoincrement())
+  user                      User             @relation(fields: [user_id], references: [id])
+  user_id                   Int              @unique
+  city                      String
+  state                     String
+  cleanliness               Cleanliness
+  smokes                    Boolean
+  pets                      Pets
+  gender_preference         GenderPreference
+  room_type                 RoomType
+  num_roommates             Int
+  lease_duration            Int
+  move_in_date              DateTime
+  sleep_schedule            SleepSchedule
+  noise_tolerance           NoiseTolerance
+  socialness                Socialness
+  hobbies                   String
+  favorite_music            String
+  bio                       String
+
+  cleanliness_weight        Decimal?          @db.Decimal(3, 2)
+  smokes_weight             Decimal?          @db.Decimal(3, 2)
+  pets_weight               Decimal?          @db.Decimal(3, 2)
+  gender_preference_weight  Decimal?          @db.Decimal(3, 2)
+  room_type_weight          Decimal?          @db.Decimal(3, 2)
+  num_roommates_weight      Decimal?          @db.Decimal(3, 2)
+  sleep_schedule_weight     Decimal?          @db.Decimal(3, 2)
+  noise_tolerance_weight    Decimal?          @db.Decimal(3, 2)
+  socialness_weight         Decimal?          @db.Decimal(3, 2)
+  hobbies_weight            Decimal?          @db.Decimal(3, 2)
+  favorite_music_weight     Decimal?          @db.Decimal(3, 2)
 }
 
 model Post {
@@ -117,4 +147,34 @@ model Post {
   city              String
   state             String
   content           String
+  pictures          Picture[]
+}
+
+model Picture {
+  id                Int              @id @default(autoincrement())
+  post              Post             @relation(fields: [post_id], references: [id])
+  post_id           Int
+  image             Bytes
+}
+
+model Matches {
+  id                        Int              @id @default(autoincrement())
+  user                      User             @relation("ReceivedMatches", fields: [user_id], references: [id])
+  user_id                   Int
+  recommended_user          User             @relation("RecommendedMatches", fields: [recommended_id], references: [id])
+  recommended_id            Int
+  similarity_score          Float
+  status                    MatchStatus      @default(PENDING)
+  potential_group_id        String?
+  friend_request_sent_by    Int?
+  friend_request_sender     User?            @relation("SentFriendRequests", fields: [friend_request_sent_by], references: [id])
+  friend_request_sent_at    DateTime?
+  responded_at              DateTime?
+  created_at                DateTime         @default(now())
+  updated_at                DateTime         @updatedAt
+}
+
+model Group {
+  id                        Int              @id @default(autoincrement())
+  members                   User[]
 }

@@ -3,7 +3,7 @@ import {
   getBasicUserInfo,
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
-import RoommateAttributes from "../RoommateAttributes/RoommateAttributes.jsx";
+import RoommateAttribute from "../RoommateAttribute/RoommateAttribute.jsx";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 
 const ProfileModal = ({ userProfile, onClose }) => {
@@ -37,7 +37,7 @@ const ProfileModal = ({ userProfile, onClose }) => {
               />
               <div className="profile-details">
                 {basicUserInfo.map((info, index) => (
-                  <RoommateAttributes
+                  <RoommateAttribute
                     key={index}
                     attribute={info.attribute}
                     value={info.value}
@@ -50,7 +50,7 @@ const ProfileModal = ({ userProfile, onClose }) => {
               <h3 className="title">Roommate Preferences</h3>
               <div className="profile-details">
                 {roommatePreferencesInfo.map((preference, index) => (
-                  <RoommateAttributes
+                  <RoommateAttribute
                     key={index}
                     attribute={preference.attribute}
                     value={preference.value}

@@ -5,6 +5,7 @@ const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 const helmet = require("helmet");
 const cors = require("cors");
+const { fetchOfficeCoordinates } = require("./fetchCoordinates");
 router.use(helmet());
 router.use(express.json());
 router.use(cors());
@@ -14,6 +15,8 @@ router.post("/create-account", async (req, res) => {
   const {
     name,
     email,
+    phone_number,
+    instagram_handle,
     password,
     dob,
     gender,
@@ -22,6 +25,7 @@ router.post("/create-account", async (req, res) => {
     budget_max,
     university,
     company,
+    office_address,
   } = req.body;
 
   try {
@@ -74,6 +78,8 @@ router.post("/create-account", async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        phone_number,
+        instagram_handle,
         dob,
         gender,
         intern_or_new_grad,
@@ -81,6 +87,7 @@ router.post("/create-account", async (req, res) => {
         budget_max,
         university,
         company,
+        office_address,
       },
     });
     res.status(201).json({ newUser });
@@ -144,7 +151,50 @@ router.post("/logout/:id", (req, res) => {
 router.get("/", async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
-    res.status(200).json(users);
+
+    const usersWithCoordinates = await Promise.all(
+      users.map(async (user) => {
+        if (user.office_address) {
+          // check if user already has coordinates in database and return stored coordinates
+          if (user.office_latitude && user.office_longitude) {
+            return {
+              ...user,
+              officeCoordinates: {
+                latitude: user.office_latitude,
+                longitude: user.office_longitude,
+              },
+            };
+          } else {
+            // otherwise fetch coordinates from Google Maps Geocoding API and store them
+            const coordinates = await fetchOfficeCoordinates(
+              user.office_address,
+            );
+
+            if (coordinates) {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  office_latitude: coordinates.latitude,
+                  office_longitude: coordinates.longitude,
+                },
+              });
+            }
+
+            return {
+              ...user,
+              officeCoordinates: coordinates,
+            };
+          }
+        } else {
+          return {
+            ...user,
+            officeCoordinates: null,
+          };
+        }
+      }),
+    );
+
+    res.status(200).json(usersWithCoordinates);
   } catch (err) {
     next(err);
   }

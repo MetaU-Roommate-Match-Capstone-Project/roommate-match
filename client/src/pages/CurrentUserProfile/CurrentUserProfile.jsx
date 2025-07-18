@@ -2,7 +2,7 @@ import React from "react";
 import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
-import RoommateAttributes from "../../components/RoommateAttributes/RoommateAttributes.jsx";
+import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -11,6 +11,8 @@ import {
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import { getUrl } from "../../utils/url";
+import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
+import Spinner from "../../components/Spinner/Spinner.jsx";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -20,10 +22,12 @@ const CurrentUserProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${getUrl()}/api/users/logout/${user.id}`, {
         method: "POST",
         credentials: "include",
@@ -35,51 +39,7 @@ const CurrentUserProfile = () => {
       }
     } catch (error) {
       setError(error.message);
-    }
-  };
-
-  // fetch user profile picture from backend
-  const fetchUserProfilePicture = async (
-    url,
-    method = "GET",
-    credentials = "include",
-    body = null,
-  ) => {
-    try {
-      const options = {
-        method,
-        credentials,
-      };
-
-      if (body) {
-        options.body = body;
-      }
-
-      const response = await fetch(url, options);
-
-      return response;
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const fetchProfilePicture = async () => {
-    try {
-      const imageToDisplay = await fetchUserProfilePicture(
-        `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`,
-        "GET",
-        "include",
-        null,
-      );
-
-      if (imageToDisplay.ok) {
-        const imageBlob = await imageToDisplay.blob();
-        setProfilePicture(URL.createObjectURL(imageBlob));
-      } else {
-        setProfilePicture("");
-      }
-    } catch (error) {
-      setProfilePicture("");
+      setLoading(false);
     }
   };
 
@@ -89,25 +49,41 @@ const CurrentUserProfile = () => {
       return;
     }
 
+    const localImageUrl = URL.createObjectURL(file);
+    setProfilePicture(localImageUrl);
+
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("profilePicture", file);
-      await fetchUserProfilePicture(
+
+      const response = await fetch(
         `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`,
-        "PUT",
-        "include",
-        formData,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        },
       );
-      fetchProfilePicture();
+
+      if (!response.ok) {
+        setProfilePicture("");
+        throw new Error("Failed to upload profile picture");
+      }
     } catch (error) {
       setError(error.message);
+      setProfilePicture("");
+      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   // fetch user profile data from backend
   const fetchCurrentUserProfile = async () => {
     try {
+      setLoading(true);
       setError(null);
       const response = await fetch(`${getUrl()}/api/roommate-profile/me`, {
         method: "GET",
@@ -125,6 +101,7 @@ const CurrentUserProfile = () => {
         setTimeout(() => {
           navigate("/roommate-profile-form");
         }, 10000);
+        setLoading(false);
         return;
       }
 
@@ -135,14 +112,17 @@ const CurrentUserProfile = () => {
 
       const currentUserProfile = await response.json();
       setRoommateProfile(currentUserProfile);
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
   // fetch user posts
   const fetchUserPosts = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${getUrl()}/api/post/me`, {
         method: "GET",
         headers: {
@@ -157,19 +137,19 @@ const CurrentUserProfile = () => {
       }
       const currentUserPosts = await response.json();
       setPosts(currentUserPosts);
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
-  const createPost = async (postContent) => {
+  const createPost = async (formData) => {
     try {
+      setLoading(true);
       const response = await fetch(`${getUrl()}/api/post`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postContent),
+        body: formData,
         credentials: "include",
       });
 
@@ -178,45 +158,54 @@ const CurrentUserProfile = () => {
         throw new Error(errorInfo.error || "Failed to create post");
       }
 
-      const newPost = await response.json();
-      setPosts([newPost, ...posts]);
+      await fetchUserPosts();
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
+      throw error;
     }
   };
 
   const deletePost = async (postId) => {
-    fetch(`${getUrl()}/api/post/me/${postId}`, {
-      method: "DELETE",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to delete post, error: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPosts(posts.filter((post) => post.id !== postId));
-      })
-      .catch((error) => {
-        setError(error.message);
+    try {
+      setLoading(true);
+      const response = await fetch(`${getUrl()}/api/post/me/${postId}`, {
+        method: "DELETE",
+        credentials: "include",
       });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete post, error: ${response.status}`);
+      }
+
+      await response.json();
+      setPosts(posts.filter((post) => post.id !== postId));
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   };
 
-  useEffect(
-    () => {
-      if (!user) {
-        return;
-      }
-      fetchCurrentUserProfile();
-      fetchUserPosts();
-      fetchProfilePicture();
-    },
-    [user],
-    posts,
-    profilePicture,
-  );
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    fetchCurrentUserProfile();
+    fetchUserPosts();
+  }, [user]);
+
+  // render spinner when loading
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner-positioning">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   // render error message if user has not created a profile yet
   if (error) {
@@ -238,9 +227,9 @@ const CurrentUserProfile = () => {
   // loading message while user profile is being fetched
   if (!roommateProfile) {
     return (
-      <div className="profile-container">
-        <div className="profile-card">
-          <h2>Loading your profile...</h2>
+      <div className="loading-container">
+        <div className="loading-spinner-positioning">
+          <Spinner />
         </div>
       </div>
     );
@@ -254,8 +243,16 @@ const CurrentUserProfile = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmit = async (postContent) => {
-    await createPost(postContent);
+  const handleSubmit = async (formState) => {
+    const formData = new FormData();
+    formData.append("city", formState.city);
+    formData.append("state", formState.state);
+    formData.append("content", formState.content);
+    formState.pictures.forEach((file) => {
+      formData.append("pictures", file);
+    });
+
+    await createPost(formData);
   };
 
   const basicUserInfo = getBasicUserInfo(roommateProfile);
@@ -274,8 +271,15 @@ const CurrentUserProfile = () => {
           <div className="profile-col">
             <img
               className="profile-image"
-              src={profilePicture ? profilePicture : fallbackProfilePic}
+              src={
+                profilePicture
+                  ? profilePicture
+                  : `/api/roommate-profile/profile-picture/${user.id}`
+              }
               alt="profile-picture"
+              onError={(e) => {
+                e.target.src = fallbackProfilePic;
+              }}
             />
             <input
               type="file"
@@ -293,7 +297,7 @@ const CurrentUserProfile = () => {
             </button>
             <div className="profile-details">
               {basicUserInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
@@ -306,7 +310,7 @@ const CurrentUserProfile = () => {
             <h3 className="title">Roommate Preferences</h3>
             <div className="profile-details">
               {roommatePreferencesInfo.map((preference, index) => (
-                <RoommateAttributes
+                <RoommateAttribute
                   key={index}
                   attribute={preference.attribute}
                   value={preference.value}
@@ -325,7 +329,20 @@ const CurrentUserProfile = () => {
 
       <section className="mb-12">
         <div>
-          <h3 className="title">My Posts</h3>
+          <div className="my-posts-header">
+            <div className="my-posts-header-spacer"></div>
+            <h3 className="title">My Posts</h3>
+            <div className="my-posts-button-container">
+              <button className="btn-primary" onClick={openModal}>
+                + Create a New Post
+              </button>
+            </div>
+          </div>
+          <NewPostModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+          ></NewPostModal>
           <div className="post-container">
             {posts.length === 0 ? (
               <div className="text-center py-12">
@@ -344,19 +361,12 @@ const CurrentUserProfile = () => {
                     &#x1F4CD;{post.city}, {post.state}
                   </p>
                   <p className="post-content">{post.content}</p>
+                  <PostPictureDisplay pictures={post.pictures} />
                 </div>
               ))
             )}
           </div>
         </div>
-        <button className="btn-primary mt-8" onClick={openModal}>
-          + Create a New Post
-        </button>
-        <NewPostModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSubmit={handleSubmit}
-        ></NewPostModal>
       </section>
 
       <div className="flex justify-center mb-8">
