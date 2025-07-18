@@ -2,6 +2,11 @@ const RecommendationEngine = require("./RecommendationEngine");
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
+const NEGATIVE_STATUSES = new Set([
+  "REJECTED_BY_RECIPIENT",
+  "REJECTED_RECOMMENDATION",
+]);
+
 async function buildPreferenceSimilarityMatrix() {
   try {
     // get all users and their roommate profiles
@@ -361,8 +366,8 @@ function getMaxGroupSize(group) {
 function createGroup(members) {
   // create a new group with the given members
   const group = {
-    id: Math.floor(Math.random() * 1000),
-    members: [...members],
+    id: Math.floor(Math.random() * 1000000),
+    members: members,
   };
 
   // set the current group for each member
@@ -419,8 +424,34 @@ function shuffleArray(array) {
 }
 
 // make multiple group options ranked by number of stable pairs within that group
-function getMultipleGroupOptions(users, numGroupOptions) {
+async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
   const groupOptions = [];
+
+  // get all users that the current user has rejected or who have rejected the current user
+  const rejectedMatches = await prisma.matches.findMany({
+    where: {
+      OR: [
+        {
+          user_id: currentUserId,
+          status: { in: Array.from(NEGATIVE_STATUSES) },
+        },
+        {
+          recommended_id: currentUserId,
+          status: { in: Array.from(NEGATIVE_STATUSES) },
+        },
+      ],
+    },
+  });
+
+  // create a set of rejected user IDs for filtering group options
+  const rejectedUserIds = new Set();
+  rejectedMatches.forEach((match) => {
+    if (match.user_id === currentUserId) {
+      rejectedUserIds.add(match.recommended_id);
+    } else {
+      rejectedUserIds.add(match.user_id);
+    }
+  });
 
   for (let i = 0; i < numGroupOptions; i++) {
     const usersCopy = users.map((user) => ({
@@ -435,11 +466,18 @@ function getMultipleGroupOptions(users, numGroupOptions) {
     const userMap = new Map();
     usersCopy.forEach((user) => userMap.set(user.id, user));
 
-    // add group option to list
-    if (groups.length > 0) {
-      const stablePairs = countStablePairs(groups, userMap);
+    const filteredGroups = groups.filter((group) => {
+      return !group.members.some(
+        (member) =>
+          member.id !== currentUserId && rejectedUserIds.has(member.id),
+      );
+    });
+
+    // add group option to list if there are valid groups after filtering
+    if (filteredGroups.length > 0) {
+      const stablePairs = countStablePairs(filteredGroups, userMap);
       groupOptions.push({
-        groups: groups,
+        groups: filteredGroups,
         stablePairs: stablePairs,
         users: usersCopy,
       });
