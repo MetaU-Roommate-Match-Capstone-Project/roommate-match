@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   if (!req.session.userId) {
     return res
       .status(401)
-      .json({ error: "You must be logged in to view recommendations" });
+      .json({ error: "You must be logged in to view recommendations." });
   }
 
   try {
@@ -57,7 +57,19 @@ router.get("/groups", async (req, res) => {
 
   try {
     const userPreferences = await buildPreferenceSimilarityMatrix();
-    const multipleGroupOptions = getMultipleGroupOptions(userPreferences, 50);
+
+    if (userPreferences.length < 2) {
+      return res.status(200).json({
+        message: "Not enough users with roommate profiles to form groups",
+        userPreferences,
+      });
+    }
+
+    const multipleGroupOptions = await getMultipleGroupOptions(
+      userPreferences,
+      50,
+      req.session.userId,
+    );
     const formattedOptions = formatMultipleGroupOptions(multipleGroupOptions);
 
     // filter each option to only return groups that contain the current user
@@ -70,6 +82,14 @@ router.get("/groups", async (req, res) => {
       }))
       .filter((option) => option.groups.length > 0);
 
+    if (userGroupOptions.length === 0) {
+      return res.status(200).json({
+        message: "No groups containing the current user were found",
+        userCount: userPreferences.length,
+        optionsCount: formattedOptions.length,
+      });
+    }
+
     res.status(200).json(userGroupOptions);
   } catch (err) {
     res.status(500).json({ error: "Error fetching stable groups" });
@@ -81,7 +101,7 @@ router.get("/friend-requests", async (req, res) => {
   if (!req.session.userId) {
     return res
       .status(401)
-      .json({ error: "You must be logged in to view friend requests" });
+      .json({ error: "You must be logged in to view friend requests." });
   }
 
   try {
@@ -101,78 +121,166 @@ router.get("/friend-requests", async (req, res) => {
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profile_picture: true,
-          },
+          select: { id: true, name: true, email: true, profile_picture: true },
         },
         recommended_user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profile_picture: true,
-          },
-        },
-        friend_request_sender: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profile_picture: true,
-          },
+          select: { id: true, name: true, email: true, profile_picture: true },
         },
       },
     });
 
-    // get the sender information for each friend request
-    const friendRequestsWithSenders = friendRequests.map((match) => {
-      const senderId = match.friend_request_sent_by;
-      let sender;
+    // group requests by potential_group_id
+    const groupedRequests = {};
 
-      if (match.user.id === senderId) {
-        sender = match.user;
-      } else if (match.recommended_user.id === senderId) {
-        sender = match.recommended_user;
-      } else {
-        sender = match.friend_request_sender;
+    for (const request of friendRequests) {
+      const sender =
+        request.friend_request_sent_by === request.user.id
+          ? request.user
+          : request.recommended_user;
+
+      const groupKey = request.potential_group_id || `individual-${sender.id}`;
+
+      if (!groupedRequests[groupKey]) {
+        groupedRequests[groupKey] = {
+          sender: sender,
+          sentAt: request.friend_request_sent_at,
+          isGroupRequest: !!request.potential_group_id,
+          members: [],
+          matches: [],
+        };
       }
 
-      return {
-        matchId: match.id,
-        sender: sender,
-        sentAt: match.friend_request_sent_at,
-        similarityScore: match.similarity_score,
-      };
-    });
+      groupedRequests[groupKey].matches.push({
+        matchId: request.id,
+        similarityScore: request.similarity_score,
+      });
+    }
 
-    res.status(200).json(friendRequestsWithSenders);
+    // get all other members within a potential group
+    // used to display to user which other members apart from the sender are in the group
+    // users need to accept the request to officially join the group
+    for (const groupKey in groupedRequests) {
+      if (groupKey.startsWith("potential-")) {
+        const otherMembers = await prisma.matches.findMany({
+          where: {
+            potential_group_id: groupKey,
+            OR: [
+              { user_id: { not: req.session.userId } },
+              { recommended_id: { not: req.session.userId } },
+            ],
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                profile_picture: true,
+              },
+            },
+            recommended_user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                profile_picture: true,
+              },
+            },
+          },
+        });
+
+        // add unique members to the group except those who have rejected the request/recommendation
+        for (const match of otherMembers) {
+          if (
+            match.status === "REJECTED_BY_RECIPIENT" ||
+            match.status === "REJECTED_RECOMMENDATION"
+          ) {
+            continue;
+          }
+
+          const user1 = match.user;
+          const user2 = match.recommended_user;
+
+          if (
+            user1.id !== req.session.userId &&
+            user1.id !== groupedRequests[groupKey].sender.id &&
+            !groupedRequests[groupKey].members.some((m) => m.id === user1.id)
+          ) {
+            groupedRequests[groupKey].members.push(user1);
+          }
+
+          if (
+            user2.id !== req.session.userId &&
+            user2.id !== groupedRequests[groupKey].sender.id &&
+            !groupedRequests[groupKey].members.some((m) => m.id === user2.id)
+          ) {
+            groupedRequests[groupKey].members.push(user2);
+          }
+        }
+      }
+    }
+
+    res.status(200).json(Object.values(groupedRequests));
   } catch (err) {
     res.status(500).json({ error: "Error fetching friend requests" });
   }
 });
 
-// [GET] /matches/accepted - gets all accepted matches for the current user signed in
+// [GET] /matches/accepted - gets all accepted matches for the current user signed in, including group information
 router.get("/accepted", async (req, res) => {
   if (!req.session.userId) {
     return res
       .status(401)
-      .json({ error: "You must be logged in to view accepted matches" });
+      .json({ error: "You must be logged in to view accepted matches." });
   }
 
   try {
-    const acceptedMatches = await prisma.matches.findMany({
-      where: {
-        status: "ACCEPTED",
-        OR: [
-          { user_id: req.session.userId },
-          { recommended_id: req.session.userId },
-        ],
+    const currentUser = await prisma.user.findUnique({
+      where: { id: req.session.userId },
+      include: { group: true },
+    });
+
+    if (!currentUser.group_id) {
+      return res.status(200).json({
+        message: "User is not in any group",
+        group: null,
+        members: [],
+        matches: [],
+      });
+    }
+
+    const groupMembers = await prisma.user.findMany({
+      where: { group_id: currentUser.group_id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone_number: true,
+        instagram_handle: true,
+        profile_picture: true,
+        company: true,
+        university: true,
+        office_address: true,
+        roommate_profile: true,
       },
     });
-    res.status(200).json(acceptedMatches);
+
+    // get all accepted matches between group members
+    const memberIds = groupMembers.map((member) => member.id);
+    const groupMatches = await prisma.matches.findMany({
+      where: {
+        status: "ACCEPTED",
+        user_id: { in: memberIds },
+        recommended_id: { in: memberIds },
+      },
+    });
+
+    res.status(200).json({
+      message: "Group found successfully",
+      group: currentUser.group,
+      members: groupMembers,
+      matches: groupMatches,
+    });
   } catch (err) {
     res.status(500).json({ error: "Error fetching accepted matches" });
   }
@@ -183,31 +291,19 @@ router.put("/", async (req, res) => {
   if (!req.session.userId) {
     return res
       .status(401)
-      .json({ error: "You must be logged in to update match status" });
+      .json({ error: "You must be logged in to update match status." });
   }
 
-  const { recommended_id, status, similarity_score } = req.body;
+  const { recommended_id, status } = req.body;
 
   if (!recommended_id || !status) {
-    return res.status(400).json({
-      error: "ID of user recommended and current match status required",
-    });
-  }
-
-  // input validation to check that match status is valid
-  const validStatuses = [
-    "PENDING",
-    "FRIEND_REQUEST_SENT",
-    "ACCEPTED",
-    "REJECTED_BY_RECIPIENT",
-    "REJECTED_RECOMMENDATION",
-  ];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: "Invalid status value" });
+    return res
+      .status(400)
+      .json({ error: "Invalid recommended_id or status parameters." });
   }
 
   try {
-    let match = await prisma.matches.findFirst({
+    const match = await prisma.matches.findFirst({
       where: {
         OR: [
           { user_id: req.session.userId, recommended_id: recommended_id },
@@ -216,103 +312,212 @@ router.put("/", async (req, res) => {
       },
     });
 
-    const updateData = {
-      status: status,
-      updated_at: new Date(),
-    };
+    let potentialGroupId = match?.potential_group_id;
 
-    if (status === "FRIEND_REQUEST_SENT") {
-      updateData.friend_request_sent_by = req.session.userId;
-      updateData.friend_request_sent_at = new Date();
-    } else if (status === "ACCEPTED" || status === "REJECTED_BY_RECIPIENT") {
-      updateData.responded_at = new Date();
+    if (status === "FRIEND_REQUEST_SENT" && !potentialGroupId) {
+      potentialGroupId = `potential-${Date.now()}`;
     }
 
     if (match) {
-      match = await prisma.matches.update({
+      // update existing match
+      await prisma.matches.update({
         where: { id: match.id },
-        data: updateData,
+        data: {
+          status: status,
+          responded_at: new Date(),
+          friend_request_sent_by:
+            status === "FRIEND_REQUEST_SENT"
+              ? req.session.userId
+              : match.friend_request_sent_by,
+          friend_request_sent_at:
+            status === "FRIEND_REQUEST_SENT"
+              ? new Date()
+              : match.friend_request_sent_at,
+          potential_group_id: potentialGroupId,
+        },
       });
     } else {
-      if (!similarity_score) {
-        return res.status(400).json({
-          error: "Similarity score is required when creating a new match",
+      // create new match if it doesn't exist
+      if (status === "FRIEND_REQUEST_SENT") {
+        await prisma.matches.create({
+          data: {
+            user_id: req.session.userId,
+            recommended_id: recommended_id,
+            status: status,
+            friend_request_sent_by: req.session.userId,
+            friend_request_sent_at: new Date(),
+            potential_group_id: potentialGroupId,
+            similarity_score: similarity_score,
+          },
+        });
+      } else {
+        return res.status(404).json({ error: "Match not found" });
+      }
+    }
+
+    if (status === "ACCEPTED" && potentialGroupId) {
+      let groupId;
+
+      // check if the sender already has a group
+      const sender = await prisma.user.findUnique({
+        where: { id: match.friend_request_sent_by },
+        select: { group_id: true },
+      });
+
+      if (sender.group_id) {
+        // use the sender's existing group
+        groupId = sender.group_id;
+      } else {
+        // create a new group when no group found for the sender
+        const newGroup = await prisma.group.create({ data: {} });
+        groupId = newGroup.id;
+
+        // add sender to new group
+        await prisma.user.update({
+          where: { id: match.friend_request_sent_by },
+          data: { group_id: groupId },
         });
       }
 
-      match = await prisma.matches.create({
-        data: {
-          user_id: req.session.userId,
-          recommended_id: recommended_id,
-          similarity_score: similarity_score,
-          ...updateData,
-        },
-      });
-    }
-
-    if (
-      status === "ACCEPTED" ||
-      status === "REJECTED_BY_RECIPIENT" ||
-      status === "REJECTED_RECOMMENDATION"
-    ) {
-      // get the similarity scores that were calculated when showing the recommendation
-      const currentProfile = await prisma.roommateProfile.findUnique({
-        where: { user_id: req.session.userId },
-      });
-      const currentUser = await prisma.user.findUnique({
+      // add current user who accepted the request to the group
+      await prisma.user.update({
         where: { id: req.session.userId },
-      });
-      const otherProfile = await prisma.roommateProfile.findUnique({
-        where: { user_id: recommended_id },
-      });
-      const otherUser = await prisma.user.findUnique({
-        where: { id: recommended_id },
-      });
-
-      const recommender = new RecommendationEngine(
-        currentProfile,
-        currentUser,
-        otherProfile,
-        otherUser,
-      );
-      const similarity = recommender.computeSimilarity(otherProfile, otherUser);
-      const updatedWeights = recommender.changeWeightsOnFeedback(
-        similarity,
-        status,
-      );
-
-      // map weight keys to match database field names before updating the weights in database
-      const weightMapping = {
-        cleanliness: "cleanliness_weight",
-        smokes: "smokes_weight",
-        pets: "pets_weight",
-        genderPreference: "gender_preference_weight",
-        roomType: "room_type_weight",
-        numRoommates: "num_roommates_weight",
-        sleepSchedule: "sleep_schedule_weight",
-        noiseTolerance: "noise_tolerance_weight",
-        socialness: "socialness_weight",
-        hobbies: "hobbies_weight",
-        favoriteMusic: "favorite_music_weight",
-      };
-
-      const dbWeights = {};
-      for (const key in weightMapping) {
-        dbWeights[weightMapping[key]] = updatedWeights[key];
-      }
-
-      await prisma.roommateProfile.update({
-        where: { user_id: req.session.userId },
-        data: dbWeights,
+        data: { group_id: groupId },
       });
     }
 
     res.status(200).json({
       message: "Match status updated successfully",
-      match: match,
     });
   } catch (err) {
-    res.status(500).json({ error: "Error updating match status" });
+    res.status(500).json({ error: "Error updating match" });
+  }
+});
+
+// [PUT] /matches/groups - updates the match status with a specific group for the current user signed in
+router.put("/groups", async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "You must be logged in" });
+  }
+
+  const { status, similarity_score, member_ids } = req.body;
+
+  if (status !== "FRIEND_REQUEST_SENT" || !member_ids || !similarity_score) {
+    return res.status(400).json({
+      error: "Invalid request parameters for updating match status of a group.",
+    });
+  }
+
+  try {
+    // creates a time based potential group identifier
+    const potentialGroupId = `potential-${Date.now()}`;
+
+    // send friend requests to all members in the group
+    const matchUpdates = [];
+    for (const memberId of member_ids) {
+      const existingMatch = await prisma.matches.findFirst({
+        where: {
+          OR: [
+            { user_id: req.session.userId, recommended_id: memberId },
+            { user_id: memberId, recommended_id: req.session.userId },
+          ],
+        },
+      });
+
+      if (existingMatch) {
+        matchUpdates.push(
+          prisma.matches.update({
+            where: { id: existingMatch.id },
+            data: {
+              status: "FRIEND_REQUEST_SENT",
+              friend_request_sent_by: req.session.userId,
+              friend_request_sent_at: new Date(),
+              potential_group_id: potentialGroupId,
+              similarity_score: similarity_score,
+            },
+          }),
+        );
+      } else {
+        matchUpdates.push(
+          prisma.matches.create({
+            data: {
+              user_id: req.session.userId,
+              recommended_id: memberId,
+              status: "FRIEND_REQUEST_SENT",
+              friend_request_sent_by: req.session.userId,
+              friend_request_sent_at: new Date(),
+              potential_group_id: potentialGroupId,
+              similarity_score: similarity_score,
+            },
+          }),
+        );
+      }
+    }
+
+    const results = await Promise.all(matchUpdates);
+
+    res.status(200).json({
+      message: "Group friend requests sent successfully",
+      potential_group_id: potentialGroupId,
+      matches: results,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error sending group requests" });
+  }
+});
+
+// [DELETE] /matches/groups/leave - allows a user to leave their current group
+// necessary because users can only be in one group at a time
+router.delete("/groups/leave", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ error: "You must be logged in to leave a group" });
+  }
+
+  try {
+    // check if current user is in a group
+    const currentUser = await prisma.user.findUnique({
+      where: { id: req.session.userId },
+      select: { group_id: true },
+    });
+
+    if (!currentUser.group_id) {
+      return res
+        .status(400)
+        .json({ error: "You are not currently in any group" });
+    }
+
+    const groupId = currentUser.group_id;
+
+    // remove user from the group
+    await prisma.user.update({
+      where: { id: req.session.userId },
+      data: { group_id: null },
+    });
+
+    // delete group if there are less than 2 members remaining
+    const remainingMembers = await prisma.user.count({
+      where: {
+        group_id: groupId,
+      },
+    });
+
+    if (remainingMembers < 2) {
+      await prisma.user.updateMany({
+        where: { group_id: groupId },
+        data: { group_id: null },
+      });
+
+      return res.status(200).json({
+        message:
+          "You have left the group. The group has been dissolved as there are fewer than 2 members remaining.",
+      });
+    }
+
+    res.status(200).json({ message: "You have successfully left the group" });
+  } catch (err) {
+    res.status(500).json({ error: "Error leaving group" });
   }
 });
 

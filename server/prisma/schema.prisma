@@ -89,12 +89,14 @@ model User {
   office_address                  String
   office_latitude                 Float?
   office_longitude                Float?
-  group_id                        Int               @default(0)
+  group                           Group?            @relation(fields: [group_id], references: [id])
+  group_id                        Int?
   roommate_profile                RoommateProfile?
   posts                           Post[]
   received_matches                Matches[]         @relation("ReceivedMatches")
   recommended_matches             Matches[]         @relation("RecommendedMatches")
   sent_friend_requests            Matches[]         @relation("SentFriendRequests")
+
 }
 
 model RoommateProfile {
@@ -156,10 +158,16 @@ model Matches {
   recommended_id            Int
   similarity_score          Float
   status                    MatchStatus      @default(PENDING)
+  potential_group_id        String?
   friend_request_sent_by    Int?
   friend_request_sender     User?            @relation("SentFriendRequests", fields: [friend_request_sent_by], references: [id])
   friend_request_sent_at    DateTime?
   responded_at              DateTime?
   created_at                DateTime         @default(now())
   updated_at                DateTime         @updatedAt
+}
+
+model Group {
+  id                        Int              @id @default(autoincrement())
+  members                   User[]
 }
