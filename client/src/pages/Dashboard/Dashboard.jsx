@@ -27,7 +27,7 @@ const Dashboard = () => {
   const fetchUserProfile = async (id) => {
     try {
       setProfileLoading(true);
-      const response = await fetch(`${getUrl()}api/roommate-profile/${id}`, {
+      const response = await fetch(`${getUrl()}/api/roommate-profile/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
