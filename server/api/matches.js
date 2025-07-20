@@ -139,6 +139,9 @@ router.get("/friend-requests", async (req, res) => {
           },
         },
       },
+      orderBy: {
+        friend_request_sent_at: "desc",
+      },
     });
 
     // group requests by potential_group_id
@@ -159,6 +162,7 @@ router.get("/friend-requests", async (req, res) => {
           isGroupRequest: !!request.potential_group_id,
           members: [],
           matches: [],
+          existingGroupMembers: [],
         };
       }
 
@@ -168,10 +172,37 @@ router.get("/friend-requests", async (req, res) => {
       });
     }
 
-    // get all other members within a potential group
-    // used to display to user which other members apart from the sender are in the group
-    // users need to accept the request to officially join the group
     for (const groupKey in groupedRequests) {
+      // check if sender is already in a group
+      const sender = groupedRequests[groupKey].sender;
+
+      const senderWithGroup = await prisma.user.findUnique({
+        where: { id: sender.id },
+        include: { group: true },
+      });
+
+      if (senderWithGroup.group_id) {
+        // get all other members in sender's group
+        const groupMembers = await prisma.user.findMany({
+          where: {
+            group_id: senderWithGroup.group_id,
+            id: { not: sender.id },
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
+        });
+
+        groupedRequests[groupKey].existingGroupMembers = groupMembers;
+      }
+
+      // get all other members within a potential group
+      // used to display to user which other members apart from the sender are in the group
+      // users need to accept the request to officially join the group
       if (groupKey.startsWith("potential-")) {
         const otherMembers = await prisma.matches.findMany({
           where: {
@@ -263,20 +294,11 @@ router.get("/accepted", async (req, res) => {
       });
     }
 
+    // get all group members with their complete roommate profile
     const groupMembers = await prisma.user.findMany({
       where: { group_id: currentUser.group_id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone_number: true,
-        instagram_handle: true,
-        profile_picture: true,
-        company: true,
-        university: true,
-        office_address: true,
+      include: {
         roommate_profile: true,
-        friend_request_count: true,
       },
     });
 
