@@ -394,32 +394,51 @@ router.put("/", async (req, res) => {
     if (status === "ACCEPTED" && potentialGroupId) {
       let groupId;
 
+      // check if the current user is already in a group
+      const currentUser = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        select: { group_id: true },
+      });
+
       // check if the sender already has a group
       const sender = await prisma.user.findUnique({
         where: { id: match.friend_request_sent_by },
         select: { group_id: true },
       });
 
-      if (sender.group_id) {
-        // use the sender's existing group
-        groupId = sender.group_id;
-      } else {
-        // create a new group when no group found for the sender
-        const newGroup = await prisma.group.create({ data: {} });
-        groupId = newGroup.id;
+      if (currentUser.group_id) {
+        // if current user already has a group add the sender to the current user's group
+        groupId = currentUser.group_id;
 
-        // add sender to new group
+        // add sender to current user's group
         await prisma.user.update({
           where: { id: match.friend_request_sent_by },
           data: { group_id: groupId },
         });
-      }
+      } else if (sender.group_id) {
+        // if sender has a group but current user doesn't, use sender's group
+        groupId = sender.group_id;
 
-      // add current user who accepted the request to the group
-      await prisma.user.update({
-        where: { id: req.session.userId },
-        data: { group_id: groupId },
-      });
+        // add current user to sender's group
+        await prisma.user.update({
+          where: { id: req.session.userId },
+          data: { group_id: groupId },
+        });
+      } else {
+        // create a new group when neither has a group
+        const newGroup = await prisma.group.create({ data: {} });
+        groupId = newGroup.id;
+
+        await prisma.user.update({
+          where: { id: match.friend_request_sent_by },
+          data: { group_id: groupId },
+        });
+
+        await prisma.user.update({
+          where: { id: req.session.userId },
+          data: { group_id: groupId },
+        });
+      }
     }
 
     res.status(200).json({
