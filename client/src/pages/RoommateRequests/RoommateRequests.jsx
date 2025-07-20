@@ -243,6 +243,7 @@ const RoommateRequests = () => {
                   </div>
                 )}
 
+                {/* Display potential group members if it's a group request */}
                 {request.isGroupRequest &&
                   request.members.length > 0 &&
                   request.members.map((member) => (
@@ -263,8 +264,41 @@ const RoommateRequests = () => {
                         />
                       </div>
                       <h5>{member.name}</h5>
+                      <span className="text-xs text-[#3066BE]">
+                        Potential Member
+                      </span>
                     </div>
                   ))}
+
+                {/* Display existing group members if the sender is already in a group */}
+                {request.existingGroupMembers &&
+                  request.existingGroupMembers.length > 0 && (
+                    <>
+                      {request.existingGroupMembers.map((member) => (
+                        <div
+                          key={member.id}
+                          className="group-member-card cursor-pointer"
+                          onClick={() => {
+                            handleMemberClick(member);
+                          }}
+                        >
+                          <div className="group-member-profile-pic">
+                            <img
+                              src={`/api/roommate-profile/profile-picture/${member.id}`}
+                              alt={`${member.name}'s profile`}
+                              onError={(e) => {
+                                e.target.src = fallbackProfilePic;
+                              }}
+                            />
+                          </div>
+                          <h5>{member.name}</h5>
+                          <span className="text-xs text-[#3066BE]">
+                            Existing Member
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  )}
               </div>
             </div>
 
