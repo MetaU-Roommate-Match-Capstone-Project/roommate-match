@@ -581,3 +581,60 @@ hr {
   color: white !important;
   font-size: 16px;
 }
+
+/* Custom Ranking Slider Styles */
+.ranking-slider-container {
+  @apply mb-4;
+}
+
+.slider-container {
+  @apply my-2;
+}
+
+.custom-slider {
+  @apply w-full h-2 rounded bg-gray-200 outline-none my-2.5 appearance-none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+  @apply appearance-none w-5 h-5 rounded-full bg-[#3066BE] cursor-pointer border-2 border-white shadow;
+}
+
+.custom-slider::-moz-range-thumb {
+  @apply w-5 h-5 rounded-full bg-[#3066BE] cursor-pointer border-2 border-white shadow;
+}
+
+.slider-labels {
+  @apply flex justify-between text-sm text-gray-600 mt-1;
+}
+
+.slider-value {
+  @apply text-sm text-gray-600 mt-2;
+}
+
+.custom-slider:focus {
+  @apply outline-none;
+}
+
+.custom-slider:focus::-webkit-slider-thumb {
+  @apply shadow-[0_0_0_2px_rgba(48,102,190,0.3)];
+}
+
+.custom-slider:focus::-moz-range-thumb {
+  @apply shadow-[0_0_0_2px_rgba(48,102,190,0.3)];
+}
+
+.custom-slider:hover::-webkit-slider-thumb {
+  @apply bg-[#6D9DC5];
+}
+
+.custom-slider:hover::-moz-range-thumb {
+  @apply bg-[#6D9DC5];
+}
+
+.custom-slider:active::-webkit-slider-thumb {
+  @apply bg-[#1e4785];
+}
+
+.custom-slider:active::-moz-range-thumb {
+  @apply bg-[#1e4785];
+}

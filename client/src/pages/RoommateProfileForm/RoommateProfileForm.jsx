@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
@@ -20,20 +19,31 @@ const RoommateProfileForm = () => {
     city: "",
     state: "",
     cleanliness: "",
+    cleanlinessWeight: 0,
     smokes: null,
+    smokesWeight: 0,
     pets: "",
+    petsWeight: 0,
     genderPreference: "",
+    genderPreferenceWeight: 0,
     roomType: "",
+    roomTypeWeight: 0,
     numRoommates: "",
+    numRoommatesWeight: 0,
     leaseDuration: "",
     moveInMonth: "",
     moveInDay: "",
     moveInYear: "",
     sleepSchedule: "",
+    sleepScheduleWeight: 0,
     noiseTolerance: "",
+    noiseToleranceWeight: 0,
     socialness: "",
+    socialnessWeight: 0,
     hobbies: "",
+    hobbiesWeight: 0,
     favoriteMusic: "",
+    favoriteMusicWeight: 0,
     bio: "",
   });
 
@@ -187,6 +197,17 @@ const RoommateProfileForm = () => {
         hobbies: formState.hobbies,
         favoriteMusic: formState.favoriteMusic,
         bio: formState.bio,
+        cleanlinessWeight: formState.cleanlinessWeight,
+        smokesWeight: formState.smokesWeight,
+        petsWeight: formState.petsWeight,
+        genderPreferenceWeight: formState.genderPreferenceWeight,
+        roomTypeWeight: formState.roomTypeWeight,
+        numRoommatesWeight: formState.numRoommatesWeight,
+        sleepScheduleWeight: formState.sleepScheduleWeight,
+        noiseToleranceWeight: formState.noiseToleranceWeight,
+        socialnessWeight: formState.socialnessWeight,
+        hobbiesWeight: formState.hobbiesWeight,
+        favoriteMusicWeight: formState.favoriteMusicWeight,
       };
 
       await createRoommateProfile(userData);
@@ -230,7 +251,9 @@ const RoommateProfileForm = () => {
                 maxLength="2"
                 id="state"
                 value={formState.state}
-                onChange={(e) => updateFormField("state", e.target.value)}
+                onChange={(e) =>
+                  updateFormField("state", e.target.value.toUpperCase())
+                }
                 required
               />
             </div>
@@ -277,7 +300,13 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
-              <RankingSlider />
+              <RankingSlider
+                label="Rank how important cleanliness is to you:"
+                value={formState.cleanlinessWeight * 100}
+                onChange={(value) =>
+                  updateFormField("cleanlinessWeight", value)
+                }
+              />
             </div>
 
             <div className="form-group">
@@ -298,6 +327,14 @@ const RoommateProfileForm = () => {
                   No
                 </button>
               </div>
+            </div>
+
+            <div className="form-group">
+              <RankingSlider
+                label="Rank how important smoking preference is to you:"
+                value={formState.smokesWeight * 100}
+                onChange={(value) => updateFormField("smokesWeight", value)}
+              />
             </div>
 
             <div className="form-group">
@@ -344,6 +381,14 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important pet preference is to you:"
+                value={formState.petsWeight * 100}
+                onChange={(value) => updateFormField("petsWeight", value)}
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">
                 What is your gender preference for a roommate?
               </label>
@@ -384,6 +429,16 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important gender preference is to you:"
+                value={formState.genderPreferenceWeight * 100}
+                onChange={(value) =>
+                  updateFormField("genderPreferenceWeight", value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">
                 What type of lease are you looking for?
               </label>
@@ -417,6 +472,14 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important room type is to you:"
+                value={formState.roomTypeWeight * 100}
+                onChange={(value) => updateFormField("roomTypeWeight", value)}
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label" htmlFor="numRoommates">
                 How many roommates are you looking for?
               </label>
@@ -429,6 +492,16 @@ const RoommateProfileForm = () => {
                   updateFormField("numRoommates", e.target.value)
                 }
                 required
+              />
+            </div>
+
+            <div className="form-group">
+              <RankingSlider
+                label="Rank how important the number of roommates is to you:"
+                value={formState.numRoommatesWeight * 100}
+                onChange={(value) =>
+                  updateFormField("numRoommatesWeight", value)
+                }
               />
             </div>
 
@@ -523,6 +596,16 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important sleep schedule is to you:"
+                value={formState.sleepScheduleWeight * 100}
+                onChange={(value) =>
+                  updateFormField("sleepScheduleWeight", value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">
                 What is your noise tolerance?
               </label>
@@ -563,6 +646,16 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important noise tolerance is to you:"
+                value={formState.noiseToleranceWeight * 100}
+                onChange={(value) =>
+                  updateFormField("noiseToleranceWeight", value)
+                }
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label">How social are you?</label>
               <div className="button-group">
                 <button
@@ -599,6 +692,14 @@ const RoommateProfileForm = () => {
             </div>
 
             <div className="form-group">
+              <RankingSlider
+                label="Rank how important socialness is to you:"
+                value={formState.socialnessWeight * 100}
+                onChange={(value) => updateFormField("socialnessWeight", value)}
+              />
+            </div>
+
+            <div className="form-group">
               <label className="form-label" htmlFor="hobbies">
                 What are some of your hobbies?
               </label>
@@ -609,6 +710,14 @@ const RoommateProfileForm = () => {
                 value={formState.hobbies}
                 onChange={(e) => updateFormField("hobbies", e.target.value)}
                 required
+              />
+            </div>
+
+            <div className="form-group">
+              <RankingSlider
+                label="Rank how important shared hobbies are to you:"
+                value={formState.hobbiesWeight * 100}
+                onChange={(value) => updateFormField("hobbiesWeight", value)}
               />
             </div>
 
@@ -625,6 +734,16 @@ const RoommateProfileForm = () => {
                   updateFormField("favoriteMusic", e.target.value)
                 }
                 required
+              />
+            </div>
+
+            <div className="form-group">
+              <RankingSlider
+                label="Rank how important music taste is to you:"
+                value={formState.favoriteMusicWeight * 100}
+                onChange={(value) =>
+                  updateFormField("favoriteMusicWeight", value)
+                }
               />
             </div>
 
