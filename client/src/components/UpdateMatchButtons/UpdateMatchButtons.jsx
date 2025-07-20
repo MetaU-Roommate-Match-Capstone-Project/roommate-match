@@ -1,4 +1,5 @@
 import React from "react";
+
 // request button component for sending individual roommate or group requests
 const RequestButton = ({ onClick, disabled = false, isGroup = false }) => {
   return (
@@ -9,6 +10,21 @@ const RequestButton = ({ onClick, disabled = false, isGroup = false }) => {
     >
       <span className="button-text">
         {isGroup ? "Send Group Request" : "Send Roommate Request"}
+      </span>
+    </button>
+  );
+};
+
+// accept button component for accepting recommendations
+const AcceptButton = ({ onClick, disabled = false, isGroup = false }) => {
+  return (
+    <button
+      className="action-button accept"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <span className="button-text">
+        {isGroup ? "Accept Group" : "Accept Roommate"}
       </span>
     </button>
   );
@@ -35,11 +51,24 @@ const UpdateMatchButtons = ({
   onReject,
   disabled = false,
   isGroup = false,
+  isFriendRequest = false,
 }) => {
   return (
     <div className="recommendation-actions">
       <RejectButton onClick={onReject} disabled={disabled} isGroup={isGroup} />
-      <RequestButton onClick={onAccept} disabled={disabled} isGroup={isGroup} />
+      {isFriendRequest ? (
+        <AcceptButton
+          onClick={onAccept}
+          disabled={disabled}
+          isGroup={isGroup}
+        />
+      ) : (
+        <RequestButton
+          onClick={onAccept}
+          disabled={disabled}
+          isGroup={isGroup}
+        />
+      )}
     </div>
   );
 };

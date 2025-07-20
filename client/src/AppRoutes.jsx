@@ -7,6 +7,8 @@ import WithAuth from "./components/WithAuth/WithAuth";
 import RoommateProfileForm from "./pages/RoommateProfileForm/RoommateProfileForm";
 import CurrentUserProfile from "./pages/CurrentUserProfile/CurrentUserProfile";
 import Recommendations from "./pages/Recommendations/Recommendations";
+import RoommateRequests from "./pages/RoommateRequests/RoommateRequests";
+import RoommatePod from "./pages/RoommatePod/RoommatePod";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 
@@ -34,6 +36,8 @@ function AppRoutes() {
               path="/roommate-recommendations"
               element={<Recommendations />}
             />
+            <Route path="/roommate-requests" element={<RoommateRequests />} />
+            <Route path="/roommate-pod" element={<RoommatePod />} />
           </Route>
         </Routes>
       </Router>
