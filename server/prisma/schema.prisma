@@ -97,6 +97,7 @@ model User {
   received_matches                Matches[]         @relation("ReceivedMatches")
   recommended_matches             Matches[]         @relation("RecommendedMatches")
   sent_friend_requests            Matches[]         @relation("SentFriendRequests")
+  recommendation_type             String?
 
 }
 
