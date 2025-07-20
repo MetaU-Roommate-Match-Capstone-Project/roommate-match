@@ -5,6 +5,7 @@ const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 const helmet = require("helmet");
 const cors = require("cors");
+const { fetchOfficeCoordinates } = require("./fetchCoordinates");
 router.use(helmet());
 router.use(express.json());
 router.use(cors());
@@ -14,6 +15,8 @@ router.post("/create-account", async (req, res) => {
   const {
     name,
     email,
+    phone_number,
+    instagram_handle,
     password,
     dob,
     gender,
@@ -22,6 +25,7 @@ router.post("/create-account", async (req, res) => {
     budget_max,
     university,
     company,
+    office_address,
   } = req.body;
 
   try {
@@ -74,6 +78,8 @@ router.post("/create-account", async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        phone_number,
+        instagram_handle,
         dob,
         gender,
         intern_or_new_grad,
@@ -81,6 +87,7 @@ router.post("/create-account", async (req, res) => {
         budget_max,
         university,
         company,
+        office_address,
       },
     });
     res.status(201).json({ newUser });
@@ -125,6 +132,29 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// [POST] - set user's recommendation preference
+router.post("/recommendation-type", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ message: "You must be logged in to set a recommendation type." });
+  }
+  const { recommendationType } = req.body;
+
+  try {
+    await prisma.user.update({
+      where: { id: req.session.userId },
+      data: { recommendation_type: recommendationType },
+    });
+
+    res.status(200).json(recommendationType);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Could not set user's recommendation type. " });
+  }
+});
+
 // [POST] - Logout route
 router.post("/logout/:id", (req, res) => {
   req.session.destroy((err) => {
@@ -141,7 +171,50 @@ router.post("/logout/:id", (req, res) => {
 router.get("/", async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
-    res.status(200).json(users);
+
+    const usersWithCoordinates = await Promise.all(
+      users.map(async (user) => {
+        if (user.office_address) {
+          // check if user already has coordinates in database and return stored coordinates
+          if (user.office_latitude && user.office_longitude) {
+            return {
+              ...user,
+              officeCoordinates: {
+                latitude: user.office_latitude,
+                longitude: user.office_longitude,
+              },
+            };
+          } else {
+            // otherwise fetch coordinates from Google Maps Geocoding API and store them
+            const coordinates = await fetchOfficeCoordinates(
+              user.office_address,
+            );
+
+            if (coordinates) {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  office_latitude: coordinates.latitude,
+                  office_longitude: coordinates.longitude,
+                },
+              });
+            }
+
+            return {
+              ...user,
+              officeCoordinates: coordinates,
+            };
+          }
+        } else {
+          return {
+            ...user,
+            officeCoordinates: null,
+          };
+        }
+      }),
+    );
+
+    res.status(200).json(usersWithCoordinates);
   } catch (err) {
     next(err);
   }
@@ -156,11 +229,55 @@ router.get("/me", async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.session.userId },
-      select: { email: true },
+      select: { email: true, recommendation_type: true },
     });
-    res.json({ id: req.session.userId, username: user.email });
+    res.json({
+      id: req.session.userId,
+      username: user.email,
+      recommendation_type: user.recommendation_type,
+    });
   } catch (err) {
     res.status(500).json({ error: "Error fetching user session data." });
+  }
+});
+
+// [GET] - get user by ID
+router.get("/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view user data." });
+    }
+
+    const userId = parseInt(req.params.id);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone_number: true,
+        instagram_handle: true,
+        dob: true,
+        gender: true,
+        intern_or_new_grad: true,
+        budget_min: true,
+        budget_max: true,
+        university: true,
+        company: true,
+        office_address: true,
+        friend_request_count: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching user data" });
   }
 });
 

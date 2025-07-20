@@ -63,22 +63,42 @@ enum Socialness {
   VERY_SOCIAL
 }
 
+enum MatchStatus {
+  PENDING
+  FRIEND_REQUEST_SENT
+  ACCEPTED
+  REJECTED_BY_RECIPIENT
+  REJECTED_RECOMMENDATION
+}
+
 model User {
-  id                 Int              @id @default(autoincrement())
-  name               String
-  email              String
-  password           String
-  dob                DateTime
-  gender             String
-  profile_picture    Bytes?
-  intern_or_new_grad String
-  budget_min         Int
-  budget_max         Int
-  university         String
-  company            String
-  group_id           Int              @default(0)
-  roommate_profile   RoommateProfile?
-  posts              Post[]
+  id                              Int               @id @default(autoincrement())
+  name                            String
+  email                           String
+  phone_number                    String?
+  instagram_handle                String?
+  dob                             DateTime
+  password                        String
+  gender                          String
+  profile_picture                 Bytes?
+  intern_or_new_grad              String
+  budget_min                      Int
+  budget_max                      Int
+  university                      String
+  company                         String
+  office_address                  String
+  office_latitude                 Float?
+  office_longitude                Float?
+  friend_request_count            Int               @default(0)
+  group                           Group?            @relation(fields: [group_id], references: [id])
+  group_id                        Int?
+  roommate_profile                RoommateProfile?
+  posts                           Post[]
+  received_matches                Matches[]         @relation("ReceivedMatches")
+  recommended_matches             Matches[]         @relation("RecommendedMatches")
+  sent_friend_requests            Matches[]         @relation("SentFriendRequests")
+  recommendation_type             String?
+
 }
 
 model RoommateProfile {
@@ -130,4 +150,26 @@ model Picture {
   post              Post             @relation(fields: [post_id], references: [id])
   post_id           Int
   image             Bytes
+}
+
+model Matches {
+  id                        Int              @id @default(autoincrement())
+  user                      User             @relation("ReceivedMatches", fields: [user_id], references: [id])
+  user_id                   Int
+  recommended_user          User             @relation("RecommendedMatches", fields: [recommended_id], references: [id])
+  recommended_id            Int
+  similarity_score          Float
+  status                    MatchStatus      @default(PENDING)
+  potential_group_id        String?
+  friend_request_sent_by    Int?
+  friend_request_sender     User?            @relation("SentFriendRequests", fields: [friend_request_sent_by], references: [id])
+  friend_request_sent_at    DateTime?
+  responded_at              DateTime?
+  created_at                DateTime         @default(now())
+  updated_at                DateTime         @updatedAt
+}
+
+model Group {
+  id                        Int              @id @default(autoincrement())
+  members                   User[]
 }

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
 import RankingSlider from "../../components/RankingSlider/RankingSlider";
+import Spinner from "../../components/Spinner/Spinner";
 
 const RoommateProfileForm = () => {
   const {
@@ -226,6 +227,7 @@ const RoommateProfileForm = () => {
               <input
                 className="form-input"
                 type="state"
+                maxLength="2"
                 id="state"
                 value={formState.state}
                 onChange={(e) => updateFormField("state", e.target.value)}
@@ -463,7 +465,7 @@ const RoommateProfileForm = () => {
                   onChange={(e) =>
                     updateFormField("moveInYear", e.target.value)
                   }
-                  className="form-input-year"
+                  className="form-input-medium"
                   required
                 />
               </div>
@@ -647,9 +649,7 @@ const RoommateProfileForm = () => {
               className="btn-primary"
               disabled={isSubmitting}
             >
-              {isSubmitting
-                ? "Saving roommate profile preferences"
-                : "Save roommate profile preferences"}
+              {isSubmitting ? <Spinner /> : "Match me!"}
             </button>
           </form>
         </div>

@@ -229,6 +229,181 @@ body {
   @apply text-2xl cursor-pointer;
 }
 
+/* Recommendation Page Styles */
+.recommendations-page {
+  @apply p-5 max-w-7xl mx-auto;
+}
+
+/* Recommendation Type Popup Styles */
+.recommendation-popup-overlay {
+  @apply fixed inset-0 bg-black/70 flex justify-center items-center z-50;
+}
+
+.recommendation-popup {
+  @apply bg-white rounded-lg p-8 w-[90%] max-w-lg shadow-xl text-center;
+}
+
+.recommendation-popup h2 {
+  @apply mt-0 text-gray-800 text-2xl font-bold;
+}
+
+.recommendation-popup p {
+  @apply mb-6 text-gray-600 text-base;
+}
+
+.recommendation-buttons {
+  @apply flex flex-col gap-4 md:flex-row md:justify-center;
+}
+
+.recommendation-button {
+  @apply py-4 px-5 border-none rounded font-semibold text-base cursor-pointer transition-all duration-200 md:flex-1 md:max-w-[200px];
+}
+
+.recommendation-button.individual {
+  @apply bg-[#3066BE] text-white hover:bg-blue-600;
+}
+
+.recommendation-button.group {
+  @apply bg-[#6D9DC5] text-white hover:bg-blue-600;
+}
+
+/* Recommendations Container Styles */
+.recommendations-container {
+  @apply mt-5 w-full max-w-5xl mx-auto;
+}
+
+.recommendations-container h2 {
+  @apply mb-5 text-gray-800 text-2xl font-bold;
+}
+
+/* Individual Recommendations Styles */
+.recommendation-card-container {
+  @apply max-w-5xl mx-auto flex flex-col gap-5;
+}
+
+.recommendation-card {
+  @apply bg-white rounded-xl p-6 shadow-lg relative transition-transform duration-300;
+}
+
+.recommendation-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.recommendation-header h3 {
+  @apply m-0 text-2xl text-gray-800 font-bold;
+}
+
+.similarity-score {
+  @apply bg-[#3066BE] text-white py-1 px-3 rounded-full font-bold text-sm m-0;
+}
+
+.profile-picture {
+  @apply w-full h-64 rounded-lg overflow-hidden mb-5 bg-gray-100 flex justify-center items-center;
+}
+
+.profile-picture img {
+  @apply w-full h-full object-cover;
+}
+
+.profile-picture.placeholder img {
+  @apply w-1/2 h-auto opacity-50;
+}
+
+.recommendation-details {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.recommendation-details p {
+  @apply m-0 text-sm text-gray-600;
+}
+
+.recommendation-details p strong {
+  @apply text-gray-800 font-semibold;
+}
+
+.recommendation-actions {
+  @apply flex justify-between gap-5 mt-6;
+}
+
+.action-button {
+  @apply flex-1 py-4 border-none rounded-lg text-base font-semibold cursor-pointer flex flex-col items-center transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+.action-button.reject {
+  @apply text-red-600 text-sm bg-red-50 border border-red-200 rounded hover:bg-red-100;
+}
+
+.action-button.accept {
+  @apply text-green-600 text-sm bg-green-50 border border-red-200 rounded hover:bg-green-100;
+}
+
+.button-icon {
+  @apply text-2xl mb-1;
+}
+
+.recommendation-progress p {
+  @apply text-center text-gray-500 text-sm mt-4;
+}
+
+.loading-container,
+.no-recommendations,
+.no-more-recommendations {
+  @apply text-center py-10 px-5 text-gray-600 text-lg bg-white rounded-lg shadow;
+}
+
+.no-more-recommendations {
+  @apply bg-blue-50 border border-blue-100;
+}
+
+/* Group Recommendations Styles */
+.group-card {
+  @apply bg-white rounded-xl p-6 shadow-lg;
+}
+
+.score-header {
+  @apply flex justify-between items-center mb-5;
+}
+
+.group-header h3 {
+  @apply m-0 text-xl text-gray-800 font-bold;
+}
+
+.group-members-container {
+  @apply mb-5;
+}
+
+.group-members-container h4 {
+  @apply mt-0 mb-4 text-gray-700 text-lg font-semibold;
+}
+
+.group-members {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center;
+}
+
+.group-member-card {
+  @apply bg-white rounded-xl p-6 shadow-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center w-64;
+}
+
+.group-member-profile-pic {
+  @apply w-52 h-52 overflow-hidden bg-gray-200 mb-4;
+}
+
+.group-member-profile-pic img {
+  @apply w-full h-full object-cover;
+}
+
+.group-member-card h5 {
+  @apply mt-0 mb-2 text-gray-800 text-lg font-semibold text-center;
+}
+
+.group-member-card p {
+  @apply m-0 text-sm text-gray-600 text-center;
+}
+
+.group-member-friend-count {
+  @apply bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center justify-center mx-auto mt-1;
+}
+
 /* Delete button and exit out of modal button styles */
 .x-btn {
   @apply absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded text-lg flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer border-none;
@@ -267,7 +442,7 @@ body {
   @apply w-16 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
 }
 
-.form-input-year {
+.form-input-medium {
   @apply w-20 text-center p-2 border-2 border-gray-300 rounded text-base transition-colors bg-white text-black focus:outline-none focus:border-blue-600;
 }
 
@@ -277,6 +452,18 @@ body {
 
 .date-separator {
   @apply text-lg font-bold text-gray-600;
+}
+
+.address-container {
+  @apply flex flex-col gap-3;
+}
+
+.city-state-zip-layout {
+  @apply flex gap-3;
+}
+
+.phone-container {
+  @apply flex flex-row gap-3;
 }
 
 .nav-container {
@@ -369,12 +556,20 @@ hr {
   @apply flex items-center gap-2;
 }
 
-.budget-separator {
+.separator {
   @apply text-lg font-bold text-gray-600;
 }
 
 .btn-back {
   @apply bg-gray-500 text-white px-4 py-2 rounded font-medium hover:bg-gray-600 transition-colors cursor-pointer border-none;
+}
+
+.loading-container {
+  @apply flex justify-center items-center min-h-[calc(100vh-4rem)] p-4;
+}
+
+.loading-spinner-positioning {
+  @apply flex flex-col items-center gap-4;
 }
 
 .footer {

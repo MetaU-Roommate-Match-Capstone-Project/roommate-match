@@ -3,7 +3,6 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import NewPostModal from "../../components/NewPostModal/NewPostModal.jsx";
 import RoommateAttribute from "../../components/RoommateAttribute/RoommateAttribute.jsx";
-import PictureSlideshow from "../../components/PictureSlideshow/PictureSlideshow.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -12,6 +11,7 @@ import {
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
+import Spinner from "../../components/Spinner/Spinner.jsx";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -21,10 +21,12 @@ const CurrentUserProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`/api/users/logout/${user.id}`, {
         method: "POST",
         credentials: "include",
@@ -36,6 +38,7 @@ const CurrentUserProfile = () => {
       }
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
@@ -49,6 +52,7 @@ const CurrentUserProfile = () => {
     setProfilePicture(localImageUrl);
 
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("profilePicture", file);
 
@@ -68,13 +72,17 @@ const CurrentUserProfile = () => {
     } catch (error) {
       setError(error.message);
       setProfilePicture("");
+      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   // fetch user profile data from backend
   const fetchCurrentUserProfile = async () => {
     try {
+      setLoading(true);
       setError(null);
       const response = await fetch("/api/roommate-profile/me", {
         method: "GET",
@@ -92,6 +100,7 @@ const CurrentUserProfile = () => {
         setTimeout(() => {
           navigate("/roommate-profile-form");
         }, 10000);
+        setLoading(false);
         return;
       }
 
@@ -102,14 +111,17 @@ const CurrentUserProfile = () => {
 
       const currentUserProfile = await response.json();
       setRoommateProfile(currentUserProfile);
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
   // fetch user posts
   const fetchUserPosts = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/post/me", {
         method: "GET",
         headers: {
@@ -124,13 +136,16 @@ const CurrentUserProfile = () => {
       }
       const currentUserPosts = await response.json();
       setPosts(currentUserPosts);
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
     }
   };
 
   const createPost = async (formData) => {
     try {
+      setLoading(true);
       const response = await fetch("/api/post", {
         method: "POST",
         body: formData,
@@ -143,29 +158,33 @@ const CurrentUserProfile = () => {
       }
 
       await fetchUserPosts();
+      setLoading(false);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
       throw error;
     }
   };
 
   const deletePost = async (postId) => {
-    fetch(`/api/post/me/${postId}`, {
-      method: "DELETE",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to delete post, error: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPosts(posts.filter((post) => post.id !== postId));
-      })
-      .catch((error) => {
-        setError(error.message);
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/post/me/${postId}`, {
+        method: "DELETE",
+        credentials: "include",
       });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete post, error: ${response.status}`);
+      }
+
+      await response.json();
+      setPosts(posts.filter((post) => post.id !== postId));
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -175,6 +194,17 @@ const CurrentUserProfile = () => {
     fetchCurrentUserProfile();
     fetchUserPosts();
   }, [user]);
+
+  // render spinner when loading
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner-positioning">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   // render error message if user has not created a profile yet
   if (error) {
@@ -196,9 +226,9 @@ const CurrentUserProfile = () => {
   // loading message while user profile is being fetched
   if (!roommateProfile) {
     return (
-      <div className="profile-container">
-        <div className="profile-card">
-          <h2>Loading your profile...</h2>
+      <div className="loading-container">
+        <div className="loading-spinner-positioning">
+          <Spinner />
         </div>
       </div>
     );

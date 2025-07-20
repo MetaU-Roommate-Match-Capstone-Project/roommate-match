@@ -3,8 +3,6 @@ import { useState } from "react";
 
 const NewPostModal = ({ isOpen, onClose, onSubmit }) => {
   const [formState, setFormState] = useState({
-    city: "",
-    state: "",
     content: "",
     pictures: [],
   });
@@ -41,11 +39,8 @@ const NewPostModal = ({ isOpen, onClose, onSubmit }) => {
 
     try {
       await onSubmit(formState);
-
       // clear form fields for when button pressed again
       setFormState({
-        city: "",
-        state: "",
         content: "",
         pictures: [],
       });
@@ -72,34 +67,6 @@ const NewPostModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="modal">
             <h2>Create a New post</h2>
             <form onSubmit={handleSubmit}>
-              <div className="new-post-form-grid">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="city">
-                    City
-                  </label>
-                  <input
-                    className="form-input"
-                    type="text"
-                    id="city"
-                    value={formState.city}
-                    onChange={(e) => updateFormField("city", e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="state">
-                    State
-                  </label>
-                  <input
-                    className="form-input"
-                    type="text"
-                    id="state"
-                    value={formState.state}
-                    onChange={(e) => updateFormField("state", e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="content">
                   Content

@@ -2,11 +2,13 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
+import Spinner from "../../components/Spinner/Spinner";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [submitError, setSubmitError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { setUser } = useUser();
   const navigate = useNavigate();
 
@@ -106,7 +108,7 @@ const Login = () => {
               className="btn-primary"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? <Spinner /> : "Login"}
             </button>
           </form>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
+import Spinner from "../Spinner/Spinner";
 
 const WithAuth = (WrappedComponent) => {
   return function ProtectedComponent(props) {
@@ -31,7 +32,7 @@ const WithAuth = (WrappedComponent) => {
     }, [user, setUser, navigate]);
 
     if (!user) {
-      return <p>Loading...</p>;
+      return <Spinner />;
     }
 
     return <WrappedComponent {...props} />;

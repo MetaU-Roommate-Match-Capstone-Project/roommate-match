@@ -89,32 +89,189 @@ const COMPANIES = [
   "Slack",
   "Zoom",
   "Snapchat",
-  "Twitter",
+  "X",
 ];
 
-const CITY_STATE_PAIRS = [
-  { city: "San Francisco", state: "California" },
-  { city: "Palo Alto", state: "California" },
-  { city: "Mountain View", state: "California" },
-  { city: "Sunnyvale", state: "California" },
-  { city: "San Jose", state: "California" },
-  { city: "Redwood City", state: "California" },
-  { city: "Menlo Park", state: "California" },
-  { city: "Cupertino", state: "California" },
-  { city: "Santa Clara", state: "California" },
-  { city: "Fremont", state: "California" },
-  { city: "Oakland", state: "California" },
-  { city: "Berkeley", state: "California" },
-  { city: "Los Angeles", state: "California" },
-  { city: "San Diego", state: "California" },
-  { city: "Seattle", state: "Washington" },
-  { city: "Bellevue", state: "Washington" },
-  { city: "New York", state: "New York" },
-  { city: "Austin", state: "Texas" },
-  { city: "Boston", state: "Massachusetts" },
-  { city: "Miami", state: "Florida" },
-  { city: "Chicago", state: "Illinois" },
-];
+const OFFICE_ADDRESSES = {
+  Google: {
+    "San Francisco, CA": "345 Spear St, San Francisco, CA 94105",
+    "Mountain View, CA": "1600 Amphitheatre Parkway, Mountain View, CA 94043",
+    "Sunnyvale, CA": "1155 Borregas Ave, Sunnyvale, CA 94089",
+    "Palo Alto, CA": "3400 Hillview Ave, Palo Alto, CA 94304",
+    "Seattle, WA": "601 N 34th St, Seattle, WA 98103",
+    "New York, NY": "111 8th Ave, New York, NY 10011",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+    "Boston, MA": "355 Main St, Cambridge, MA 02142",
+    "Chicago, IL": "320 N Morgan St, Chicago, IL 60607",
+  },
+  Meta: {
+    "Menlo Park, CA": "1 Hacker Way, Menlo Park, CA 94025",
+    "San Francisco, CA": "181 Fremont St, San Francisco, CA 94105",
+    "Fremont, CA": "39900 Balentine Dr, Fremont, CA 94538",
+    "Seattle, WA": "2200 Westlake Ave, Seattle, WA 98121",
+    "New York, NY": "770 Broadway, New York, NY 10003",
+    "Austin, TX": "300 W 6th St, Austin, TX 78701",
+    "Boston, MA": "1 Hacker Way, Boston, MA 02210",
+  },
+  Apple: {
+    "Cupertino, CA": "1 Apple Park Way, Cupertino, CA 95014",
+    "San Francisco, CA": "1 Stockton St, San Francisco, CA 94108",
+    "Sunnyvale, CA": "1 Infinite Loop, Sunnyvale, CA 94089",
+    "Austin, TX": "12545 Riata Vista Cir, Austin, TX 78727",
+    "Seattle, WA": "2201 Westlake Ave, Seattle, WA 98121",
+    "New York, NY": "401 W 14th St, New York, NY 10014",
+  },
+  Microsoft: {
+    "Redmond, WA": "1 Microsoft Way, Redmond, WA 98052",
+    "Seattle, WA": "320 Westlake Ave N, Seattle, WA 98109",
+    "Bellevue, WA": "15590 NE 31st St, Redmond, WA 98052",
+    "San Francisco, CA": "555 California St, San Francisco, CA 94104",
+    "Mountain View, CA": "1065 La Avenida St, Mountain View, CA 94043",
+    "New York, NY": "11 Times Square, New York, NY 10036",
+    "Austin, TX": "8834 Capital of Texas Hwy N, Austin, TX 78759",
+    "Boston, MA": "1 Memorial Dr, Cambridge, MA 02142",
+  },
+  Amazon: {
+    "Seattle, WA": "410 Terry Ave N, Seattle, WA 98109",
+    "Bellevue, WA": "2200 Alaskan Way, Seattle, WA 98121",
+    "San Francisco, CA": "101 California St, San Francisco, CA 94111",
+    "Palo Alto, CA": "101 Lytton Ave, Palo Alto, CA 94301",
+    "Sunnyvale, CA": "1200 Borregas Ave, Sunnyvale, CA 94089",
+    "New York, NY": "7 W 34th St, New York, NY 10001",
+    "Austin, TX": "1800 Lavaca St, Austin, TX 78701",
+    "Boston, MA": "101 Main St, Cambridge, MA 02142",
+  },
+  Netflix: {
+    "Los Gatos, CA": "100 Winchester Cir, Los Gatos, CA 95032",
+    "San Francisco, CA": "888 Brannan St, San Francisco, CA 94103",
+    "Los Angeles, CA": "5808 W Sunset Blvd, Los Angeles, CA 90028",
+    "New York, NY": "888 Broadway, New York, NY 10003",
+    "Austin, TX": "1 Barton Springs Rd, Austin, TX 78704",
+  },
+  Tesla: {
+    "Palo Alto, CA": "3500 Deer Creek Rd, Palo Alto, CA 94304",
+    "Fremont, CA": "45500 Fremont Blvd, Fremont, CA 94538",
+    "San Francisco, CA": "201 3rd St, San Francisco, CA 94103",
+    "Austin, TX": "13101 Harold Green Rd, Austin, TX 78724",
+    "New York, NY": "860 Washington St, New York, NY 10014",
+  },
+  Uber: {
+    "San Francisco, CA": "1455 Market St, San Francisco, CA 94103",
+    "Palo Alto, CA": "405 E 4th Ave, San Mateo, CA 94401",
+    "Seattle, WA": "505 Howard St, San Francisco, CA 94105",
+    "New York, NY": "3 World Trade Center, New York, NY 10007",
+    "Austin, TX": "1201 S Mopac Expy, Austin, TX 78746",
+    "Chicago, IL": "200 W Jackson Blvd, Chicago, IL 60606",
+  },
+  Airbnb: {
+    "San Francisco, CA": "888 Brannan St, San Francisco, CA 94103",
+    "Seattle, WA": "2200 1st Ave, Seattle, WA 98121",
+    "New York, NY": "130 E 57th St, New York, NY 10022",
+    "Los Angeles, CA": "1 LMU Dr, Los Angeles, CA 90045",
+    "Austin, TX": "800 Brazos St, Austin, TX 78701",
+  },
+  Spotify: {
+    "San Francisco, CA": "564 Market St, San Francisco, CA 94104",
+    "New York, NY": "4 World Trade Center, New York, NY 10007",
+    "Los Angeles, CA": "2901 28th St, Santa Monica, CA 90405",
+    "Boston, MA": "4 Copley Pl, Boston, MA 02116",
+  },
+  Adobe: {
+    "San Jose, CA": "345 Park Ave, San Jose, CA 95110",
+    "San Francisco, CA": "601 Townsend St, San Francisco, CA 94103",
+    "Seattle, WA": "410 Terry Ave N, Seattle, WA 98109",
+    "New York, NY": "601 W 26th St, New York, NY 10001",
+    "Austin, TX": "314 E Highland Mall Blvd, Austin, TX 78752",
+    "Boston, MA": "1 Broadway, Cambridge, MA 02142",
+  },
+  Salesforce: {
+    "San Francisco, CA": "415 Mission St, San Francisco, CA 94105",
+    "Palo Alto, CA": "303 Almaden Blvd, San Jose, CA 95110",
+    "Seattle, WA": "929 108th Ave NE, Bellevue, WA 98004",
+    "New York, NY": "1095 Avenue of the Americas, New York, NY 10036",
+    "Austin, TX": "111 Congress Ave, Austin, TX 78701",
+    "Chicago, IL": "111 W Illinois St, Chicago, IL 60654",
+  },
+  Oracle: {
+    "Redwood City, CA": "500 Oracle Pkwy, Redwood City, CA 94065",
+    "San Francisco, CA": "1 Front St, San Francisco, CA 94111",
+    "Austin, TX": "2300 W Parmer Ln, Austin, TX 78727",
+    "Seattle, WA": "800 5th Ave, Seattle, WA 98104",
+    "New York, NY": "1 World Financial Center, New York, NY 10281",
+  },
+  IBM: {
+    "San Francisco, CA": "1 Post St, San Francisco, CA 94104",
+    "Austin, TX": "11501 Burnet Rd, Austin, TX 78758",
+    "Seattle, WA": "2001 6th Ave, Seattle, WA 98121",
+    "New York, NY": "590 Madison Ave, New York, NY 10022",
+    "Boston, MA": "314 Main St, Cambridge, MA 02142",
+  },
+  Intel: {
+    "Santa Clara, CA": "2200 Mission College Blvd, Santa Clara, CA 95054",
+    "San Francisco, CA": "100 1st St, San Francisco, CA 94105",
+    "Austin, TX": "1300 S Mopac Expy, Austin, TX 78746",
+    "Seattle, WA": "15590 NE 31st St, Redmond, WA 98052",
+    "New York, NY": "1633 Broadway, New York, NY 10019",
+  },
+  NVIDIA: {
+    "Santa Clara, CA": "2788 San Tomas Expy, Santa Clara, CA 95051",
+    "San Francisco, CA": "303 2nd St, San Francisco, CA 94107",
+    "Austin, TX": "10900 Stonelake Blvd, Austin, TX 78759",
+    "Seattle, WA": "918 5th Ave, Seattle, WA 98164",
+    "New York, NY": "1633 Broadway, New York, NY 10019",
+  },
+  Palantir: {
+    "Palo Alto, CA": "100 Hamilton Ave, Palo Alto, CA 94301",
+    "San Francisco, CA": "100 Hamilton Ave, Palo Alto, CA 94301",
+    "New York, NY": "200 5th Ave, New York, NY 10010",
+    "Seattle, WA": "2200 Alaskan Way, Seattle, WA 98121",
+    "Austin, TX": "98 San Jacinto Blvd, Austin, TX 78701",
+  },
+  Stripe: {
+    "San Francisco, CA": "510 Townsend St, San Francisco, CA 94103",
+    "Palo Alto, CA": "3180 Porter Dr, Palo Alto, CA 94304",
+    "Seattle, WA": "1201 3rd Ave, Seattle, WA 98101",
+    "New York, NY": "354 Oyster Point Blvd, South San Francisco, CA 94080",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+  },
+  Square: {
+    "San Francisco, CA": "1455 Market St, San Francisco, CA 94103",
+    "Oakland, CA": "1955 Broadway, Oakland, CA 94612",
+    "New York, NY": "1 World Trade Center, New York, NY 10007",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+  },
+  Dropbox: {
+    "San Francisco, CA": "1800 Owens St, San Francisco, CA 94158",
+    "New York, NY": "333 Brannan St, San Francisco, CA 94107",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+    "Seattle, WA": "1201 3rd Ave, Seattle, WA 98101",
+  },
+  Slack: {
+    "San Francisco, CA": "500 Howard St, San Francisco, CA 94105",
+    "New York, NY": "32 Old Slip, New York, NY 10005",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+    "Seattle, WA": "1201 3rd Ave, Seattle, WA 98101",
+  },
+  Zoom: {
+    "San Jose, CA": "55 Almaden Blvd, San Jose, CA 95113",
+    "San Francisco, CA": "55 Almaden Blvd, San Jose, CA 95113",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+    "New York, NY": "55 Almaden Blvd, San Jose, CA 95113",
+  },
+  Snapchat: {
+    "Santa Monica, CA": "2772 Donald Douglas Loop N, Santa Monica, CA 90405",
+    "Los Angeles, CA": "63 Market St, Venice, CA 90291",
+    "San Francisco, CA": "Market St, San Francisco, CA 94103",
+    "New York, NY": "229 W 43rd St, New York, NY 10036",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+  },
+  X: {
+    "San Francisco, CA": "1355 Market St, San Francisco, CA 94103",
+    "New York, NY": "249 W 17th St, New York, NY 10011",
+    "Austin, TX": "500 W 2nd St, Austin, TX 78701",
+    "Seattle, WA": "1201 3rd Ave, Seattle, WA 98101",
+  },
+};
 
 const HOBBIES = [
   "Reading",
@@ -184,6 +341,23 @@ function generateUserData() {
   const budgetMin = faker.number.int({ min: 800, max: 2000 });
   const budgetMax = budgetMin + faker.number.int({ min: 200, max: 800 });
 
+  const company = getRandomElement(COMPANIES);
+  const companyOffices = OFFICE_ADDRESSES[company];
+  const officeLocations = Object.keys(companyOffices);
+  const selectedLocation = getRandomElement(officeLocations);
+  const officeAddress = companyOffices[selectedLocation];
+
+  // get city and state from the randomly selected location
+  const [city, stateAbbr] = selectedLocation.split(", ");
+
+  const countryCode = "1";
+  const phoneFirstThree = faker.string.numeric(3);
+  const phoneMiddleThree = faker.string.numeric(3);
+  const phoneLastFour = faker.string.numeric(4);
+  const phoneNumber = `+${countryCode} (${phoneFirstThree})-${phoneMiddleThree}-${phoneLastFour}`;
+
+  const instagramHandle = `@${firstName.toLowerCase()}${lastName.toLowerCase()}`;
+
   return {
     name: `${firstName} ${lastName}`,
     email: email,
@@ -194,12 +368,16 @@ function generateUserData() {
     budget_min: budgetMin,
     budget_max: budgetMax,
     university: university,
-    company: getRandomElement(COMPANIES),
+    company: company,
+    office_address: officeAddress,
+    phone_number: phoneNumber,
+    instagram_handle: instagramHandle,
+    city: city,
+    state: stateAbbr,
   };
 }
 
-function generateRoommateProfileData() {
-  const cityStatePair = getRandomElement(CITY_STATE_PAIRS);
+function generateRoommateProfileData(city, state) {
   const moveInDate = faker.date.future({ years: 1 });
   const selectedHobbies = faker.helpers.arrayElements(HOBBIES, {
     min: 2,
@@ -207,8 +385,8 @@ function generateRoommateProfileData() {
   });
 
   return {
-    city: cityStatePair.city,
-    state: cityStatePair.state,
+    city: city,
+    state: state,
     cleanliness: getRandomElement(CLEANLINESS_VALUES),
     smokes: faker.datatype.boolean({ probability: 0.2 }),
     pets: getRandomElement(PETS_VALUES),
@@ -259,8 +437,7 @@ function generateRoommateProfileData() {
   };
 }
 
-function generatePostData(user) {
-  const cityStatePair = getRandomElement(CITY_STATE_PAIRS);
+function generatePostData(user, city, state) {
   const template = getRandomElement(POST_CONTENT_TEMPLATES);
   const selectedHobbies = faker.helpers
     .arrayElements(HOBBIES, { min: 1, max: 3 })
@@ -268,7 +445,7 @@ function generatePostData(user) {
   const music = getRandomElement(MUSIC_GENRES);
 
   const content = template
-    .replace("{city}", cityStatePair.city)
+    .replace("{city}", city)
     .replace("{internOrNewGrad}", user.intern_or_new_grad.toLowerCase())
     .replace("{company}", user.company)
     .replace("{university}", user.university)
@@ -287,8 +464,8 @@ function generatePostData(user) {
     );
 
   return {
-    city: cityStatePair.city,
-    state: cityStatePair.state,
+    city: city,
+    state: state,
     content: content,
   };
 }
@@ -443,12 +620,19 @@ async function main() {
       const loginResult = await loginUser(userData.email, userData.password);
 
       if (loginResult) {
-        const profileData = generateRoommateProfileData();
+        const profileData = generateRoommateProfileData(
+          userData.city,
+          userData.state,
+        );
         await createRoommateProfile(profileData);
 
         const numPosts = faker.number.int({ min: 1, max: 3 });
         for (let j = 0; j < numPosts; j++) {
-          const postData = generatePostData(userData);
+          const postData = generatePostData(
+            userData,
+            userData.city,
+            userData.state,
+          );
           await createPost(postData);
         }
         await logoutUser();
