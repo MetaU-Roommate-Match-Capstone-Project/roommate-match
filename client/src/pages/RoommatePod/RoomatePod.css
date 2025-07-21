@@ -4,13 +4,13 @@
   margin: 0 auto;
 }
 
-.leave-pod-button {
+.pod-buttons {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 15px;
 }
 
-.leave-pod-button button {
+.pod-buttons button {
   background-color: rgb(254, 162, 162);
   color: rgb(219, 9, 9);
   font-weight: bold;
@@ -21,6 +21,7 @@
   transition:
     background-color 0.3s,
     transform 0.2s;
+  margin: 0 5px;
 }
 
 .leave-pod-button button:hover {

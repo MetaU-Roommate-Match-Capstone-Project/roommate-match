@@ -18,6 +18,7 @@ const RoommatePod = () => {
   const [tooltipText, setTooltipText] = useState("");
   const [isOverButton, setIsOverButton] = useState(false);
   const [leaveGroup, setLeaveGroup] = useState(false);
+  const [groupClosed, setGroupClosed] = useState(false);
 
   const fetchRoommatePod = async () => {
     try {
@@ -36,6 +37,14 @@ const RoommatePod = () => {
 
       const data = await response.json();
       setRoommatePod(data);
+
+      // update groupClosed state based on group status
+      if (data.group && data.group.group_status === "CLOSED") {
+        setGroupClosed(true);
+      } else {
+        setGroupClosed(false);
+      }
+
       setError(null);
     } catch (error) {
       setError(error);
@@ -79,6 +88,39 @@ const RoommatePod = () => {
     leaveRoommatePod();
   };
 
+  const updateGroupStatus = async () => {
+    try {
+      setLoading(true);
+      const status = groupClosed ? "OPEN" : "CLOSED";
+
+      const response = await fetch("/api/matches/groups/status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ group_status: status }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update group status for roommate pod.");
+      }
+
+      await response.json();
+      setGroupClosed(!groupClosed);
+      setError(null);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateGroupStatus = () => {
+    updateGroupStatus();
+  };
+
   useEffect(() => {
     fetchRoommatePod();
   }, []);
@@ -111,11 +153,16 @@ const RoommatePod = () => {
 
   return (
     <div className="roommate-pod-container">
-      <div className="leave-pod-button">
-        <button onClick={handleLeaveRoommatePod}>Leave Pod</button>
-      </div>
-
       <h1 className="pod-title">Roommate Pod</h1>
+
+      {pod && pod.length > 0 && (
+        <div className="pod-buttons">
+          <button onClick={handleUpdateGroupStatus}>
+            {groupClosed ? "Open Pod" : "Close Pod"}
+          </button>
+          <button onClick={handleLeaveRoommatePod}>Leave Pod</button>
+        </div>
+      )}
 
       <div className="roommate-cards-container">
         {error && <div className="error-message">{String(error)}</div>}
