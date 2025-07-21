@@ -90,6 +90,37 @@ router.post("/create-account", async (req, res) => {
         office_address,
       },
     });
+
+    // fetch office address coordinates and update user's latitude and longitude coordinates
+    if (office_address) {
+      try {
+        const coordinates = await fetchOfficeCoordinates(office_address);
+
+        if (coordinates) {
+          const updatedUser = await prisma.user.update({
+            where: { id: newUser.id },
+            data: {
+              office_latitude: coordinates.latitude,
+              office_longitude: coordinates.longitude,
+            },
+          });
+
+          return res.status(201).json({
+            newUser: {
+              ...updatedUser,
+              officeCoordinates: coordinates,
+            },
+          });
+        }
+      } catch (coordError) {
+        return res.status(201).json({
+          newUser,
+          warning:
+            "User created successfully, but office coordinates could not be fetched.",
+        });
+      }
+    }
+
     res.status(201).json({ newUser });
   } catch (err) {
     res
@@ -278,21 +309,6 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: "Error fetching user data" });
-  }
-});
-
-// Delete user account
-router.delete("/delete-account/:id", async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const deletedUser = await prisma.user.delete({
-      where: { id },
-    });
-    res.json({ deletedUser });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Something went wrong during account deletion." });
   }
 });
 

@@ -1,5 +1,6 @@
 const RecommendationEngine = require("./RecommendationEngine");
 const { PrismaClient } = require("../generated/prisma");
+const { distanceBetweenCoordinates } = require("./similarityCalculations");
 const prisma = new PrismaClient();
 
 const NEGATIVE_STATUSES = new Set([
@@ -280,6 +281,32 @@ function canAcceptNewMember(group, proposer, userMap) {
   const maxCapacity = Math.max(...group.members.map((m) => m.capacity));
   if (group.members.length >= maxCapacity + 1) {
     return false;
+  }
+
+  // check if any member of the group is more than 100 km away from the proposer
+  for (const member of group.members) {
+    // validation for office coordinates to prevent errors
+    if (
+      !proposer.originalUser.office_latitude ||
+      !proposer.originalUser.office_longitude ||
+      !member.originalUser.office_latitude ||
+      !member.originalUser.office_longitude
+    ) {
+      continue;
+    }
+
+    // call distanceBetweenCoordinates function to calculate distance between coordinates
+    const officeDistance = distanceBetweenCoordinates(
+      proposer.originalUser.office_latitude,
+      proposer.originalUser.office_longitude,
+      member.originalUser.office_latitude,
+      member.originalUser.office_longitude,
+    );
+
+    // reject new member from joining group if any member is more than 64 km (~40 miles) away
+    if (officeDistance > 64) {
+      return false;
+    }
   }
 
   // check if the new member is more similar to the group than the worst member
