@@ -323,8 +323,30 @@ class RecommendationEngine {
         },
       });
 
-      // only add recommendation if user is not in a closed group and there's no negative match
-      if (!existingNegativeMatch && !userInClosedGroup) {
+      // check if offices are within 64 km (~40 miles) of each other
+      let officesWithinRange = true;
+      if (
+        this.currentUser.office_latitude &&
+        this.currentUser.office_longitude &&
+        rec.user.office_latitude &&
+        rec.user.office_longitude
+      ) {
+        const officeDistance = distanceBetweenCoordinates(
+          this.currentUser.office_latitude,
+          this.currentUser.office_longitude,
+          rec.user.office_latitude,
+          rec.user.office_longitude,
+        );
+
+        // filter out recommendations where offices are too far apart
+        if (officeDistance > 64) {
+          officesWithinRange = false;
+        }
+      }
+
+      // only add recommendation if user is not in a closed group, there's no negative match,
+      // and if offices are within 64 km of each other
+      if (!existingNegativeMatch && !userInClosedGroup && officesWithinRange) {
         filteredRecommendations.push(rec);
       }
     }
