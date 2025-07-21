@@ -292,7 +292,7 @@ class RecommendationEngine {
       };
     });
 
-    // exclude recommendations who have already been rejected by the user
+    // exclude recommendations who have already been rejected by the user or are in closed groups
     const filteredRecommendations = [];
     for (const rec of recommendations) {
       // check match model for existing negative match status
@@ -313,7 +313,18 @@ class RecommendationEngine {
         },
       });
 
-      if (!existingNegativeMatch) {
+      // check if user is in a closed group
+      const userInClosedGroup = await prisma.user.findFirst({
+        where: {
+          id: rec.user_id,
+          group: {
+            group_status: "CLOSED",
+          },
+        },
+      });
+
+      // only add recommendation if user is not in a closed group and there's no negative match
+      if (!existingNegativeMatch && !userInClosedGroup) {
         filteredRecommendations.push(rec);
       }
     }

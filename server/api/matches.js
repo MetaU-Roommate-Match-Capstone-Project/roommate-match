@@ -340,6 +340,22 @@ router.put("/", async (req, res) => {
   }
 
   try {
+    // check if the sender is in a closed group
+    if (status === "FRIEND_REQUEST_SENT") {
+      const sender = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        include: {
+          group: true,
+        },
+      });
+
+      if (sender.group_id && sender.group.group_status === "CLOSED") {
+        return res.status(400).json({
+          error: "Your group is closed. You cannot send friend requests.",
+        });
+      }
+    }
+
     const match = await prisma.matches.findFirst({
       where: {
         OR: [
@@ -494,6 +510,22 @@ router.put("/groups", async (req, res) => {
   }
 
   try {
+    // check if the sender is in a closed group
+    if (status === "FRIEND_REQUEST_SENT") {
+      const sender = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        include: {
+          group: true,
+        },
+      });
+
+      if (sender.group_id && sender.group.group_status === "CLOSED") {
+        return res.status(400).json({
+          error: "Your group is closed. You cannot send friend requests.",
+        });
+      }
+    }
+
     // creates a time based potential group identifier
     const potentialGroupId = `potential-${Date.now()}`;
 
@@ -642,6 +674,44 @@ router.put("/groups", async (req, res) => {
   }
 });
 
+// [PUT] /matches/groups/status - allows a user to update the status of a group to open or closed
+router.put("/groups/status", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ error: "You must be logged in to update group status" });
+  }
+
+  // check that user belongs to a group
+  const currentUser = await prisma.user.findUnique({
+    where: { id: req.session.userId },
+    select: { group_id: true },
+  });
+
+  if (!currentUser.group_id) {
+    return res
+      .status(400)
+      .json({ error: "You are not currently in any group." });
+  }
+
+  const { group_status } = req.body;
+
+  if (group_status !== "OPEN" && group_status !== "CLOSED") {
+    return res.status(400).json({ error: "Invalid group status" });
+  }
+
+  try {
+    await prisma.group.update({
+      where: { id: currentUser.group_id },
+      data: { group_status: group_status },
+    });
+
+    res.status(200).json({ message: "Group status updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Error updating group status" });
+  }
+});
+
 // [DELETE] /matches/groups/leave - allows a user to leave their current group
 // necessary because users can only be in one group at a time
 router.delete("/groups/leave", async (req, res) => {
@@ -683,6 +753,10 @@ router.delete("/groups/leave", async (req, res) => {
       await prisma.user.updateMany({
         where: { group_id: groupId },
         data: { group_id: null },
+      });
+
+      await prisma.group.delete({
+        where: { id: groupId },
       });
 
       return res.status(200).json({

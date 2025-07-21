@@ -443,6 +443,20 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     },
   });
 
+  // get users in closed groups to prevent these from being recommended
+  const closedGroups = await prisma.group.findMany({
+    where: {
+      group_status: "CLOSED",
+    },
+    include: {
+      members: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
   // create a set of rejected user IDs for filtering group options
   const rejectedUserIds = new Set();
   rejectedMatches.forEach((match) => {
@@ -451,6 +465,15 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     } else {
       rejectedUserIds.add(match.user_id);
     }
+  });
+
+  // add users from closed groups to the rejected set
+  closedGroups.forEach((group) => {
+    group.members.forEach((member) => {
+      if (member.id !== currentUserId) {
+        rejectedUserIds.add(member.id);
+      }
+    });
   });
 
   for (let i = 0; i < numGroupOptions; i++) {

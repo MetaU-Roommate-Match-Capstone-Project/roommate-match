@@ -172,4 +172,5 @@ model Matches {
 model Group {
   id                        Int              @id @default(autoincrement())
   members                   User[]
+  group_status              String?          @default("OPEN")
 }
