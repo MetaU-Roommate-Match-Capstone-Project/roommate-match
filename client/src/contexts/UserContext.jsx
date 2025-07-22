@@ -6,6 +6,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [hasRoommateProfile, setHasRoommateProfile] = useState(false);
+  const [recommendationType, setRecommendationType] = useState(null);
 
   const checkIfUserHasRoommateProfile = async () => {
     if (!user) {
@@ -66,6 +67,8 @@ export const UserProvider = ({ children }) => {
         hasRoommateProfile,
         setHasRoommateProfile,
         checkIfUserHasRoommateProfile,
+        recommendationType,
+        setRecommendationType,
         logout,
       }}
     >

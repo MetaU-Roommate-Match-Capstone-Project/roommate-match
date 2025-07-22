@@ -195,6 +195,38 @@ router.get("/me", async (req, res) => {
   }
 });
 
+// [GET] - get posts by specific user ID
+router.get("/user/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view other users' posts." });
+    }
+
+    const userId = parseInt(req.params.id);
+
+    const userPosts = await prisma.post.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        user: true,
+        pictures: true,
+      },
+      orderBy: [
+        {
+          id: "desc",
+        },
+      ],
+    });
+
+    res.status(200).json(userPosts);
+  } catch (err) {
+    res.status(500).json("Error getting user's posts");
+  }
+});
+
 // [GET] - get picture by ID
 router.get("/picture/:id", async (req, res) => {
   try {

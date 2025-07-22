@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUrl } from "../../utils/url";
 import Spinner from "../../components/Spinner/Spinner";
@@ -34,9 +34,12 @@ const CreateAccount = () => {
   });
 
   const [step, setStep] = useState(1);
-  const [passwordError, setPasswordError] = useState("");
+  const [accountDetailsError, setAccountDetailsError] = useState("");
   const [submitError, setSubmitError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [doPasswordsMatch, setDoPasswordsMatch] = useState(false);
 
   const createUser = async (userData) => {
     try {
@@ -67,15 +70,51 @@ const CreateAccount = () => {
     }));
   };
 
+  useEffect(() => {
+    const emailIsValid =
+      formState.email.includes("@") && formState.email.endsWith(".edu");
+    setIsEmailValid(emailIsValid);
+
+    const passwordIsValid = formState.password.length >= 8;
+    setIsPasswordValid(passwordIsValid);
+
+    const passwordsMatch =
+      formState.password &&
+      formState.confirmPassword &&
+      formState.password === formState.confirmPassword;
+    setDoPasswordsMatch(passwordsMatch);
+  }, [formState.email, formState.password, formState.confirmPassword]);
+
   const handleFirstStepSubmit = (e) => {
     e.preventDefault();
 
-    if (formState.password !== formState.confirmPassword) {
-      setPasswordError("Passwords do not match");
+    // basic user account details validation
+    const validationChecks = [
+      { condition: !formState.email, message: "Email is required." },
+      { condition: !formState.password, message: "Password is required." },
+      {
+        condition: !formState.confirmPassword,
+        message: "Please confirm your password.",
+      },
+      {
+        condition: !isEmailValid,
+        message: "Email must be a valid .edu address.",
+      },
+      {
+        condition: !isPasswordValid,
+        message: "Password must be at least 8 characters.",
+      },
+      { condition: !doPasswordsMatch, message: "Passwords do not match." },
+    ];
+
+    const error = validationChecks.find((check) => check.condition);
+
+    if (error) {
+      setAccountDetailsError(error.message);
       return;
     }
 
-    setPasswordError("");
+    setAccountDetailsError("");
     setStep(2);
   };
 
@@ -211,48 +250,68 @@ const CreateAccount = () => {
                 <label className="form-label" htmlFor="email">
                   Email
                 </label>
-                <input
-                  className="form-input"
-                  type="email"
-                  id="email"
-                  value={formState.email}
-                  onChange={(e) => updateFormField("email", e.target.value)}
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    className={`form-input ${isEmailValid && formState.email ? "valid-input" : ""}`}
+                    type="email"
+                    id="email"
+                    placeholder="Must end with .edu"
+                    value={formState.email}
+                    onChange={(e) => updateFormField("email", e.target.value)}
+                    required
+                  />
+                  {isEmailValid && formState.email && (
+                    <span className="validation-icon">&#x2713;</span>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="password">
                   Password
                 </label>
-                <input
-                  className="form-input"
-                  type="password"
-                  id="password"
-                  value={formState.password}
-                  onChange={(e) => updateFormField("password", e.target.value)}
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    className={`form-input ${isPasswordValid && formState.password ? "valid-input" : ""}`}
+                    type="password"
+                    id="password"
+                    placeholder="Must be at least 8 characters"
+                    value={formState.password}
+                    onChange={(e) =>
+                      updateFormField("password", e.target.value)
+                    }
+                    required
+                  />
+                  {isPasswordValid && formState.password && (
+                    <span className="validation-icon">&#x2713;</span>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label" htmlFor="confirmPassword">
                   Confirm Password
                 </label>
-                <input
-                  className="form-input"
-                  type="password"
-                  id="confirmPassword"
-                  value={formState.confirmPassword}
-                  onChange={(e) =>
-                    updateFormField("confirmPassword", e.target.value)
-                  }
-                  required
-                />
+                <div className="input-container">
+                  <input
+                    className={`form-input ${doPasswordsMatch ? "valid-input" : ""}`}
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Must match password"
+                    value={formState.confirmPassword}
+                    onChange={(e) =>
+                      updateFormField("confirmPassword", e.target.value)
+                    }
+                    required
+                  />
+                  {doPasswordsMatch && (
+                    <span className="validation-icon">&#x2713;</span>
+                  )}
+                </div>
               </div>
 
-              {passwordError && (
-                <div className="error-message">{passwordError}</div>
+              {accountDetailsError && (
+                <div className="error-message">{accountDetailsError}</div>
               )}
               <button type="submit" className="btn-primary">
                 Continue

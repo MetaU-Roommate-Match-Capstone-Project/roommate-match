@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
       others,
       otherUsers,
     );
-    const results = await recommender.getTopKRecommendations(20);
+    const results = await recommender.getTopKRecommendations(50);
 
     res.status(200).json(results);
   } catch (err) {
@@ -121,11 +121,26 @@ router.get("/friend-requests", async (req, res) => {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true, profile_picture: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
         },
         recommended_user: {
-          select: { id: true, name: true, email: true, profile_picture: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
         },
+      },
+      orderBy: {
+        friend_request_sent_at: "desc",
       },
     });
 
@@ -147,6 +162,7 @@ router.get("/friend-requests", async (req, res) => {
           isGroupRequest: !!request.potential_group_id,
           members: [],
           matches: [],
+          existingGroupMembers: [],
         };
       }
 
@@ -156,10 +172,37 @@ router.get("/friend-requests", async (req, res) => {
       });
     }
 
-    // get all other members within a potential group
-    // used to display to user which other members apart from the sender are in the group
-    // users need to accept the request to officially join the group
     for (const groupKey in groupedRequests) {
+      // check if sender is already in a group
+      const sender = groupedRequests[groupKey].sender;
+
+      const senderWithGroup = await prisma.user.findUnique({
+        where: { id: sender.id },
+        include: { group: true },
+      });
+
+      if (senderWithGroup.group_id) {
+        // get all other members in sender's group
+        const groupMembers = await prisma.user.findMany({
+          where: {
+            group_id: senderWithGroup.group_id,
+            id: { not: sender.id },
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+            friend_request_count: true,
+          },
+        });
+
+        groupedRequests[groupKey].existingGroupMembers = groupMembers;
+      }
+
+      // get all other members within a potential group
+      // used to display to user which other members apart from the sender are in the group
+      // users need to accept the request to officially join the group
       if (groupKey.startsWith("potential-")) {
         const otherMembers = await prisma.matches.findMany({
           where: {
@@ -176,6 +219,7 @@ router.get("/friend-requests", async (req, res) => {
                 name: true,
                 email: true,
                 profile_picture: true,
+                friend_request_count: true,
               },
             },
             recommended_user: {
@@ -184,6 +228,7 @@ router.get("/friend-requests", async (req, res) => {
                 name: true,
                 email: true,
                 profile_picture: true,
+                friend_request_count: true,
               },
             },
           },
@@ -249,18 +294,10 @@ router.get("/accepted", async (req, res) => {
       });
     }
 
+    // get all group members with their complete roommate profile
     const groupMembers = await prisma.user.findMany({
       where: { group_id: currentUser.group_id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone_number: true,
-        instagram_handle: true,
-        profile_picture: true,
-        company: true,
-        university: true,
-        office_address: true,
+      include: {
         roommate_profile: true,
       },
     });
@@ -294,7 +331,7 @@ router.put("/", async (req, res) => {
       .json({ error: "You must be logged in to update match status." });
   }
 
-  const { recommended_id, status } = req.body;
+  const { recommended_id, status, similarity_score } = req.body;
 
   if (!recommended_id || !status) {
     return res
@@ -303,6 +340,22 @@ router.put("/", async (req, res) => {
   }
 
   try {
+    // check if the sender is in a closed group
+    if (status === "FRIEND_REQUEST_SENT") {
+      const sender = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        include: {
+          group: true,
+        },
+      });
+
+      if (sender.group_id && sender.group.group_status === "CLOSED") {
+        return res.status(400).json({
+          error: "Your group is closed. You cannot send friend requests.",
+        });
+      }
+    }
+
     const match = await prisma.matches.findFirst({
       where: {
         OR: [
@@ -338,18 +391,39 @@ router.put("/", async (req, res) => {
       });
     } else {
       // create new match if it doesn't exist
-      if (status === "FRIEND_REQUEST_SENT") {
+      if (
+        [
+          "FRIEND_REQUEST_SENT",
+          "REJECTED_RECOMMENDATION",
+          "REJECTED_BY_RECIPIENT",
+        ].includes(status)
+      ) {
         await prisma.matches.create({
           data: {
             user_id: req.session.userId,
             recommended_id: recommended_id,
             status: status,
-            friend_request_sent_by: req.session.userId,
-            friend_request_sent_at: new Date(),
+            friend_request_sent_by:
+              status === "FRIEND_REQUEST_SENT" ? req.session.userId : null,
+            friend_request_sent_at:
+              status === "FRIEND_REQUEST_SENT" ? new Date() : null,
+            responded_at: new Date(),
             potential_group_id: potentialGroupId,
             similarity_score: similarity_score,
           },
         });
+
+        // increment friend request count only for friend requests
+        if (status === "FRIEND_REQUEST_SENT") {
+          await prisma.user.update({
+            where: { id: recommended_id },
+            data: {
+              friend_request_count: {
+                increment: 1,
+              },
+            },
+          });
+        }
       } else {
         return res.status(404).json({ error: "Match not found" });
       }
@@ -358,32 +432,51 @@ router.put("/", async (req, res) => {
     if (status === "ACCEPTED" && potentialGroupId) {
       let groupId;
 
+      // check if the current user is already in a group
+      const currentUser = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        select: { group_id: true },
+      });
+
       // check if the sender already has a group
       const sender = await prisma.user.findUnique({
         where: { id: match.friend_request_sent_by },
         select: { group_id: true },
       });
 
-      if (sender.group_id) {
-        // use the sender's existing group
-        groupId = sender.group_id;
-      } else {
-        // create a new group when no group found for the sender
-        const newGroup = await prisma.group.create({ data: {} });
-        groupId = newGroup.id;
+      if (currentUser.group_id) {
+        // if current user already has a group add the sender to the current user's group
+        groupId = currentUser.group_id;
 
-        // add sender to new group
+        // add sender to current user's group
         await prisma.user.update({
           where: { id: match.friend_request_sent_by },
           data: { group_id: groupId },
         });
-      }
+      } else if (sender.group_id) {
+        // if sender has a group but current user doesn't, use sender's group
+        groupId = sender.group_id;
 
-      // add current user who accepted the request to the group
-      await prisma.user.update({
-        where: { id: req.session.userId },
-        data: { group_id: groupId },
-      });
+        // add current user to sender's group
+        await prisma.user.update({
+          where: { id: req.session.userId },
+          data: { group_id: groupId },
+        });
+      } else {
+        // create a new group when neither has a group
+        const newGroup = await prisma.group.create({ data: {} });
+        groupId = newGroup.id;
+
+        await prisma.user.update({
+          where: { id: match.friend_request_sent_by },
+          data: { group_id: groupId },
+        });
+
+        await prisma.user.update({
+          where: { id: req.session.userId },
+          data: { group_id: groupId },
+        });
+      }
     }
 
     res.status(200).json({
@@ -402,67 +495,220 @@ router.put("/groups", async (req, res) => {
 
   const { status, similarity_score, member_ids } = req.body;
 
-  if (status !== "FRIEND_REQUEST_SENT" || !member_ids || !similarity_score) {
+  if (
+    ![
+      "FRIEND_REQUEST_SENT",
+      "REJECTED_RECOMMENDATION",
+      "REJECTED_BY_RECIPIENT",
+    ].includes(status) ||
+    !member_ids ||
+    !similarity_score
+  ) {
     return res.status(400).json({
       error: "Invalid request parameters for updating match status of a group.",
     });
   }
 
   try {
-    // creates a time based potential group identifier
-    const potentialGroupId = `potential-${Date.now()}`;
-
-    // send friend requests to all members in the group
-    const matchUpdates = [];
-    for (const memberId of member_ids) {
-      const existingMatch = await prisma.matches.findFirst({
-        where: {
-          OR: [
-            { user_id: req.session.userId, recommended_id: memberId },
-            { user_id: memberId, recommended_id: req.session.userId },
-          ],
+    // check if the sender is in a closed group
+    if (status === "FRIEND_REQUEST_SENT") {
+      const sender = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+        include: {
+          group: true,
         },
       });
 
-      if (existingMatch) {
-        matchUpdates.push(
-          prisma.matches.update({
-            where: { id: existingMatch.id },
-            data: {
-              status: "FRIEND_REQUEST_SENT",
-              friend_request_sent_by: req.session.userId,
-              friend_request_sent_at: new Date(),
-              potential_group_id: potentialGroupId,
-              similarity_score: similarity_score,
-            },
-          }),
-        );
-      } else {
-        matchUpdates.push(
-          prisma.matches.create({
-            data: {
-              user_id: req.session.userId,
-              recommended_id: memberId,
-              status: "FRIEND_REQUEST_SENT",
-              friend_request_sent_by: req.session.userId,
-              friend_request_sent_at: new Date(),
-              potential_group_id: potentialGroupId,
-              similarity_score: similarity_score,
-            },
-          }),
-        );
+      if (sender.group_id && sender.group.group_status === "CLOSED") {
+        return res.status(400).json({
+          error: "Your group is closed. You cannot send friend requests.",
+        });
       }
     }
 
-    const results = await Promise.all(matchUpdates);
+    // creates a time based potential group identifier
+    const potentialGroupId = `potential-${Date.now()}`;
 
-    res.status(200).json({
-      message: "Group friend requests sent successfully",
-      potential_group_id: potentialGroupId,
-      matches: results,
-    });
+    const matchUpdates = [];
+
+    if (status === "FRIEND_REQUEST_SENT") {
+      // send friend requests to all members in the group
+      for (const memberId of member_ids) {
+        const existingMatch = await prisma.matches.findFirst({
+          where: {
+            OR: [
+              { user_id: req.session.userId, recommended_id: memberId },
+              { user_id: memberId, recommended_id: req.session.userId },
+            ],
+          },
+        });
+
+        if (existingMatch) {
+          matchUpdates.push(
+            prisma.matches.update({
+              where: { id: existingMatch.id },
+              data: {
+                status: "FRIEND_REQUEST_SENT",
+                friend_request_sent_by: req.session.userId,
+                friend_request_sent_at: new Date(),
+                potential_group_id: potentialGroupId,
+                similarity_score: similarity_score,
+              },
+            }),
+          );
+        } else {
+          matchUpdates.push(
+            prisma.matches.create({
+              data: {
+                user_id: req.session.userId,
+                recommended_id: memberId,
+                status: "FRIEND_REQUEST_SENT",
+                friend_request_sent_by: req.session.userId,
+                friend_request_sent_at: new Date(),
+                potential_group_id: potentialGroupId,
+                similarity_score: similarity_score,
+              },
+            }),
+          );
+          // increment friend request count for all users in the group
+          matchUpdates.push(
+            prisma.user.update({
+              where: { id: memberId },
+              data: {
+                friend_request_count: {
+                  increment: 1,
+                },
+              },
+            }),
+          );
+        }
+      }
+
+      const results = await Promise.all(matchUpdates);
+
+      res.status(200).json({
+        message: "Group friend requests sent successfully",
+        potential_group_id: potentialGroupId,
+        matches: results,
+      });
+    } else if (status === "REJECTED_RECOMMENDATION") {
+      for (const memberId of member_ids) {
+        const existingMatch = await prisma.matches.findFirst({
+          where: {
+            OR: [
+              { user_id: req.session.userId, recommended_id: memberId },
+              { user_id: memberId, recommended_id: req.session.userId },
+            ],
+          },
+        });
+
+        if (existingMatch) {
+          matchUpdates.push(
+            prisma.matches.update({
+              where: { id: existingMatch.id },
+              data: {
+                status: "REJECTED_RECOMMENDATION",
+                responded_at: new Date(),
+                potential_group_id: potentialGroupId,
+                similarity_score: similarity_score,
+              },
+            }),
+          );
+        } else {
+          matchUpdates.push(
+            prisma.matches.create({
+              data: {
+                user_id: req.session.userId,
+                recommended_id: memberId,
+                status: "REJECTED_RECOMMENDATION",
+                responded_at: new Date(),
+                potential_group_id: potentialGroupId,
+                similarity_score: similarity_score,
+              },
+            }),
+          );
+        }
+      }
+
+      const results = await Promise.all(matchUpdates);
+
+      res.status(200).json({
+        message: "Group recommendation rejected successfully",
+        potential_group_id: potentialGroupId,
+        matches: results,
+      });
+    } else if (status === "REJECTED_BY_RECIPIENT") {
+      for (const memberId of member_ids) {
+        const existingMatch = await prisma.matches.findFirst({
+          where: {
+            OR: [
+              { user_id: req.session.userId, recommended_id: memberId },
+              { user_id: memberId, recommended_id: req.session.userId },
+            ],
+            status: "FRIEND_REQUEST_SENT",
+          },
+        });
+
+        if (existingMatch) {
+          matchUpdates.push(
+            prisma.matches.update({
+              where: { id: existingMatch.id },
+              data: {
+                status: "REJECTED_BY_RECIPIENT",
+                responded_at: new Date(),
+              },
+            }),
+          );
+        }
+      }
+
+      const results = await Promise.all(matchUpdates);
+
+      res.status(200).json({
+        message: "Group friend request rejected successfully",
+        matches: results,
+      });
+    }
   } catch (err) {
     res.status(500).json({ error: "Error sending group requests" });
+  }
+});
+
+// [PUT] /matches/groups/status - allows a user to update the status of a group to open or closed
+router.put("/groups/status", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ error: "You must be logged in to update group status" });
+  }
+
+  // check that user belongs to a group
+  const currentUser = await prisma.user.findUnique({
+    where: { id: req.session.userId },
+    select: { group_id: true },
+  });
+
+  if (!currentUser.group_id) {
+    return res
+      .status(400)
+      .json({ error: "You are not currently in any group." });
+  }
+
+  const { group_status } = req.body;
+
+  if (group_status !== "OPEN" && group_status !== "CLOSED") {
+    return res.status(400).json({ error: "Invalid group status" });
+  }
+
+  try {
+    await prisma.group.update({
+      where: { id: currentUser.group_id },
+      data: { group_status: group_status },
+    });
+
+    res.status(200).json({ message: "Group status updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Error updating group status" });
   }
 });
 
@@ -507,6 +753,10 @@ router.delete("/groups/leave", async (req, res) => {
       await prisma.user.updateMany({
         where: { group_id: groupId },
         data: { group_id: null },
+      });
+
+      await prisma.group.delete({
+        where: { id: groupId },
       });
 
       return res.status(200).json({

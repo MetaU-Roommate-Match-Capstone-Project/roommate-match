@@ -1,5 +1,6 @@
 const RecommendationEngine = require("./RecommendationEngine");
 const { PrismaClient } = require("../generated/prisma");
+const { distanceBetweenCoordinates } = require("./similarityCalculations");
 const prisma = new PrismaClient();
 
 const NEGATIVE_STATUSES = new Set([
@@ -282,6 +283,32 @@ function canAcceptNewMember(group, proposer, userMap) {
     return false;
   }
 
+  // check if any member of the group is more than 100 km away from the proposer
+  for (const member of group.members) {
+    // validation for office coordinates to prevent errors
+    if (
+      !proposer.originalUser.office_latitude ||
+      !proposer.originalUser.office_longitude ||
+      !member.originalUser.office_latitude ||
+      !member.originalUser.office_longitude
+    ) {
+      continue;
+    }
+
+    // call distanceBetweenCoordinates function to calculate distance between coordinates
+    const officeDistance = distanceBetweenCoordinates(
+      proposer.originalUser.office_latitude,
+      proposer.originalUser.office_longitude,
+      member.originalUser.office_latitude,
+      member.originalUser.office_longitude,
+    );
+
+    // reject new member from joining group if any member is more than 64 km (~40 miles) away
+    if (officeDistance > 64) {
+      return false;
+    }
+  }
+
   // check if the new member is more similar to the group than the worst member
   const currentWorstMember = findWorstMember(group, userMap);
   if (!currentWorstMember) {
@@ -443,6 +470,20 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     },
   });
 
+  // get users in closed groups to prevent these from being recommended
+  const closedGroups = await prisma.group.findMany({
+    where: {
+      group_status: "CLOSED",
+    },
+    include: {
+      members: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
   // create a set of rejected user IDs for filtering group options
   const rejectedUserIds = new Set();
   rejectedMatches.forEach((match) => {
@@ -451,6 +492,15 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     } else {
       rejectedUserIds.add(match.user_id);
     }
+  });
+
+  // add users from closed groups to the rejected set
+  closedGroups.forEach((group) => {
+    group.members.forEach((member) => {
+      if (member.id !== currentUserId) {
+        rejectedUserIds.add(member.id);
+      }
+    });
   });
 
   for (let i = 0; i < numGroupOptions; i++) {
@@ -484,8 +534,40 @@ async function getMultipleGroupOptions(users, numGroupOptions, currentUserId) {
     }
   }
 
+  // find index of current user to access info about current user (e.g. capacity)
+  const currentUserIndex = users.findIndex((user) => user.id === currentUserId);
+  const currentUser = currentUserIndex !== -1 ? users[currentUserIndex] : null;
+
   // sort by stable pairs count (most stable to least stable - descending order)
-  groupOptions.sort((a, b) => b.stablePairs - a.stablePairs);
+  // if number of stable pairs are equal, use tiebreaker based on group size preference
+  groupOptions.sort((a, b) => {
+    if (b.stablePairs !== a.stablePairs) {
+      return b.stablePairs - a.stablePairs;
+    }
+
+    if (currentUser) {
+      // get the groups containing the current user in each option
+      const aUserGroup = a.groups.find((group) =>
+        group.members.some((member) => member.id === currentUserId),
+      );
+
+      const bUserGroup = b.groups.find((group) =>
+        group.members.some((member) => member.id === currentUserId),
+      );
+
+      if (aUserGroup && bUserGroup) {
+        // get the preferred size of the group for the current user
+        const preferredSize = currentUser.capacity + 1;
+
+        const aSizeDiff = Math.abs(aUserGroup.members.length - preferredSize);
+        const bSizeDiff = Math.abs(bUserGroup.members.length - preferredSize);
+
+        // return group with the closest group size to the user's preference
+        return aSizeDiff - bSizeDiff;
+      }
+    }
+    return 0;
+  });
 
   return groupOptions;
 }

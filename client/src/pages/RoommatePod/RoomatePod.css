@@ -1,0 +1,107 @@
+.roommate-pod-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pod-buttons {
+  flex: 1;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  transition: all 0.2s;
+  opacity: 1;
+}
+
+.pod-buttons button {
+  flex: 1;
+  color: #dc2626;
+  font-size: 14px;
+  background-color: #fef2f2;
+  border-radius: 8px;
+  padding: 16px 24px;
+  max-width: 400px;
+}
+
+.pod-buttons button:hover {
+  background-color: #fee2e2;
+  transform: translateY(-2px);
+}
+
+.pod-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.roommate-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  border: #3066be solid 4px;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Custom tooltip styles */
+.cursor-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background-color: #3066be;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  pointer-events: none;
+  z-index: 1000;
+  max-width: 150px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.2s;
+}
+
+/* Message bubble tail */
+.cursor-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #3066be transparent transparent transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.error-message {
+  color: #d9534f;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #f8d7da;
+  border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+  .roommate-card {
+    width: 250px;
+    height: 380px;
+  }
+}

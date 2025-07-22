@@ -88,6 +88,37 @@ router.post("/create-account", async (req, res) => {
         office_address,
       },
     });
+
+    // fetch office address coordinates and update user's latitude and longitude coordinates
+    if (office_address) {
+      try {
+        const coordinates = await fetchOfficeCoordinates(office_address);
+
+        if (coordinates) {
+          const updatedUser = await prisma.user.update({
+            where: { id: newUser.id },
+            data: {
+              office_latitude: coordinates.latitude,
+              office_longitude: coordinates.longitude,
+            },
+          });
+
+          return res.status(201).json({
+            newUser: {
+              ...updatedUser,
+              officeCoordinates: coordinates,
+            },
+          });
+        }
+      } catch (coordError) {
+        return res.status(201).json({
+          newUser,
+          warning:
+            "User created successfully, but office coordinates could not be fetched.",
+        });
+      }
+    }
+
     res.status(201).json({ newUser });
   } catch (err) {
     console.log(err);
@@ -128,6 +159,29 @@ router.post("/login", async (req, res) => {
     res.json({ id: user.id, username: user.email });
   } catch (err) {
     res.status(500).json({ error: "Something went wrong during login." });
+  }
+});
+
+// [POST] - set user's recommendation preference
+router.post("/recommendation-type", async (req, res) => {
+  if (!req.session.userId) {
+    return res
+      .status(401)
+      .json({ message: "You must be logged in to set a recommendation type." });
+  }
+  const { recommendationType } = req.body;
+
+  try {
+    await prisma.user.update({
+      where: { id: req.session.userId },
+      data: { recommendation_type: recommendationType },
+    });
+
+    res.status(200).json(recommendationType);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Could not set user's recommendation type. " });
   }
 });
 
@@ -205,26 +259,55 @@ router.get("/me", async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.session.userId },
-      select: { email: true },
+      select: { email: true, recommendation_type: true },
     });
-    res.json({ id: req.session.userId, username: user.email });
+    res.json({
+      id: req.session.userId,
+      username: user.email,
+      recommendation_type: user.recommendation_type,
+    });
   } catch (err) {
     res.status(500).json({ error: "Error fetching user session data." });
   }
 });
 
-// Delete user account
-router.delete("/delete-account/:id", async (req, res) => {
+// [GET] - get user by ID
+router.get("/:id", async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    const deletedUser = await prisma.user.delete({
-      where: { id },
+    if (!req.session.userId) {
+      return res
+        .status(401)
+        .json({ error: "You must be logged in to view user data." });
+    }
+
+    const userId = parseInt(req.params.id);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone_number: true,
+        instagram_handle: true,
+        dob: true,
+        gender: true,
+        intern_or_new_grad: true,
+        budget_min: true,
+        budget_max: true,
+        university: true,
+        company: true,
+        office_address: true,
+        friend_request_count: true,
+      },
     });
-    res.json({ deletedUser });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Something went wrong during account deletion." });
+    res.status(500).json({ error: "Error fetching user data" });
   }
 });
 

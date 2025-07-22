@@ -53,6 +53,18 @@ const NavBar = () => {
                 </button>
                 <button
                   className="btn-nav font-medium"
+                  onClick={() => navigate("/roommate-requests")}
+                >
+                  Roommate Requests
+                </button>
+                <button
+                  className="btn-nav font-medium"
+                  onClick={() => navigate("/roommate-pod")}
+                >
+                  Roommate Pod
+                </button>
+                <button
+                  className="btn-nav font-medium"
                   onClick={() => navigate("/current-user-profile")}
                 >
                   Profile

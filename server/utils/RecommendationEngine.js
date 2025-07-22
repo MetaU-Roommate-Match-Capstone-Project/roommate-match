@@ -20,6 +20,28 @@ class RecommendationEngine {
     this.currentUser = currentUser;
     this.others = others;
     this.otherUsers = otherUsers;
+    this.tiebreakerPrecedence = [
+      "gender",
+      "age",
+      "cleanliness",
+      "noiseTolerance",
+    ];
+  }
+
+  calculateAge(dob) {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
   }
 
   getWeights() {
@@ -51,25 +73,8 @@ class RecommendationEngine {
     const userA = this.currentUser;
     const userB = otherUser;
 
-    // calculate age from dob
-    const calculateAge = (dob) => {
-      const today = new Date();
-      const birthDate = new Date(dob);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-      ) {
-        age--;
-      }
-
-      return age;
-    };
-
-    const userAAge = calculateAge(userA.dob);
-    const userBAge = calculateAge(userB.dob);
+    const userAAge = this.calculateAge(userA.dob);
+    const userBAge = this.calculateAge(userB.dob);
 
     // calculate move-in date similarity (closer dates = higher similarity)
     const calculateDateDifferenceInDays = (date1, date2) => {
@@ -181,6 +186,97 @@ class RecommendationEngine {
     return weights;
   }
 
+  compareRecommendations(a, b) {
+    let userAFriendRequestCount = a.user.friend_request_count || 0;
+    let userBFriendRequestCount = b.user.friend_request_count || 0;
+
+    // use weighted approach where similarity is the primary factor but friend request count provides a boost
+    const friendRequestBoostFactor = 0.05;
+    const adjustedSimA =
+      a.similarity + userAFriendRequestCount * friendRequestBoostFactor;
+    const adjustedSimB =
+      b.similarity + userBFriendRequestCount * friendRequestBoostFactor;
+
+    if (adjustedSimB !== adjustedSimA) {
+      return adjustedSimB - adjustedSimA;
+    }
+
+    // prioritize raw similarity if adjusted similarity is the same
+    if (b.similarity !== a.similarity) {
+      return b.similarity - a.similarity;
+    }
+
+    // iterate through tiebreakers in order of precedence
+    for (const tiebreaker of this.tiebreakerPrecedence) {
+      switch (tiebreaker) {
+        case "gender":
+          // prioritize same gender
+          const currentUserGender = this.currentUser.gender;
+          const aGenderMatch = a.user.gender === currentUserGender;
+          const bGenderMatch = b.user.gender === currentUserGender;
+
+          if (aGenderMatch !== bGenderMatch) {
+            return aGenderMatch ? -1 : 1;
+          }
+          break;
+
+        case "age":
+          // prioritize closer age
+          const currentUserAge = this.calculateAge(this.currentUser.dob);
+          const aAge = this.calculateAge(a.user.dob);
+          const bAge = this.calculateAge(b.user.dob);
+
+          const aAgeDiff = Math.abs(currentUserAge - aAge);
+          const bAgeDiff = Math.abs(currentUserAge - bAge);
+
+          if (aAgeDiff !== bAgeDiff) {
+            return aAgeDiff - bAgeDiff;
+          }
+          break;
+
+        case "cleanliness":
+          // prioritize same cleanliness
+          const aCleanlinessDistance = distanceBetweenEnumValues(
+            "cleanliness",
+            this.currentProfile.cleanliness,
+            a.profile.cleanliness,
+          );
+
+          const bCleanlinessDistance = distanceBetweenEnumValues(
+            "cleanliness",
+            this.currentProfile.cleanliness,
+            b.profile.cleanliness,
+          );
+
+          if (aCleanlinessDistance !== bCleanlinessDistance) {
+            return aCleanlinessDistance - bCleanlinessDistance;
+          }
+          break;
+
+        case "noiseTolerance":
+          // prioriritze same noise tolerance
+          const aNoiseDistance = distanceBetweenEnumValues(
+            "noiseTolerance",
+            this.currentProfile.noise_tolerance,
+            a.profile.noise_tolerance,
+          );
+
+          const bNoiseDistance = distanceBetweenEnumValues(
+            "noiseTolerance",
+            this.currentProfile.noise_tolerance,
+            b.profile.noise_tolerance,
+          );
+
+          if (aNoiseDistance !== bNoiseDistance) {
+            return aNoiseDistance - bNoiseDistance;
+          }
+          break;
+      }
+    }
+
+    return 0;
+  }
+
   async getTopKRecommendations(k) {
     // map over the other user profiles and compute similarity
     const recommendations = this.others.map((otherProfile) => {
@@ -196,7 +292,7 @@ class RecommendationEngine {
       };
     });
 
-    // exclude recommendations who have already been rejected by the user
+    // exclude recommendations who have already been rejected by the user or are in closed groups
     const filteredRecommendations = [];
     for (const rec of recommendations) {
       // check match model for existing negative match status
@@ -217,13 +313,46 @@ class RecommendationEngine {
         },
       });
 
-      if (!existingNegativeMatch) {
+      // check if user is in a closed group
+      const userInClosedGroup = await prisma.user.findFirst({
+        where: {
+          id: rec.user_id,
+          group: {
+            group_status: "CLOSED",
+          },
+        },
+      });
+
+      // check if offices are within 64 km (~40 miles) of each other
+      let officesWithinRange = true;
+      if (
+        this.currentUser.office_latitude &&
+        this.currentUser.office_longitude &&
+        rec.user.office_latitude &&
+        rec.user.office_longitude
+      ) {
+        const officeDistance = distanceBetweenCoordinates(
+          this.currentUser.office_latitude,
+          this.currentUser.office_longitude,
+          rec.user.office_latitude,
+          rec.user.office_longitude,
+        );
+
+        // filter out recommendations where offices are too far apart
+        if (officeDistance > 64) {
+          officesWithinRange = false;
+        }
+      }
+
+      // only add recommendation if user is not in a closed group, there's no negative match,
+      // and if offices are within 64 km of each other
+      if (!existingNegativeMatch && !userInClosedGroup && officesWithinRange) {
         filteredRecommendations.push(rec);
       }
     }
 
     return filteredRecommendations
-      .sort((a, b) => b.similarity - a.similarity)
+      .sort((a, b) => this.compareRecommendations(a, b))
       .slice(0, k);
   }
 }
