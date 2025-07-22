@@ -46,6 +46,10 @@ function convertStringToVector(str) {
 // cosine similarity between two vectors to calculate distance between two strings
 // reference: https://www.youtube.com/watch?v=e9U0QAFbfLI
 function distanceBetweenStringValues(str1, str2) {
+  if (str1 === str2) {
+    return 0;
+  }
+
   const vector1 = convertStringToVector(str1);
   const vector2 = convertStringToVector(str2);
 
