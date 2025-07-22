@@ -8,6 +8,7 @@ import {
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import PostPictureDisplay from "../PostPictureDisplay/PostPictureDisplay";
 import Spinner from "../Spinner/Spinner";
+import { getUrl } from "../../utils/url";
 
 const UserProfileDisplay = ({
   userProfile,
@@ -35,7 +36,7 @@ const UserProfileDisplay = ({
   const fetchUserPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/post/user/${userId}`, {
+      const response = await fetch(`${getUrl()}/api/post/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

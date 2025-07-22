@@ -12,8 +12,7 @@ app.set('trust proxy', 1);
 app.use(express.json());
 
 const corsConfig = cors({
-    // origin: [/*"http://localhost:5173",*/"https://roomify-metau.onrender.com"],
-    origin: "https://roomify-metau.onrender.com",
+    origin: ["https://roomify-metau.onrender.com", "http://localhost:5173"],
     methods: ["GET","HEAD", "PUT", "PATCH", "POST", "DELETE"],
     credentials: true,
   });
@@ -26,7 +25,7 @@ app.use(
       secure: process.env.NODE_ENV === "production", // use secure in production
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 60, // 1 hour session
-      sameSite: 'none', // allow cross-site cookies
+      sameSite: "none", // allow cross-site cookies
     },
     secret: "roommate-match",
     resave: false,

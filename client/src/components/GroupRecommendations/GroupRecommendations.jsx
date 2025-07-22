@@ -4,6 +4,7 @@ import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import Spinner from "../../components/Spinner/Spinner";
 import UpdateMatchButtons from "../../components/UpdateMatchButtons/UpdateMatchButtons";
+import { getUrl } from "../../utils/url";
 
 const GroupRecommendations = () => {
   const [groupOptions, setGroupOptions] = useState([]);
@@ -15,7 +16,7 @@ const GroupRecommendations = () => {
 
   const fetchGroupRecommendations = async () => {
     try {
-      const response = await fetch("/api/matches/groups", {
+      const response = await fetch(`${getUrl()}/api/matches/groups`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +74,7 @@ const GroupRecommendations = () => {
       ) / group.members.length;
 
     try {
-      const response = await fetch("/api/matches/groups", {
+      const response = await fetch(`${getUrl()}/api/matches/groups`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +169,7 @@ const GroupRecommendations = () => {
   const handleMemberClick = (member) => {
     const fetchUserData = async () => {
       try {
-        const userResponse = await fetch(`/api/users/${member.userId}`, {
+        const userResponse = await fetch(`${getUrl()}/api/users/${member.userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -183,7 +184,7 @@ const GroupRecommendations = () => {
         const userData = await userResponse.json();
 
         const profileResponse = await fetch(
-          `/api/roommate-profile/${member.userId}`,
+          `${getUrl()}/api/roommate-profile/${member.userId}`,
           {
             method: "GET",
             headers: {

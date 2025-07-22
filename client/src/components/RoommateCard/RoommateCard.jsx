@@ -1,4 +1,5 @@
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import { getUrl } from "../../utils/url";
 import "./RoommateCard.css";
 
 const RoommateCard = ({
