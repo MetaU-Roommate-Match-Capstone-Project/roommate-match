@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Spinner from "../../components/Spinner/Spinner";
-import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
+import RoommateCard from "../../components/RoommateCard/RoommateCard";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useNavigate } from "react-router-dom";
 import "./RoomatePod.css";
@@ -139,6 +139,7 @@ const RoommatePod = () => {
       profile: member.roommate_profile,
     };
     setActiveProfile(profileData);
+    setShowTooltip(false);
   };
 
   const closeProfileModal = () => {
@@ -155,15 +156,6 @@ const RoommatePod = () => {
     <div className="roommate-pod-container">
       <h1 className="pod-title">Roommate Pod</h1>
 
-      {pod && pod.length > 0 && (
-        <div className="pod-buttons">
-          <button onClick={handleUpdateGroupStatus}>
-            {groupClosed ? "Open Pod" : "Close Pod"}
-          </button>
-          <button onClick={handleLeaveRoommatePod}>Leave Pod</button>
-        </div>
-      )}
-
       <div className="roommate-cards-container">
         {error && <div className="error-message">{String(error)}</div>}
 
@@ -176,10 +168,12 @@ const RoommatePod = () => {
 
         {pod &&
           pod.map((member) => (
-            <div
+            <RoommateCard
               key={member.id}
-              className={`roommate-card ${flippedCards[member.id] ? "flipped" : ""}`}
-              onClick={() => handleCardFlip(member.id)}
+              member={member}
+              isFlipped={flippedCards[member.id]}
+              onCardFlip={handleCardFlip}
+              onViewProfile={openProfileModal}
               onMouseMove={(e) => {
                 // get the position relative to the viewport
                 // reference for mouse tracking: https://medium.com/@ryan_forrester_/how-to-get-mouse-position-in-javascript-37e4772a3f21
@@ -197,78 +191,23 @@ const RoommatePod = () => {
               onMouseLeave={() => {
                 setShowTooltip(false);
               }}
-            >
-              <div className="roommate-card-inner">
-                <div className="roommate-card-front">
-                  <div className="roommate-card-image">
-                    <img
-                      src={`/api/roommate-profile/profile-picture/${member.id}`}
-                      alt={`${member.name}'s profile`}
-                      onError={(e) => {
-                        e.target.src = fallbackProfilePic;
-                      }}
-                    />
-                  </div>
-                  <h2>{member.name}</h2>
-                </div>
-
-                <div className="roommate-card-back">
-                  <h3>{member.name}</h3>
-                  <div className="roommate-info">
-                    <p>
-                      <strong>Email:</strong> {member.email}
-                    </p>
-                    {member.phone_number && (
-                      <p>
-                        <strong>Phone:</strong> {member.phone_number}
-                      </p>
-                    )}
-                    {member.instagram_handle && (
-                      <p>
-                        <strong>Instagram:</strong> {member.instagram_handle}
-                      </p>
-                    )}
-                    {member.company && (
-                      <p>
-                        <strong>Company:</strong> {member.company}
-                      </p>
-                    )}
-                    {member.university && (
-                      <p>
-                        <strong>University:</strong> {member.university}
-                      </p>
-                    )}
-                    {member.office_address && (
-                      <p>
-                        <strong>Office:</strong> {member.office_address}
-                      </p>
-                    )}
-                    {member.roommate_profile.city && (
-                      <p>
-                        <strong>Location:</strong>{" "}
-                        {member.roommate_profile.city},{" "}
-                        {member.roommate_profile.state}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    className="view-profile-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openProfileModal(member);
-                    }}
-                    onMouseEnter={() => setIsOverButton(true)}
-                    onMouseLeave={() => setIsOverButton(false)}
-                  >
-                    View Full Profile
-                  </button>
-                </div>
-              </div>
-            </div>
+              onButtonHover={(isOver) => {
+                setIsOverButton(isOver);
+              }}
+            />
           ))}
       </div>
 
-      {/* hides tooltip when hovering over view profile button*/}
+      {pod && pod.length > 0 && (
+        <div className="pod-buttons">
+          <button onClick={handleUpdateGroupStatus}>
+            {groupClosed ? "Open Pod" : "Close Pod"}
+          </button>
+          <button onClick={handleLeaveRoommatePod}>Leave Pod</button>
+        </div>
+      )}
+
+      {/* hides tooltip when hovering over view profile button */}
       {showTooltip && !isOverButton && (
         <div
           className="cursor-tooltip"
