@@ -157,6 +157,7 @@ model Picture {
   post              Post             @relation(fields: [post_id], references: [id])
   post_id           Int
   image             Bytes
+  mime_type         String?
 }
 
 model Matches {

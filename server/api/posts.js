@@ -53,9 +53,19 @@ router.post("/", upload.array("pictures"), async (req, res) => {
     });
 
     if (files && files.length > 0) {
+      const validMimeTypes = ['image/jpeg', 'image/png'];
+      const invalidFiles = files.filter(file => !validMimeTypes.includes(file.mimetype));
+      if (invalidFiles.length > 0) {
+        return res.status(400).json({
+          error: "Invalid file type. Only JPEG and PNG images allowed.",
+          invalidFiles: invalidFiles.map(f => f.originalname)
+        });
+      }
+
       const pictureData = files.map((file) => ({
         post_id: newPost.id,
         image: file.buffer,
+        mime_type: file.mimetype
       }));
 
       await prisma.picture.createMany({
@@ -240,8 +250,9 @@ router.get("/picture/:id", async (req, res) => {
       return res.status(404).json({ error: "Picture not found" });
     }
 
+    // Use the stored MIME type for the Content-Type header
     res.set({
-      "Content-Type": "image/*",
+      "Content-Type": picture.mime_type,
       "Content-Length": picture.image.length,
     });
 

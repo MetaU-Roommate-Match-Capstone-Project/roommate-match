@@ -275,7 +275,25 @@ router.get("/profile-picture/:id", async (req, res) => {
       return res.status(404).json({ error: "No profile picture found" });
     }
 
-    res.set("Content-Type", "image/*");
+    // get image type from buffer
+    // automatically default to JPEG if no signature found
+    // app only supports JPEG and PNG
+    let contentType = "image/jpeg";
+    const buffer = user.profile_picture;
+
+    // check for PNG magic number (89 50 4E 47)
+    if (buffer.length > 8 &&
+        buffer[0] === 0x89 &&
+        buffer[1] === 0x50 &&
+        buffer[2] === 0x4E &&
+        buffer[3] === 0x47) {
+      contentType = "image/png";
+    }
+
+    res.set({
+      "Content-Type": contentType,
+      "Content-Length": user.profile_picture.length,
+    });
     res.send(user.profile_picture);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile picture" });
@@ -296,6 +314,14 @@ router.put(
 
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          error: "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.",
+          fileType: req.file.mimetype
+        });
       }
 
       const buffer = req.file.buffer;

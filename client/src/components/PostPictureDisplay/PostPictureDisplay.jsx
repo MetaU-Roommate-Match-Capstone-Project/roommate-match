@@ -1,6 +1,5 @@
 import React from "react";
 import PictureSlideshow from "../PictureSlideshow/PictureSlideshow";
-import { getUrl } from "../../utils/url"
 
 const PostPictureDisplay = ({ pictures }) => {
   if (!pictures || pictures.length === 0) {
