@@ -326,6 +326,7 @@ router.get("/profile-picture/:id", async (req, res) => {
     if (ext === ".png") {
       contentType = "image/png";
     }
+
     // set content type header and send file
     res.set("Content-Type", contentType);
     res.set("Cross-Origin-Resource-Policy", "cross-origin");
