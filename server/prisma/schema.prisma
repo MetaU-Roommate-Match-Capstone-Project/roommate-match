@@ -156,7 +156,7 @@ model Picture {
   id                Int              @id @default(autoincrement())
   post              Post             @relation(fields: [post_id], references: [id])
   post_id           Int
-  image_path        String
+  image_path        String?
   mime_type         String?
 }
 
