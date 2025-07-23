@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch server.js",
     "seed": "node prisma/seed.js",
-    "build": "npm install && prisma generate && prisma migrate reset --force && prisma migrate deploy",
+    "build": "npm install && prisma generate && prisma migrate deploy",
     "start": "node server.js",
     "postinstall": "prisma generate"
   },
