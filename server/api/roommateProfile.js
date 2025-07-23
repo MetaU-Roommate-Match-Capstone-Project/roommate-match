@@ -328,7 +328,7 @@ router.get("/profile-picture/:id", async (req, res) => {
     }
     // set content type header and send file
     res.set("Content-Type", contentType);
-    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
     res.sendFile(imagePath);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile picture" });

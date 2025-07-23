@@ -301,7 +301,7 @@ router.get("/picture/:id", async (req, res) => {
 
     // set content type based on mime type and send file
     res.set("Content-Type", contentType);
-    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
     res.sendFile(imagePath);
   } catch (err) {
     res.status(500).json("Error retrieving picture");
