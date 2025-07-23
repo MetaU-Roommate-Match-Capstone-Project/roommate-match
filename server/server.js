@@ -19,18 +19,24 @@ const corsConfig = cors({
 
 app.use(corsConfig);
 
+const prisma = new PrismaClient();
+
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(
   expressSession({
     cookie: {
-      secure: process.env.NODE_ENV === "production", // use secure in production
+      // secure cookies only used in prod (https), dev uses http
+      secure: isProduction,
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 60, // 1 hour session
-      sameSite: "none", // allow cross-site cookies
+      // 'lax' for localhost dev, 'none' for prod cross-origin
+      sameSite: isProduction ? 'none' : 'lax',
     },
     secret: "roommate-match",
     resave: false,
     saveUninitialized: false,
-    store: new PrismaSessionStore(new PrismaClient(), {
+    store: new PrismaSessionStore(prisma, {
       checkPeriod: 2 * 60 * 1000,
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
