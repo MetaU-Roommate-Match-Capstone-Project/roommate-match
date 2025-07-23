@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getUrl } from "../../utils/url";
 import Spinner from "../../components/Spinner/Spinner";
 
 const CreateAccount = () => {
@@ -42,7 +43,7 @@ const CreateAccount = () => {
 
   const createUser = async (userData) => {
     try {
-      const response = await fetch("/api/users/create-account", {
+      const response = await fetch(`${getUrl()}/api/users/create-account`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

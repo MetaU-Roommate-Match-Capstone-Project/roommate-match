@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
+import { getUrl } from "../../utils/url";
 import Spinner from "../Spinner/Spinner";
 
 const WithAuth = (WrappedComponent) => {
@@ -10,7 +11,7 @@ const WithAuth = (WrappedComponent) => {
 
     useEffect(() => {
       if (!user) {
-        fetch("/api/users/me", { credentials: "include" })
+        fetch(`${getUrl()}/api/users/me`, { credentials: "include" })
           .then((response) => {
             if (response.ok) {
               return response.json();

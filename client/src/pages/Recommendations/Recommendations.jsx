@@ -6,6 +6,7 @@ import Spinner from "../../components/Spinner/Spinner";
 import RecommendationTypePopup from "../../components/RecommendationTypePopup/RecommendationTypePopup";
 import IndividualRecommendations from "../../components/IndividualRecommendations/IndividualRecommendations";
 import GroupRecommendations from "../../components/GroupRecommendations/GroupRecommendations";
+import { getUrl } from "../../utils/url";
 
 const Recommendations = () => {
   const { user, recommendationType, setRecommendationType } = useUser();
@@ -13,11 +14,11 @@ const Recommendations = () => {
 
   // call the recommendation card component and have buttons below it to either Send friend request or reject the recommendation
   useEffect(() => {
-    // Check if the user has a recommendation type preference
+    // check if the user has a recommendation type preference
     const checkRecommendationType = async () => {
       if (user && recommendationType === null) {
         try {
-          const response = await fetch("/api/users/me", {
+          const response = await fetch(`${getUrl()}/api/users/me`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -46,14 +47,17 @@ const Recommendations = () => {
 
   const handleRecommendationTypeSelect = async (type) => {
     try {
-      const response = await fetch("/api/users/recommendation-type", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${getUrl()}/api/users/recommendation-type`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ recommendationType: type }),
+          credentials: "include",
         },
-        body: JSON.stringify({ recommendationType: type }),
-        credentials: "include",
-      });
+      );
 
       if (response.ok) {
         setRecommendationType(type);

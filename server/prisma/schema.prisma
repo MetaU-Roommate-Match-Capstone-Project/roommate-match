@@ -63,6 +63,13 @@ enum Socialness {
   VERY_SOCIAL
 }
 
+model Session {
+  id                  String   @id
+  sid                 String   @unique
+  data                String
+  expiresAt           DateTime
+}
+
 enum MatchStatus {
   PENDING
   FRIEND_REQUEST_SENT
@@ -80,7 +87,7 @@ model User {
   dob                             DateTime
   password                        String
   gender                          String
-  profile_picture                 Bytes?
+  profile_picture_path            String?
   intern_or_new_grad              String
   budget_min                      Int
   budget_max                      Int
@@ -149,7 +156,8 @@ model Picture {
   id                Int              @id @default(autoincrement())
   post              Post             @relation(fields: [post_id], references: [id])
   post_id           Int
-  image             Bytes
+  image_path        String?
+  mime_type         String?
 }
 
 model Matches {

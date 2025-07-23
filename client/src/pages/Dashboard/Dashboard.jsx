@@ -4,6 +4,7 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
+import { getUrl } from "../../utils/url";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay";
 import Spinner from "../../components/Spinner/Spinner";
 
@@ -26,7 +27,7 @@ const Dashboard = () => {
   const fetchUserProfile = async (id) => {
     try {
       setProfileLoading(true);
-      const response = await fetch(`api/roommate-profile/${id}`, {
+      const response = await fetch(`${getUrl()}/api/roommate-profile/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +83,11 @@ const Dashboard = () => {
               <div className="post-header">
                 <img
                   className="post-profile-picture"
-                  src={`/api/roommate-profile/profile-picture/${post.user.id}`}
+                  src={
+                    import.meta.env.DEV
+                      ? `/api/roommate-profile/profile-picture/${post.user.id}`
+                      : `${getUrl()}/api/roommate-profile/profile-picture/${post.user.id}`
+                  }
                   alt="profile-picture"
                   onError={(e) => {
                     e.target.src = fallbackProfilePic;
@@ -139,7 +144,9 @@ function useFetchPosts(setPosts) {
   const fetchPosts = async (cursor = null, append = false) => {
     try {
       setPostsLoading(true);
-      const url = cursor ? `/api/post?cursor=${cursor}` : "/api/post";
+      const url = cursor
+        ? `${getUrl()}/api/post?cursor=${cursor}`
+        : `${getUrl()}/api/post`;
 
       const response = await fetch(url, {
         method: "GET",

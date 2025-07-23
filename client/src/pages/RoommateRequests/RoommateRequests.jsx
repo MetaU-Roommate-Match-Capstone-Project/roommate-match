@@ -4,6 +4,7 @@ import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import UpdateMatchButtons from "../../components/UpdateMatchButtons/UpdateMatchButtons";
+import { getUrl } from "../../utils/url";
 
 const RoommateRequests = () => {
   const [roommateRequests, setRoommateRequests] = useState([]);
@@ -16,7 +17,7 @@ const RoommateRequests = () => {
   const fetchRoommateRequests = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/matches/friend-requests", {
+      const response = await fetch(`${getUrl()}/api/matches/friend-requests`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +58,7 @@ const RoommateRequests = () => {
   const handleMemberClick = async (member) => {
     try {
       // fetch user data
-      const userResponse = await fetch(`/api/users/${member.id}`, {
+      const userResponse = await fetch(`${getUrl()}/api/users/${member.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +74,7 @@ const RoommateRequests = () => {
 
       // fetch roommate profile data
       const profileResponse = await fetch(
-        `/api/roommate-profile/${member.id}`,
+        `${getUrl()}/api/roommate-profile/${member.id}`,
         {
           method: "GET",
           headers: {
@@ -113,7 +114,7 @@ const RoommateRequests = () => {
 
     setActionInProgress(true);
     try {
-      const response = await fetch("/api/matches", {
+      const response = await fetch(`${getUrl()}/api/matches`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -146,7 +147,7 @@ const RoommateRequests = () => {
     setActionInProgress(true);
     try {
       if (!request.isGroupRequest) {
-        const response = await fetch("/api/matches", {
+        const response = await fetch(`${getUrl()}/api/matches`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -168,7 +169,7 @@ const RoommateRequests = () => {
           ...request.members.map((member) => member.id),
         ];
 
-        const response = await fetch("/api/matches/groups", {
+        const response = await fetch(`${getUrl()}/api/matches/groups`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -231,7 +232,11 @@ const RoommateRequests = () => {
                   >
                     <div className="group-member-profile-pic">
                       <img
-                        src={`/api/roommate-profile/profile-picture/${request.sender.id}`}
+                        src={
+                          import.meta.env.DEV
+                            ? `/api/roommate-profile/profile-picture/${request.sender.id}`
+                            : `${getUrl()}/api/roommate-profile/profile-picture/${request.sender.id}`
+                        }
                         alt={`${request.sender.name}'s profile`}
                         onError={(e) => {
                           e.target.src = fallbackProfilePic;
@@ -256,7 +261,11 @@ const RoommateRequests = () => {
                     >
                       <div className="group-member-profile-pic">
                         <img
-                          src={`/api/roommate-profile/profile-picture/${member.id}`}
+                          src={
+                            import.meta.env.DEV
+                              ? `/api/roommate-profile/profile-picture/${member.id}`
+                              : `${getUrl()}/api/roommate-profile/profile-picture/${member.id}`
+                          }
                           alt={`${member.name}'s profile`}
                           onError={(e) => {
                             e.target.src = fallbackProfilePic;
@@ -284,7 +293,11 @@ const RoommateRequests = () => {
                         >
                           <div className="group-member-profile-pic">
                             <img
-                              src={`/api/roommate-profile/profile-picture/${member.id}`}
+                              src={
+                                import.meta.env.DEV
+                                  ? `/api/roommate-profile/profile-picture/${member.id}`
+                                  : `${getUrl()}/api/roommate-profile/profile-picture/${member.id}`
+                              }
                               alt={`${member.name}'s profile`}
                               onError={(e) => {
                                 e.target.src = fallbackProfilePic;

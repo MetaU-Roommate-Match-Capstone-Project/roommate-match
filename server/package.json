@@ -5,7 +5,10 @@
   "scripts": {
     "test": "jest",
     "dev": "node --watch server.js",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "build": "npm install && prisma generate && prisma migrate deploy",
+    "start": "node server.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +17,7 @@
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
     "@prisma/client": "^6.10.1",
+    "@quixo3/prisma-session-store": "^3.1.13",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",

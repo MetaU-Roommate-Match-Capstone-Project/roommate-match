@@ -3,13 +3,49 @@ const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 const helmet = require("helmet");
-const cors = require("cors");
 router.use(helmet());
 router.use(express.json());
-router.use(cors());
 const multer = require("multer");
-const multerStorage = multer.memoryStorage();
-const upload = multer(multerStorage);
+const path = require("path");
+const fs = require("fs");
+
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../assets/profile-pictures");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    // unique filename based on user id and timestamp
+    const userId = req.session.userId;
+    const timestamp = Date.now();
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    cb(null, `user-${userId}-${timestamp}${fileExtension}`);
+  },
+});
+
+// only jpeg and png images are supported
+const fileFilter = (req, file, cb) => {
+  const validMimeTypes = ["image/jpeg", "image/png"];
+  if (validMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error("Invalid file type. Only JPEG and PNG images are allowed."),
+      false,
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+});
 
 // [POST] - create a new roommate profile
 router.post("/", async (req, res) => {
@@ -266,19 +302,35 @@ router.get("/profile-picture/:id", async (req, res) => {
     const userId = parseInt(req.params.id);
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { profile_picture: true },
+      select: { profile_picture_path: true },
     });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (!user.profile_picture) {
+    if (!user.profile_picture_path) {
       return res.status(404).json({ error: "No profile picture found" });
     }
 
-    res.set("Content-Type", "image/*");
-    res.send(user.profile_picture);
+    const imagePath = path.join(__dirname, "..", user.profile_picture_path);
+
+    if (!fs.existsSync(imagePath)) {
+      return res.status(404).json({ error: "Profile picture file not found" });
+    }
+
+    // use file extension to determine content type
+    const ext = path.extname(imagePath).toLowerCase();
+    let contentType = "image/jpeg"; // Default
+
+    if (ext === ".png") {
+      contentType = "image/png";
+    }
+
+    // set content type header and send file
+    res.set("Content-Type", contentType);
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    res.sendFile(imagePath);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile picture" });
   }
@@ -300,22 +352,41 @@ router.put(
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const buffer = req.file.buffer;
       const user = await prisma.user.findUnique({
         where: { id: req.session.userId },
+        select: { profile_picture_path: true },
       });
 
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const updatedProfilePicture = await prisma.user.update({
-        where: { id: user.id },
+      // delete old profile picture if there is one
+      if (user.profile_picture_path) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          user.profile_picture_path,
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      const relativePath = path.relative(
+        path.join(__dirname, ".."),
+        req.file.path,
+      );
+
+      // update user with new profile picture
+      const updatedUser = await prisma.user.update({
+        where: { id: req.session.userId },
         data: {
-          profile_picture: buffer,
+          profile_picture_path: relativePath,
         },
       });
-      res.status(200).json(updatedProfilePicture);
+
+      res.status(200).json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Error uploading profile picture" });
     }

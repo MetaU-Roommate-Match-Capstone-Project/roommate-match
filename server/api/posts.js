@@ -3,13 +3,49 @@ const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 const helmet = require("helmet");
-const cors = require("cors");
 router.use(helmet());
 router.use(express.json());
-router.use(cors());
 const multer = require("multer");
-const multerStorage = multer.memoryStorage();
-const upload = multer(multerStorage);
+const path = require("path");
+const fs = require("fs");
+
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = path.join(__dirname, "../assets/post-images");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    // unique filenames created using timestamp and random string
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 10);
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    cb(null, `post-${timestamp}-${randomString}${fileExtension}`);
+  },
+});
+
+// images only supported in jpeg or png format
+const fileFilter = (req, file, cb) => {
+  const validMimeTypes = ["image/jpeg", "image/png"];
+  if (validMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error("Invalid file type. Only JPEG and PNG images are allowed."),
+      false,
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+});
 
 // [POST] - create a new post with optional multiple pictures
 router.post("/", upload.array("pictures"), async (req, res) => {
@@ -55,10 +91,19 @@ router.post("/", upload.array("pictures"), async (req, res) => {
     });
 
     if (files && files.length > 0) {
-      const pictureData = files.map((file) => ({
-        post_id: newPost.id,
-        image: file.buffer,
-      }));
+      const pictureData = files.map((file) => {
+        // store relative path of image
+        const relativePath = path.relative(
+          path.join(__dirname, ".."),
+          file.path,
+        );
+
+        return {
+          post_id: newPost.id,
+          image_path: relativePath,
+          mime_type: file.mimetype,
+        };
+      });
 
       await prisma.picture.createMany({
         data: pictureData,
@@ -242,12 +287,22 @@ router.get("/picture/:id", async (req, res) => {
       return res.status(404).json({ error: "Picture not found" });
     }
 
-    res.set({
-      "Content-Type": "image/*",
-      "Content-Length": picture.image.length,
-    });
+    if (!picture.image_path) {
+      return res.status(404).json({ error: "Image path not found" });
+    }
 
-    res.send(picture.image);
+    const imagePath = path.join(__dirname, "..", picture.image_path);
+
+    if (!fs.existsSync(imagePath)) {
+      return res.status(404).json({ error: "Image file not found" });
+    }
+
+    let contentType = picture.mime_type;
+
+    // set content type based on mime type and send file
+    res.set("Content-Type", contentType);
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    res.sendFile(imagePath);
   } catch (err) {
     res.status(500).json("Error retrieving picture");
   }
@@ -263,6 +318,21 @@ router.delete("/me/:id", async (req, res) => {
     }
 
     const postId = parseInt(req.params.id);
+
+    // get pictures associated with the post
+    const pictures = await prisma.picture.findMany({
+      where: { post_id: postId },
+    });
+
+    // delete images from server
+    for (const picture of pictures) {
+      if (picture.image_path) {
+        const imagePath = path.join(__dirname, "..", picture.image_path);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+    }
 
     // delete all pictures associated with the post due to foreign key constraint
     await prisma.picture.deleteMany({
