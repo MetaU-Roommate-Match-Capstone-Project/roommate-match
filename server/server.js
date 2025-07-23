@@ -21,71 +21,19 @@ const corsConfig = cors({
 
 app.use(corsConfig);
 
-// Helper function to recursively read directory contents
-const readDirRecursive = async (basePath, relativePath = '') => {
-  const fullPath = path.join(basePath, relativePath);
-  const dirents = await fs.promises.readdir(fullPath, { withFileTypes: true });
+// temporary route for debugging assets
+app.get('/debug/assets', (req, res) => {
+  const assetsPath = path.join(__dirname, 'assets');
+  console.log(`Reading assets folder at: ${assetsPath}`);
 
-  let results = [];
-
-  for (const dirent of dirents) {
-    const relPath = path.join(relativePath, dirent.name);
-
-    const item = {
-      name: dirent.name,
-      isDirectory: dirent.isDirectory(),
-      path: relPath
-    };
-
-    results.push(item);
-
-    if (dirent.isDirectory()) {
-      item.children = await readDirRecursive(basePath, relPath);
+  fs.readdir(assetsPath, (err, files) => {
+    if (err) {
+      console.error(`Failed to read assets folder: ${err.message}`);
+      return res.status(500).send('Error reading assets folder: ' + err.message);
     }
-  }
-
-  return results;
-};
-
-// temporary route for debugging assets and subfolders
-app.get('/debug/assets/:path(*)?', async (req, res) => {
-  try {
-    const subfolder = req.params.path || '';
-    const recursive = req.query.recursive === 'true';
-    const assetsBasePath = path.join(__dirname, 'assets');
-    const folderPath = path.join(assetsBasePath, subfolder);
-
-    console.log(`Reading folder at: ${folderPath}, recursive: ${recursive}`);
-
-    if (recursive) {
-      // Recursive mode - get full directory tree
-      const contents = await readDirRecursive(assetsBasePath, subfolder);
-      res.json({
-        currentPath: subfolder || 'assets',
-        recursive: true,
-        contents: contents
-      });
-    } else {
-      // Non-recursive mode - get only current directory
-      const dirents = await fs.promises.readdir(folderPath, { withFileTypes: true });
-      const contents = dirents.map(dirent => ({
-        name: dirent.name,
-        isDirectory: dirent.isDirectory(),
-        path: subfolder
-          ? path.join(subfolder, dirent.name)
-          : dirent.name
-      }));
-
-      res.json({
-        currentPath: subfolder || 'assets',
-        recursive: false,
-        contents: contents
-      });
-    }
-  } catch (err) {
-    console.error(`Failed to read folder: ${err.message}`);
-    return res.status(500).send('Error reading folder: ' + err.message);
-  }
+    console.log(`Assets folder contents: ${files.join(', ')}`);
+    res.json(files);
+  });
 });
 
 // serve static files from assets folder
