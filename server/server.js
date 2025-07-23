@@ -21,19 +21,29 @@ const corsConfig = cors({
 
 app.use(corsConfig);
 
-// temporary route for debugging assets
-app.get('/debug/assets', (req, res) => {
-  const assetsPath = path.join(__dirname, 'assets');
-  console.log(`Reading assets folder at: ${assetsPath}`);
-
-  fs.readdir(assetsPath, (err, files) => {
-    if (err) {
-      console.error(`Failed to read assets folder: ${err.message}`);
-      return res.status(500).send('Error reading assets folder: ' + err.message);
+// temporary debug endpoint to get all files in assets folder
+function getFilesRecursive(dirPath, arrayOfFiles) {
+  files = fs.readdirSync(dirPath);
+  arrayOfFiles = arrayOfFiles || [];
+  files.forEach(function(file) {
+    const fullPath = path.join(dirPath, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      arrayOfFiles = getFilesRecursive(fullPath, arrayOfFiles);
+    } else {
+      arrayOfFiles.push(fullPath);
     }
-    console.log(`Assets folder contents: ${files.join(', ')}`);
-    res.json(files);
   });
+  return arrayOfFiles;
+}
+app.get('/debug/assets-all', (req, res) => {
+  const assetsPath = path.join(__dirname, 'assets');
+  try {
+    const allFiles = getFilesRecursive(assetsPath);
+    res.json(allFiles);
+  } catch (err) {
+    console.error('Error reading assets folder recursively:', err);
+    res.status(500).send('Error reading assets folder recursively: ' + err.message);
+  }
 });
 
 // serve static files from assets folder
