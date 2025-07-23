@@ -8,6 +8,9 @@ router.use(express.json());
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const {
+  distanceBetweenCoordinates,
+} = require("../utils/similarityCalculations");
 
 const multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -127,6 +130,13 @@ router.get("/", async (req, res) => {
 
     const cursor = req.query.cursor ? parseInt(req.query.cursor) : 0;
 
+    // check if user has office coordinates
+    const userWithOffice = await prisma.user.findUnique({
+      where: { id: req.session.userId },
+      select: { office_latitude: true, office_longitude: true },
+    });
+
+    // check if user has a roommate profile
     const currentUserProfile = await prisma.roommateProfile.findUnique({
       where: { user_id: req.session.userId },
       select: { city: true, state: true },
@@ -134,9 +144,64 @@ router.get("/", async (req, res) => {
 
     let posts;
 
-    if (!currentUserProfile) {
+    // if user has coordinates, fetch posts within 64 km (~40 miles) of user's office
+    if (
+      userWithOffice &&
+      userWithOffice.office_latitude &&
+      userWithOffice.office_longitude
+    ) {
+      const allPosts = await prisma.post.findMany({
+        where: {
+          user_id: { not: req.session.userId },
+        },
+        include: {
+          user: true,
+          pictures: true,
+        },
+        orderBy: [
+          {
+            id: "desc",
+          },
+        ],
+      });
+
+      // filter posts to be within 64 km of user's office
+      const nearbyPosts = allPosts.filter((post) => {
+        if (
+          post.user &&
+          post.user.office_latitude &&
+          post.user.office_longitude
+        ) {
+          const distance = distanceBetweenCoordinates(
+            userWithOffice.office_latitude,
+            userWithOffice.office_longitude,
+            post.user.office_latitude,
+            post.user.office_longitude,
+          );
+          return distance <= 64;
+        }
+        return false;
+      });
+
+      // pagination
+      const startIndex = cursor
+        ? nearbyPosts.findIndex((post) => post.id === cursor) + 1
+        : 0;
+      posts = nearbyPosts.slice(startIndex, startIndex + 21);
+    }
+    // else if user has a roommate profile, fetch posts in the same city and state
+    else if (currentUserProfile) {
+      // use mode: "insensitive" to match locations without case sensitivity
       posts = await prisma.post.findMany({
         where: {
+          city: {
+            equals: currentUserProfile.city,
+            mode: "insensitive",
+          },
+          state: {
+            equals: currentUserProfile.state,
+            mode: "insensitive",
+          },
           user_id: { not: req.session.userId },
         },
         include: {
@@ -156,18 +221,11 @@ router.get("/", async (req, res) => {
           skip: 1,
         }),
       });
-    } else {
-      // use mode: "insensitive" to match locations without case sensitivity
+    }
+    // else fetch all posts
+    else {
       posts = await prisma.post.findMany({
         where: {
-          city: {
-            equals: currentUserProfile.city,
-            mode: "insensitive",
-          },
-          state: {
-            equals: currentUserProfile.state,
-            mode: "insensitive",
-          },
           user_id: { not: req.session.userId },
         },
         include: {
