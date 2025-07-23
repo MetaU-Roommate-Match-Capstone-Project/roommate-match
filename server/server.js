@@ -23,10 +23,14 @@ app.use(corsConfig);
 // temporary route for debugging assets
 app.get('/debug/assets', (req, res) => {
   const assetsPath = path.join(__dirname, 'assets');
+  console.log(`Reading assets folder at: ${assetsPath}`);
+
   fs.readdir(assetsPath, (err, files) => {
     if (err) {
+      console.error(`Failed to read assets folder: ${err.message}`);
       return res.status(500).send('Error reading assets folder: ' + err.message);
     }
+    console.log(`Assets folder contents: ${files.join(', ')}`);
     res.json(files);
   });
 });
