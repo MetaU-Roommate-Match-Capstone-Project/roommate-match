@@ -83,7 +83,11 @@ const Dashboard = () => {
               <div className="post-header">
                 <img
                   className="post-profile-picture"
-                  src={`/api/roommate-profile/profile-picture/${post.user.id}`}
+                  src={
+                    import.meta.env.DEV
+                      ? `/api/roommate-profile/profile-picture/${post.user.id}`
+                      : `${getUrl()}/api/roommate-profile/profile-picture/${post.user.id}`
+                  }
                   alt="profile-picture"
                   onError={(e) => {
                     e.target.src = fallbackProfilePic;

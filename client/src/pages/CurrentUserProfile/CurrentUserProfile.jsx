@@ -274,7 +274,9 @@ const CurrentUserProfile = () => {
               src={
                 profilePicture
                   ? profilePicture
-                  : `/api/roommate-profile/profile-picture/${user.id}`
+                  : import.meta.env.DEV
+                    ? `/api/roommate-profile/profile-picture/${user.id}`
+                    : `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`
               }
               alt="profile-picture"
               onError={(e) => {

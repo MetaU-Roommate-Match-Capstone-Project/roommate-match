@@ -80,7 +80,11 @@ const UserProfileDisplay = ({
         <div className="profile-col">
           <img
             className="profile-image"
-            src={`/api/roommate-profile/profile-picture/${userId}`}
+            src={
+              import.meta.env.DEV
+                ? `/api/roommate-profile/profile-picture/${userId}`
+                : `${getUrl()}/api/roommate-profile/profile-picture/${userId}`
+            }
             alt="profile-picture"
             onError={(e) => {
               e.target.src = fallbackProfilePic;
