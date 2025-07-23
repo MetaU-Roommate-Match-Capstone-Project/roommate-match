@@ -36,6 +36,11 @@ app.get('/debug/assets', (req, res) => {
   });
 });
 
+app.use('/api/assets', (_, res, next) => {
+    res.set.header('Cross-Origin-Resource-Policyx', 'cross-origin');
+    next();
+})
+
 // serve static files from assets folder
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
