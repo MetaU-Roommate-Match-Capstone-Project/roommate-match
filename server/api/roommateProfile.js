@@ -313,22 +313,36 @@ router.get("/profile-picture/:id", async (req, res) => {
       return res.status(404).json({ error: "No profile picture found" });
     }
 
-    const imagePath = path.join(__dirname, "..", user.profile_picture_path);
+    const isProduction = process.env.NODE_ENV === "production";
 
-    if (!fs.existsSync(imagePath)) {
-      return res.status(404).json({ error: "Profile picture file not found" });
+    if (isProduction) {
+      res.redirect(user.profile_picture_path);
+    } else {
+      const filename = path.basename(user.profile_picture_path);
+      const imagePath = path.join(
+        __dirname,
+        "../assets/profile-pictures",
+        filename,
+      );
+
+      if (!fs.existsSync(imagePath)) {
+        return res
+          .status(404)
+          .json({ error: "Profile picture file not found" });
+      }
+
+      // use file extension to determine content type
+      const ext = path.extname(imagePath).toLowerCase();
+      let contentType = "image/jpeg"; // Default
+
+      if (ext === ".png") {
+        contentType = "image/png";
+      }
+
+      // set content type header and send file
+      res.set("Content-Type", contentType);
+      res.sendFile(imagePath);
     }
-
-    // use file extension to determine content type
-    const ext = path.extname(imagePath).toLowerCase();
-    let contentType = "image/jpeg"; // Default
-
-    if (ext === ".png") {
-      contentType = "image/png";
-    }
-    // set content type header and send file
-    res.set("Content-Type", contentType);
-    res.sendFile(imagePath);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile picture" });
   }
@@ -361,26 +375,25 @@ router.put(
 
       // delete old profile picture if there is one
       if (user.profile_picture_path) {
+        const filename = path.basename(user.profile_picture_path);
         const oldImagePath = path.join(
           __dirname,
-          "..",
-          user.profile_picture_path,
+          "../assets/profile-pictures",
+          filename,
         );
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
       }
 
-      const relativePath = path.relative(
-        path.join(__dirname, ".."),
-        req.file.path,
-      );
+      const filename = path.basename(req.file.path);
+      const urlPath = `/assets/profile-pictures/${filename}`;
 
       // update user with new profile picture
       const updatedUser = await prisma.user.update({
         where: { id: req.session.userId },
         data: {
-          profile_picture_path: relativePath,
+          profile_picture_path: urlPath,
         },
       });
 

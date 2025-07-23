@@ -92,15 +92,13 @@ router.post("/", upload.array("pictures"), async (req, res) => {
 
     if (files && files.length > 0) {
       const pictureData = files.map((file) => {
-        // store relative path of image
-        const relativePath = path.relative(
-          path.join(__dirname, ".."),
-          file.path,
-        );
+        const filename = path.basename(file.path);
+
+        const urlPath = `/assets/post-images/${filename}`;
 
         return {
           post_id: newPost.id,
-          image_path: relativePath,
+          image_path: urlPath,
           mime_type: file.mimetype,
         };
       });
@@ -291,17 +289,22 @@ router.get("/picture/:id", async (req, res) => {
       return res.status(404).json({ error: "Image path not found" });
     }
 
-    const imagePath = path.join(__dirname, "..", picture.image_path);
+    const isProduction = process.env.NODE_ENV === "production";
 
-    if (!fs.existsSync(imagePath)) {
-      return res.status(404).json({ error: "Image file not found" });
+    if (isProduction) {
+      res.redirect(picture.image_path);
+    } else {
+      const filename = path.basename(picture.image_path);
+      const imagePath = path.join(__dirname, "../assets/post-images", filename);
+
+      if (!fs.existsSync(imagePath)) {
+        return res.status(404).json({ error: "Image file not found" });
+      }
+
+      let contentType = picture.mime_type;
+      res.set("Content-Type", contentType);
+      res.sendFile(imagePath);
     }
-
-    let contentType = picture.mime_type;
-
-    // set content type based on mime type and send file
-    res.set("Content-Type", contentType);
-    res.sendFile(imagePath);
   } catch (err) {
     res.status(500).json("Error retrieving picture");
   }
@@ -326,7 +329,12 @@ router.delete("/me/:id", async (req, res) => {
     // delete images from server
     for (const picture of pictures) {
       if (picture.image_path) {
-        const imagePath = path.join(__dirname, "..", picture.image_path);
+        const filename = path.basename(picture.image_path);
+        const imagePath = path.join(
+          __dirname,
+          "../assets/post-images",
+          filename,
+        );
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
