@@ -20,6 +20,17 @@ const corsConfig = cors({
 
 app.use(corsConfig);
 
+// temporary route for debugging assets
+app.get('/debug/assets', (req, res) => {
+  const assetsPath = path.join(__dirname, 'assets');
+  fs.readdir(assetsPath, (err, files) => {
+    if (err) {
+      return res.status(500).send('Error reading assets folder: ' + err.message);
+    }
+    res.json(files);
+  });
+});
+
 // serve static files from assets folder
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
