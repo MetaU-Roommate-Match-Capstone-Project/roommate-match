@@ -5,23 +5,27 @@ const expressSession = require("express-session");
 const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("./generated/prisma");
 const cors = require("cors");
+const path = require("path");
 
 // trust the first proxy when in production
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 app.use(express.json());
 
 const corsConfig = cors({
-    origin: ["https://roomify-metau.onrender.com", "http://localhost:5173"],
-    methods: ["GET","HEAD", "PUT", "PATCH", "POST", "DELETE"],
-    credentials: true,
-  });
+  origin: ["https://roomify-metau.onrender.com", "http://localhost:5173"],
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  credentials: true,
+});
 
 app.use(corsConfig);
 
+// serve static files from assets folder
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
 const prisma = new PrismaClient();
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
   expressSession({
@@ -31,7 +35,7 @@ app.use(
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 60, // 1 hour session
       // 'lax' for localhost dev, 'none' for prod cross-origin
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: isProduction ? "none" : "lax",
     },
     secret: "roommate-match",
     resave: false,

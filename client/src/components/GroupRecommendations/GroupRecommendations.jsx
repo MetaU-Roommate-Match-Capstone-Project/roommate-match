@@ -169,13 +169,16 @@ const GroupRecommendations = () => {
   const handleMemberClick = (member) => {
     const fetchUserData = async () => {
       try {
-        const userResponse = await fetch(`${getUrl()}/api/users/${member.userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+        const userResponse = await fetch(
+          `${getUrl()}/api/users/${member.userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
           },
-          credentials: "include",
-        });
+        );
 
         if (!userResponse.ok) {
           throw new Error("Failed to fetch user data");

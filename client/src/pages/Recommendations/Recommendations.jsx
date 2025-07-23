@@ -47,14 +47,17 @@ const Recommendations = () => {
 
   const handleRecommendationTypeSelect = async (type) => {
     try {
-      const response = await fetch(`${getUrl()}/api/users/recommendation-type`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${getUrl()}/api/users/recommendation-type`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ recommendationType: type }),
+          credentials: "include",
         },
-        body: JSON.stringify({ recommendationType: type }),
-        credentials: "include",
-      });
+      );
 
       if (response.ok) {
         setRecommendationType(type);

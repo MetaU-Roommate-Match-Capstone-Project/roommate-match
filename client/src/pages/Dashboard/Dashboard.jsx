@@ -140,7 +140,9 @@ function useFetchPosts(setPosts) {
   const fetchPosts = async (cursor = null, append = false) => {
     try {
       setPostsLoading(true);
-      const url = cursor ? `${getUrl()}/api/post?cursor=${cursor}` : `${getUrl()}/api/post`;
+      const url = cursor
+        ? `${getUrl()}/api/post?cursor=${cursor}`
+        : `${getUrl()}/api/post`;
 
       const response = await fetch(url, {
         method: "GET",
