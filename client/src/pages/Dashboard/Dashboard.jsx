@@ -27,13 +27,16 @@ const Dashboard = () => {
   const fetchUserProfile = async (id) => {
     try {
       setProfileLoading(true);
-      const response = await fetch(`${getBaseUrl()}/api/roommate-profile/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${getBaseUrl()}/api/roommate-profile/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         const errorInfo = await response.json();

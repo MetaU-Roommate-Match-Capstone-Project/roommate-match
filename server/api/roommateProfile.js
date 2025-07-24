@@ -8,6 +8,7 @@ router.use(express.json());
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { getGenAiBio } = require("./genAiBio.js");
 
 const multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -392,5 +393,52 @@ router.put(
     }
   },
 );
+
+// [PUT] - update the bio in roommate profile using GenAI
+router.put("/bio/:id", async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({
+        error: "You must be logged in to update your bio",
+      });
+    }
+
+    const userId = parseInt(req.params.id);
+
+    // check if signed in user is updating their own bio
+    if (req.session.userId !== userId) {
+      return res.status(403).json({
+        error: "You can only update your own bio",
+      });
+    }
+
+    const roommateProfile = await prisma.roommateProfile.findUnique({
+      where: { user_id: userId },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!roommateProfile) {
+      return res.status(404).json({ error: "Roommate profile not found" });
+    }
+
+    const generatedBio = await getGenAiBio(roommateProfile);
+
+    // update the roommate profile with the generated bio
+    const updatedProfile = await prisma.roommateProfile.update({
+      where: { user_id: userId },
+      data: { bio: generatedBio },
+    });
+
+    res.status(200).json({
+      message: "Bio updated successfully",
+      bio: generatedBio,
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error updating bio" });
+  }
+});
 
 module.exports = router;
