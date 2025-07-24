@@ -17,13 +17,16 @@ const RoommateRequests = () => {
   const fetchRoommateRequests = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getBaseUrl()}/api/matches/friend-requests`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${getBaseUrl()}/api/matches/friend-requests`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch friend requests");
@@ -58,13 +61,16 @@ const RoommateRequests = () => {
   const handleMemberClick = async (member) => {
     try {
       // fetch user data
-      const userResponse = await fetch(`${getBaseUrl()}/api/users/${member.id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const userResponse = await fetch(
+        `${getBaseUrl()}/api/users/${member.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!userResponse.ok) {
         throw new Error("Failed to fetch user data");

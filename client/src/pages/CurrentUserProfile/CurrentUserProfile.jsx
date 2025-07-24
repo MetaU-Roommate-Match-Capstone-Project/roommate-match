@@ -28,10 +28,13 @@ const CurrentUserProfile = () => {
   const handleLogout = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getBaseUrl()}/api/users/logout/${user.id}`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${getBaseUrl()}/api/users/logout/${user.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
 
       if (response.ok) {
         logout();
@@ -137,6 +140,40 @@ const CurrentUserProfile = () => {
       }
       const currentUserPosts = await response.json();
       setPosts(currentUserPosts);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const updateBioUsingGenAi = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${getBaseUrl()}/api/roommate-profile/bio/${user.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+      );
+
+      if (!response.ok) {
+        const errorInfo = await response.json();
+        throw new Error(errorInfo.error || "Failed to update bio");
+      }
+
+      const result = await response.json();
+
+      // update the roommate profile with the new bio
+      setRoommateProfile({
+        ...roommateProfile,
+        bio: result.bio,
+      });
+
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -319,6 +356,13 @@ const CurrentUserProfile = () => {
                 />
               ))}
             </div>
+            <button
+              className="btn-primary"
+              onClick={updateBioUsingGenAi}
+              disabled={loading}
+            >
+              {loading ? <Spinner /> : "Make bio with AI"}
+            </button>
           </div>
         </div>
       </section>

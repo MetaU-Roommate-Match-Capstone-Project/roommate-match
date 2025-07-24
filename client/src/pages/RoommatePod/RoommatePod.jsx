@@ -94,14 +94,17 @@ const RoommatePod = () => {
       setLoading(true);
       const status = groupClosed ? "OPEN" : "CLOSED";
 
-      const response = await fetch(`${getBaseUrl()}/api/matches/groups/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${getBaseUrl()}/api/matches/groups/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ group_status: status }),
+          credentials: "include",
         },
-        body: JSON.stringify({ group_status: status }),
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update group status for roommate pod.");
