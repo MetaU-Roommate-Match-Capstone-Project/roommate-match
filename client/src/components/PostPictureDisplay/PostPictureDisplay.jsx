@@ -1,6 +1,6 @@
 import React from "react";
 import PictureSlideshow from "../PictureSlideshow/PictureSlideshow";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 
 const PostPictureDisplay = ({ pictures }) => {
   if (!pictures || pictures.length === 0) {
@@ -10,7 +10,7 @@ const PostPictureDisplay = ({ pictures }) => {
   const imageUrls = pictures.map((pic) =>
     import.meta.env.DEV
       ? `/api/post/picture/${pic.id}`
-      : `${getUrl()}/api/post/picture/${pic.id}`,
+      : `${getBaseUrl()}/api/post/picture/${pic.id}`,
   );
 
   return <PictureSlideshow images={imageUrls} />;

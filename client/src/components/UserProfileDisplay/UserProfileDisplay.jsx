@@ -8,7 +8,7 @@ import {
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import PostPictureDisplay from "../PostPictureDisplay/PostPictureDisplay";
 import Spinner from "../Spinner/Spinner";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 
 const UserProfileDisplay = ({
   userProfile,
@@ -36,7 +36,7 @@ const UserProfileDisplay = ({
   const fetchUserPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/post/user/${userId}`, {
+      const response = await fetch(`${getBaseUrl()}/api/post/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const UserProfileDisplay = ({
             src={
               import.meta.env.DEV
                 ? `/api/roommate-profile/profile-picture/${userId}`
-                : `${getUrl()}/api/roommate-profile/profile-picture/${userId}`
+                : `${getBaseUrl()}/api/roommate-profile/profile-picture/${userId}`
             }
             alt="profile-picture"
             onError={(e) => {

@@ -6,7 +6,7 @@ import Spinner from "../../components/Spinner/Spinner";
 import RecommendationTypePopup from "../../components/RecommendationTypePopup/RecommendationTypePopup";
 import IndividualRecommendations from "../../components/IndividualRecommendations/IndividualRecommendations";
 import GroupRecommendations from "../../components/GroupRecommendations/GroupRecommendations";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 
 const Recommendations = () => {
   const { user, recommendationType, setRecommendationType } = useUser();
@@ -18,7 +18,7 @@ const Recommendations = () => {
     const checkRecommendationType = async () => {
       if (user && recommendationType === null) {
         try {
-          const response = await fetch(`${getUrl()}/api/users/me`, {
+          const response = await fetch(`${getBaseUrl()}/api/users/me`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -48,7 +48,7 @@ const Recommendations = () => {
   const handleRecommendationTypeSelect = async (type) => {
     try {
       const response = await fetch(
-        `${getUrl()}/api/users/recommendation-type`,
+        `${getBaseUrl()}/api/users/recommendation-type`,
         {
           method: "POST",
           headers: {

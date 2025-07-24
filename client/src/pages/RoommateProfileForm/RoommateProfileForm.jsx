@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import RankingSlider from "../../components/RankingSlider/RankingSlider";
 import Spinner from "../../components/Spinner/Spinner";
 
@@ -67,7 +67,7 @@ const RoommateProfileForm = () => {
 
   const createRoommateProfile = async (userData) => {
     try {
-      const response = await fetch(`${getUrl()}/api/roommate-profile`, {
+      const response = await fetch(`${getBaseUrl()}/api/roommate-profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

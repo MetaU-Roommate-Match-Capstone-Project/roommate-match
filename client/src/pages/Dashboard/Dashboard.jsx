@@ -4,7 +4,7 @@ import { useUser } from "../../contexts/UserContext";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay";
 import Spinner from "../../components/Spinner/Spinner";
 
@@ -27,7 +27,7 @@ const Dashboard = () => {
   const fetchUserProfile = async (id) => {
     try {
       setProfileLoading(true);
-      const response = await fetch(`${getUrl()}/api/roommate-profile/${id}`, {
+      const response = await fetch(`${getBaseUrl()}/api/roommate-profile/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const Dashboard = () => {
                   src={
                     import.meta.env.DEV
                       ? `/api/roommate-profile/profile-picture/${post.user.id}`
-                      : `${getUrl()}/api/roommate-profile/profile-picture/${post.user.id}`
+                      : `${getBaseUrl()}/api/roommate-profile/profile-picture/${post.user.id}`
                   }
                   alt="profile-picture"
                   onError={(e) => {
@@ -145,8 +145,8 @@ function useFetchPosts(setPosts) {
     try {
       setPostsLoading(true);
       const url = cursor
-        ? `${getUrl()}/api/post?cursor=${cursor}`
-        : `${getUrl()}/api/post`;
+        ? `${getBaseUrl()}/api/post?cursor=${cursor}`
+        : `${getBaseUrl()}/api/post`;
 
       const response = await fetch(url, {
         method: "GET",
