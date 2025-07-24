@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { getUrl } from "../utils/url.js";
+import { getBaseUrl } from "../utils/url.js";
 
 const UserContext = createContext();
 
@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`${getUrl()}/api/roommate-profile/me`, {
+      const response = await fetch(`${getBaseUrl()}/api/roommate-profile/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

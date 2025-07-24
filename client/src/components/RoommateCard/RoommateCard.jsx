@@ -1,5 +1,5 @@
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import "./RoommateCard.css";
 
 const RoommateCard = ({
@@ -25,7 +25,7 @@ const RoommateCard = ({
               src={
                 import.meta.env.DEV
                   ? `/api/roommate-profile/profile-picture/${member.id}`
-                  : `${getUrl()}/api/roommate-profile/profile-picture/${member.id}`
+                  : `${getBaseUrl()}/api/roommate-profile/profile-picture/${member.id}`
               }
               alt={`${member.name}'s profile`}
               onError={(e) => {

@@ -4,7 +4,7 @@ import ProfileModal from "../../components/ProfileModal/ProfileModal";
 import RoommateCard from "../../components/RoommateCard/RoommateCard";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useNavigate } from "react-router-dom";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import "./RoomatePod.css";
 
 const RoommatePod = () => {
@@ -24,7 +24,7 @@ const RoommatePod = () => {
   const fetchRoommatePod = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/matches/accepted`, {
+      const response = await fetch(`${getBaseUrl()}/api/matches/accepted`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +58,7 @@ const RoommatePod = () => {
   const leaveRoommatePod = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/matches/groups/leave`, {
+      const response = await fetch(`${getBaseUrl()}/api/matches/groups/leave`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +94,7 @@ const RoommatePod = () => {
       setLoading(true);
       const status = groupClosed ? "OPEN" : "CLOSED";
 
-      const response = await fetch(`${getUrl()}/api/matches/groups/status`, {
+      const response = await fetch(`${getBaseUrl()}/api/matches/groups/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

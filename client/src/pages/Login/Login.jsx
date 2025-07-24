@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import Spinner from "../../components/Spinner/Spinner";
 
 const Login = () => {
@@ -23,7 +23,7 @@ const Login = () => {
 
   const loginUser = async (userData) => {
     try {
-      const response = await fetch(`${getUrl()}/api/users/login`, {
+      const response = await fetch(`${getBaseUrl()}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

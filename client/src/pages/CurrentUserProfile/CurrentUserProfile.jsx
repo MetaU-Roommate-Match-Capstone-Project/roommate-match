@@ -10,7 +10,7 @@ import {
   getUserRoommatePreferencesInfo,
 } from "../../utils/profileAttributes.js";
 import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
 import Spinner from "../../components/Spinner/Spinner.jsx";
 
@@ -28,7 +28,7 @@ const CurrentUserProfile = () => {
   const handleLogout = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/users/logout/${user.id}`, {
+      const response = await fetch(`${getBaseUrl()}/api/users/logout/${user.id}`, {
         method: "POST",
         credentials: "include",
       });
@@ -58,7 +58,7 @@ const CurrentUserProfile = () => {
       formData.append("profilePicture", file);
 
       const response = await fetch(
-        `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`,
+        `${getBaseUrl()}/api/roommate-profile/profile-picture/${user.id}`,
         {
           method: "PUT",
           credentials: "include",
@@ -85,7 +85,7 @@ const CurrentUserProfile = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${getUrl()}/api/roommate-profile/me`, {
+      const response = await fetch(`${getBaseUrl()}/api/roommate-profile/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +123,7 @@ const CurrentUserProfile = () => {
   const fetchUserPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/post/me`, {
+      const response = await fetch(`${getBaseUrl()}/api/post/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,7 @@ const CurrentUserProfile = () => {
   const createPost = async (formData) => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/post`, {
+      const response = await fetch(`${getBaseUrl()}/api/post`, {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -170,7 +170,7 @@ const CurrentUserProfile = () => {
   const deletePost = async (postId) => {
     try {
       setLoading(true);
-      const response = await fetch(`${getUrl()}/api/post/me/${postId}`, {
+      const response = await fetch(`${getBaseUrl()}/api/post/me/${postId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -276,7 +276,7 @@ const CurrentUserProfile = () => {
                   ? profilePicture
                   : import.meta.env.DEV
                     ? `/api/roommate-profile/profile-picture/${user.id}`
-                    : `${getUrl()}/api/roommate-profile/profile-picture/${user.id}`
+                    : `${getBaseUrl()}/api/roommate-profile/profile-picture/${user.id}`
               }
               alt="profile-picture"
               onError={(e) => {

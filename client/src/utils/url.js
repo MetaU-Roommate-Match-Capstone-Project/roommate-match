@@ -1,4 +1,4 @@
-export const getUrl = () => {
+export const getBaseUrl = () => {
   if (import.meta.env.DEV) {
     return "http://localhost:3000";
   } else {

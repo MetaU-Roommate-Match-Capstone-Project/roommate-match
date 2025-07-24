@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import UserProfileDisplay from "../../components/UserProfileDisplay/UserProfileDisplay";
 import Spinner from "../../components/Spinner/Spinner";
 import UpdateMatchButtons from "../../components/UpdateMatchButtons/UpdateMatchButtons";
-import { getUrl } from "../../utils/url";
+import { getBaseUrl } from "../../utils/url";
 
 const IndividualRecommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -13,7 +13,7 @@ const IndividualRecommendations = () => {
 
   const fetchRecommendations = async () => {
     try {
-      const response = await fetch(`${getUrl()}/api/matches`, {
+      const response = await fetch(`${getBaseUrl()}/api/matches`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const IndividualRecommendations = () => {
 
     setActionInProgress(true);
     try {
-      const response = await fetch(`${getUrl()}/api/matches`, {
+      const response = await fetch(`${getBaseUrl()}/api/matches`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
