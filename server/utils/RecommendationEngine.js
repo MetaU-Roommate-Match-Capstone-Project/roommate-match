@@ -293,21 +293,32 @@ class RecommendationEngine {
     });
 
     // exclude recommendations who have already been rejected by the user or are in closed groups
+    // and exclude recommendations who have already been accepted or has a roommate request
     const filteredRecommendations = [];
     for (const rec of recommendations) {
-      // check match model for existing negative match status
-      const existingNegativeMatch = await prisma.matches.findFirst({
+      // check match model for existing negative or positive match status
+      const existingMatch = await prisma.matches.findFirst({
         where: {
           OR: [
             {
               user_id: this.currentUser.id,
               recommended_id: rec.user_id,
-              status: { in: Array.from(NEGATIVE_STATUSES) },
+              status: {
+                in: [
+                  ...Array.from(NEGATIVE_STATUSES),
+                  ...Array.from(POSITIVE_STATUSES),
+                ],
+              },
             },
             {
               user_id: rec.user_id,
               recommended_id: this.currentUser.id,
-              status: { in: Array.from(NEGATIVE_STATUSES) },
+              status: {
+                in: [
+                  ...Array.from(NEGATIVE_STATUSES),
+                  ...Array.from(POSITIVE_STATUSES),
+                ],
+              },
             },
           ],
         },
@@ -346,7 +357,7 @@ class RecommendationEngine {
 
       // only add recommendation if user is not in a closed group, there's no negative match,
       // and if offices are within 64 km of each other
-      if (!existingNegativeMatch && !userInClosedGroup && officesWithinRange) {
+      if (!existingMatch && !userInClosedGroup && officesWithinRange) {
         filteredRecommendations.push(rec);
       }
     }
