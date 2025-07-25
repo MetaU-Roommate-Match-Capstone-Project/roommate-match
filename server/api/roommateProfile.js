@@ -436,6 +436,8 @@ router.put("/bio/:id", async (req, res) => {
       bio: generatedBio,
       profile: updatedProfile,
     });
+
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
   } catch (error) {
     res.status(500).json({ error: "Error updating bio" });
   }
