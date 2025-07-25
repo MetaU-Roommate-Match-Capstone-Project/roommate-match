@@ -5,6 +5,7 @@ This web application is designed to help interns and new grads find roommates. I
 ## Project Documentation
 
 Project Plan (**required**): [Roomify Project Plan](https://docs.google.com/document/d/16vlOeixRl765HqjoHOrlddstkpDiZVMz_vsW1B8fjA8/edit?usp=sharing)
+
 Technical Challenges Documentation: [Roomify Technical Challenges](https://docs.google.com/document/d/1f9lq1fQQ2rHf0PlS3mazFINteZk_Dk40Gpoffj_iBzg/edit?usp=sharing)
 
 ## Deployed application
