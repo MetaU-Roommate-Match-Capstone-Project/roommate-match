@@ -36,7 +36,9 @@ jest.mock("./generated/prisma", () => {
   };
 });
 
+// tests that the function calculating distance between enum values works correctly
 describe("distanceBetweenEnumValues", () => {
+  // test that the function returns the correct distance between enum values in the same category
   test("should return the correct distance between two enum values in the same category", () => {
     const distance = distanceBetweenEnumValues(
       "cleanliness",
@@ -48,6 +50,7 @@ describe("distanceBetweenEnumValues", () => {
     expect(distance).toBe(3);
   });
 
+  // test that the function returns 0 when comparing the same enum value
   test("should return 0 when comparing the same enum value", () => {
     const distance = distanceBetweenEnumValues(
       "pets",
@@ -58,24 +61,31 @@ describe("distanceBetweenEnumValues", () => {
   });
 });
 
+// tests that the function calculating distance between boolean values works correctly
 describe("distanceBetweenBooleanValues", () => {
+  // test that the function returns 0 when both values are the same (e.g. true and true or false and false)
   test("should return 0 when both values are the same", () => {
     expect(distanceBetweenBooleanValues(true, true)).toBe(0);
     expect(distanceBetweenBooleanValues(false, false)).toBe(0);
   });
 
+  // test that the function returns 1 when the values are different (e.g. true and false or false and true)
   test("should return 1 when values are different", () => {
     expect(distanceBetweenBooleanValues(true, false)).toBe(1);
     expect(distanceBetweenBooleanValues(false, true)).toBe(1);
   });
 });
 
+// tests that the function calculating distance between numerical values works correctly
 describe("distanceBetweenNumericalValues", () => {
+  // ensures that the method correctly returns the absolute difference between two numbers
   test("should return the absolute difference between two positive numbers", () => {
     expect(distanceBetweenNumericalValues(10, 5)).toBe(5);
     expect(distanceBetweenNumericalValues(5, 10)).toBe(5);
   });
 
+  // ensures that the method finds the correct numerical distance between negative numbers
+  // although not relevant for the application's use case, this is a general test for the method's correctness
   test("should handle negative numbers correctly", () => {
     expect(distanceBetweenNumericalValues(-5, 5)).toBe(10);
     expect(distanceBetweenNumericalValues(5, -5)).toBe(10);
@@ -83,7 +93,10 @@ describe("distanceBetweenNumericalValues", () => {
   });
 });
 
+// tests that the function using cosine similarity to calculate distance between string values works correctly
 describe("distanceBetweenStringValues", () => {
+  // should return 0 for identical strings because this method calculates distance using cosine similarity
+  // cosine similarity for identical strings is 1 => distance = 1 - 1 = 0
   test("should return 0 for identical strings", () => {
     const result = distanceBetweenStringValues(
       "reading books",
@@ -92,7 +105,9 @@ describe("distanceBetweenStringValues", () => {
     expect(result).toBe(0);
   });
 
-  test("should return a value between 0 and 1 for similar strings", () => {
+  // test strings that are approximately 50% similar
+  // should return a value around 0.5
+  test("should return a value approximate to 0.5", () => {
     const result = distanceBetweenStringValues(
       "reading books",
       "reading novels",
@@ -102,7 +117,9 @@ describe("distanceBetweenStringValues", () => {
   });
 });
 
+// tests that the function calculating distance between coordinates works correctly
 describe("distanceBetweenCoordinates", () => {
+  // identical coordinates should return 0
   test("should return 0 for identical coordinates", () => {
     const distance = distanceBetweenCoordinates(
       37.7749,
@@ -110,9 +127,10 @@ describe("distanceBetweenCoordinates", () => {
       37.7749,
       -122.4194,
     );
-    expect(distance).toBeCloseTo(0, 5);
+    expect(distance).toBe(0);
   });
 
+  // test that the function returns the correct distance between two coordinates: SF and LA
   test("should calculate the correct distance between San Francisco and Los Angeles", () => {
     // San Francisco: 37.7749° N, 122.4194° W
     // Los Angeles: 34.0522° N, 118.2437° W
@@ -128,12 +146,15 @@ describe("distanceBetweenCoordinates", () => {
   });
 });
 
+// checks that the structure of the preference matrix is correct
 describe("buildPreferenceSimilarityMatrix", () => {
+  // should return an empty array when no users have profiles
   test("should return an empty array when no users have profiles", async () => {
     const result = await buildPreferenceSimilarityMatrix();
     expect(result).toEqual([]);
   });
 
+  // should return a matrix with the correct structure when users have profiles
   test("should build a preference matrix with correct structure", async () => {
     const mockUsers = [
       { id: 1, name: "User 1" },
@@ -163,7 +184,9 @@ describe("buildPreferenceSimilarityMatrix", () => {
   });
 });
 
+// tests that the RecommendationEngine class works correctly
 describe("RecommendationEngine.computeSimilarity", () => {
+  // demonstrates correct calculation of high similarity for profiles with similar attributes
   test("should calculate higher similarity for profiles with similar attributes", () => {
     // similar roommate profiles to test higher similarity
     const currentProfile = {
@@ -227,6 +250,7 @@ describe("RecommendationEngine.computeSimilarity", () => {
     expect(similarity).toBeGreaterThan(0.7);
   });
 
+  // demonstrates correct calculation of lower similarity for profiles with different attributes
   test("should calculate lower similarity for profiles with different attributes", () => {
     // roommate profiles with different attributes to test lower similarity
     const currentProfile = {
@@ -294,8 +318,9 @@ describe("RecommendationEngine.computeSimilarity", () => {
   });
 });
 
-// Tests for galeShapleyGroupMatching
+// tests that the Gale-Shapley algorithm for stable group matching works correctly
 describe("galeShapleyGroupMatching", () => {
+  // tests that groups are formed with stable matches
   test("should produce stable groups with optimal matching", () => {
     const mockUsers = [
       {
@@ -424,7 +449,9 @@ describe("galeShapleyGroupMatching", () => {
   });
 });
 
+// tests that the function for getting multiple group options works correctly
 describe("getMultipleGroupOptions", () => {
+  // tests that the function correctly returns an empty array for the edge case of no valid groups
   test("should return an empty array when no valid groups can be formed", async () => {
     // empty users array => no valid groups can be formed
     const users = [];
@@ -440,6 +467,7 @@ describe("getMultipleGroupOptions", () => {
     expect(result).toEqual([]);
   });
 
+  // tests that the filtering of rejected matches and closed groups works correctly
   test("should filter out rejected matches and closed groups", async () => {
     const mockUsers = [
       {
@@ -480,6 +508,7 @@ describe("getMultipleGroupOptions", () => {
       },
     ];
 
+    // mock rejected matches
     const mockRejectedMatches = [
       { user_id: 1, recommended_id: 2, status: "REJECTED_RECOMMENDATION" },
     ];
@@ -491,7 +520,7 @@ describe("getMultipleGroupOptions", () => {
 
     const result = await getMultipleGroupOptions(mockUsers, 3, 1);
 
-    // should return empty array since only valid option got rejected
+    // should return empty array since the only valid option got rejected
     expect(result).toEqual([]);
   });
 });
