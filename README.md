@@ -10,6 +10,7 @@ Technical Challenges Documentation: [Roomify Technical Challenges](https://docs.
 ## Deployed application
 
 To use the deployed application, please visit the following link: [Roomify](https://roomify-metau.onrender.com/)
+- Note: The deployed application will continuously update as the project is developed. Everytime the project is redeployed, images that were previously uploaded will be removed due to limitations with the free tier of persistent disk storage on Render.
 
 ## How to run this application:
 
