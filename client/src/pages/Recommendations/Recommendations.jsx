@@ -11,12 +11,14 @@ import { getBaseUrl } from "../../utils/url";
 const Recommendations = () => {
   const { user, recommendationType, setRecommendationType } = useUser();
   const [showPopup, setShowPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // call the recommendation card component and have buttons below it to either Send friend request or reject the recommendation
   useEffect(() => {
     // check if the user has a recommendation type preference
     const checkRecommendationType = async () => {
-      if (user && recommendationType === null) {
+      if (user) {
+        setIsLoading(true);
         try {
           const response = await fetch(`${getBaseUrl()}/api/users/me`, {
             method: "GET",
@@ -30,6 +32,7 @@ const Recommendations = () => {
             const userData = await response.json();
             if (userData.recommendation_type) {
               setRecommendationType(userData.recommendation_type);
+              setShowPopup(false);
             } else {
               setShowPopup(true);
             }
@@ -38,12 +41,14 @@ const Recommendations = () => {
           }
         } catch (error) {
           setShowPopup(true);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
 
     checkRecommendationType();
-  }, [user, recommendationType, setRecommendationType]);
+  }, [user, setRecommendationType]);
 
   const handleRecommendationTypeSelect = async (type) => {
     try {
@@ -70,14 +75,19 @@ const Recommendations = () => {
 
   return (
     <div className="recommendations-page">
-      {showPopup && (
-        <RecommendationTypePopup onSelect={handleRecommendationTypeSelect} />
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          {showPopup && (
+            <RecommendationTypePopup onSelect={handleRecommendationTypeSelect} />
+          )}
+          {!showPopup && recommendationType === "individual" && (
+            <IndividualRecommendations />
+          )}
+          {!showPopup && recommendationType === "group" && <GroupRecommendations />}
+        </>
       )}
-      {!showPopup && recommendationType === "individual" && (
-        <IndividualRecommendations />
-      )}
-      {!showPopup && recommendationType === "group" && <GroupRecommendations />}
-      {!showPopup && !recommendationType && <Spinner />}
     </div>
   );
 };
