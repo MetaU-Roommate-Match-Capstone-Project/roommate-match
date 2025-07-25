@@ -7,6 +7,7 @@ const { PrismaClient } = require("./generated/prisma");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const helmet = require("helmet");
 
 // trust the first proxy when in production
 app.set("trust proxy", 1);
@@ -20,6 +21,12 @@ const corsConfig = cors({
 });
 
 app.use(corsConfig);
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 
 // serve static files from assets folder
 app.use("/assets", express.static(path.join(__dirname, "assets")));

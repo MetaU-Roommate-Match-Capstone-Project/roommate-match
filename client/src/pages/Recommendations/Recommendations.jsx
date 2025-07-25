@@ -80,12 +80,16 @@ const Recommendations = () => {
       ) : (
         <>
           {showPopup && (
-            <RecommendationTypePopup onSelect={handleRecommendationTypeSelect} />
+            <RecommendationTypePopup
+              onSelect={handleRecommendationTypeSelect}
+            />
           )}
           {!showPopup && recommendationType === "individual" && (
             <IndividualRecommendations />
           )}
-          {!showPopup && recommendationType === "group" && <GroupRecommendations />}
+          {!showPopup && recommendationType === "group" && (
+            <GroupRecommendations />
+          )}
         </>
       )}
     </div>

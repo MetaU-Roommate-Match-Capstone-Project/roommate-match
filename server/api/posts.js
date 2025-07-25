@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
-const helmet = require("helmet");
-router.use(helmet());
 router.use(express.json());
 const multer = require("multer");
 const path = require("path");
@@ -359,7 +357,6 @@ router.get("/picture/:id", async (req, res) => {
 
     // set content type based on mime type and send file
     res.set("Content-Type", contentType);
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
     res.sendFile(imagePath);
   } catch (err) {
     res.status(500).json("Error retrieving picture");

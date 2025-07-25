@@ -3,9 +3,7 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
-const helmet = require("helmet");
 const { fetchOfficeCoordinates } = require("./fetchCoordinates");
-router.use(helmet());
 router.use(express.json());
 
 // [POST] - Create Account Route
