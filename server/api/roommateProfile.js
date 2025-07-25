@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
-const helmet = require("helmet");
-router.use(helmet());
 router.use(express.json());
 const multer = require("multer");
 const path = require("path");
@@ -330,7 +328,6 @@ router.get("/profile-picture/:id", async (req, res) => {
 
     // set content type header and send file
     res.set("Content-Type", contentType);
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
     res.sendFile(imagePath);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile picture" });
@@ -430,8 +427,6 @@ router.put("/bio/:id", async (req, res) => {
       where: { user_id: userId },
       data: { bio: generatedBio },
     });
-
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
 
     res.status(200).json({
       message: "Bio updated successfully",
