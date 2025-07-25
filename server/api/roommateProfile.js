@@ -431,13 +431,13 @@ router.put("/bio/:id", async (req, res) => {
       data: { bio: generatedBio },
     });
 
+    res.set("Cross-Origin-Resource-Policy", "cross-origin");
+
     res.status(200).json({
       message: "Bio updated successfully",
       bio: generatedBio,
       profile: updatedProfile,
     });
-
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
   } catch (error) {
     res.status(500).json({ error: "Error updating bio" });
   }
