@@ -4,7 +4,6 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import WithAuth from "./components/WithAuth/WithAuth";
-import RoommateProfileForm from "./pages/RoommateProfileForm/RoommateProfileForm";
 import CurrentUserProfile from "./pages/CurrentUserProfile/CurrentUserProfile";
 import Recommendations from "./pages/Recommendations/Recommendations";
 import RoommateRequests from "./pages/RoommateRequests/RoommateRequests";
@@ -24,10 +23,6 @@ function AppRoutes() {
             <Route path="/create-account" element={<CreateAccount />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<ProtectedDashboard />} />
-            <Route
-              path="/roommate-profile-form"
-              element={<RoommateProfileForm />}
-            />
             <Route
               path="/current-user-profile"
               element={<CurrentUserProfile />}

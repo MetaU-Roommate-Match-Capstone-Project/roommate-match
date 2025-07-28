@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import WithAuth from "../../components/WithAuth/WithAuth";
+import WithAuth from "../WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
 import { getBaseUrl } from "../../utils/url";
-import RankingSlider from "../../components/RankingSlider/RankingSlider";
-import Spinner from "../../components/Spinner/Spinner";
+import RankingSlider from "../RankingSlider/RankingSlider";
+import Spinner from "../Spinner/Spinner";
 
 const RoommateProfileForm = () => {
   const {

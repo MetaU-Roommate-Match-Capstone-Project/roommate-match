@@ -36,7 +36,7 @@ body {
 }
 
 .btn-nav {
-  @apply bg-transparent border-none cursor-pointer text-xl text-white ml-2 hover:text-gray-600 transition-colors;
+  @apply bg-transparent hover:shadow-[inset_0_0_0_100vw_rgba(0,0,0,0.1)] hover:rounded hover:p-1 cursor-pointer text-xl text-white ml-2 transition-colors;
 }
 
 .btn-option {
@@ -260,11 +260,11 @@ body {
 }
 
 .recommendation-button.individual {
-  @apply bg-[#3066BE] text-white hover:bg-blue-600;
+  @apply bg-[#3066BE] text-white hover:bg-[#6D9DC5];
 }
 
 .recommendation-button.group {
-  @apply bg-[#6D9DC5] text-white hover:bg-blue-600;
+  @apply bg-[#6D9DC5] text-white hover:bg-[#6D9DC5];
 }
 
 /* Recommendations Container Styles */
@@ -346,12 +346,11 @@ body {
 }
 
 .loading-container,
-.no-recommendations,
-.no-more-recommendations {
+.no-data-available {
   @apply text-center py-10 px-5 text-gray-600 text-lg bg-white rounded-lg shadow;
 }
 
-.no-more-recommendations {
+.no-data-available {
   @apply bg-blue-50 border border-blue-100;
 }
 

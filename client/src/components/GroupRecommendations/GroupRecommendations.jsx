@@ -136,7 +136,7 @@ const GroupRecommendations = () => {
 
   if (groupOptions.length === 0) {
     return (
-      <div className="no-recommendations">
+      <div className="no-data-available">
         No group recommendations available at this time.
       </div>
     );
@@ -144,7 +144,7 @@ const GroupRecommendations = () => {
 
   if (currentOptionIndex >= groupOptions.length) {
     return (
-      <div className="no-more-recommendations">
+      <div className="no-data-available">
         You've gone through all available group recommendations!
       </div>
     );
@@ -229,7 +229,7 @@ const GroupRecommendations = () => {
         <div className="group-card">
           <div className="score-header">
             <p className="similarity-score">
-              Similarity Score: {averageGroupSimilarity.toFixed(2) * 100}%
+              Similarity Score: {Math.round(averageGroupSimilarity * 100)}%
             </p>
           </div>
 

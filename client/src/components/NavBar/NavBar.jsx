@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 
 const NavBar = () => {
-  const { user, hasRoommateProfile } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   return (
@@ -41,27 +41,21 @@ const NavBar = () => {
                 </button>
                 <button
                   className="btn-nav font-medium"
-                  onClick={() =>
-                    navigate(
-                      hasRoommateProfile
-                        ? "/roommate-recommendations"
-                        : "/roommate-profile-form",
-                    )
-                  }
+                  onClick={() => navigate("/roommate-recommendations")}
                 >
-                  {hasRoommateProfile ? "Recommendations" : "Roommate Profile"}
+                  Recommendations
                 </button>
                 <button
                   className="btn-nav font-medium"
                   onClick={() => navigate("/roommate-requests")}
                 >
-                  Roommate Requests
+                  Requests
                 </button>
                 <button
                   className="btn-nav font-medium"
                   onClick={() => navigate("/roommate-pod")}
                 >
-                  Roommate Pod
+                  Pod
                 </button>
                 <button
                   className="btn-nav font-medium"
