@@ -92,7 +92,7 @@ const IndividualRecommendations = () => {
 
   if (recommendations.length === 0) {
     return (
-      <div className="no-recommendations">
+      <div className="no-data-available">
         No individual roommate recommendations available at this time.
       </div>
     );
@@ -100,7 +100,7 @@ const IndividualRecommendations = () => {
 
   if (currentIndex >= recommendations.length) {
     return (
-      <div className="no-more-recommendations">
+      <div className="no-data-available">
         You've gone through all available recommendations!
       </div>
     );

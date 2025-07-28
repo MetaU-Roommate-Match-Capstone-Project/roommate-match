@@ -79,7 +79,7 @@ const Dashboard = () => {
     <>
       <div className="post-container">
         {posts.length === 0 ? (
-          <p>No posts available.</p>
+          <div className="no-data-available">No posts available.</div>
         ) : (
           posts.map((post) => (
             <div key={post.id} className="post-card">

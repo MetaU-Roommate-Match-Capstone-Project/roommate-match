@@ -1,23 +1,42 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import WithAuth from "../../components/WithAuth/WithAuth";
 import { useUser } from "../../contexts/UserContext";
 import Spinner from "../../components/Spinner/Spinner";
 import RecommendationTypePopup from "../../components/RecommendationTypePopup/RecommendationTypePopup";
+import CreateProfilePopup from "../../components/CreateProfilePopup/CreateProfilePopup";
 import IndividualRecommendations from "../../components/IndividualRecommendations/IndividualRecommendations";
 import GroupRecommendations from "../../components/GroupRecommendations/GroupRecommendations";
 import { getBaseUrl } from "../../utils/url";
 
 const Recommendations = () => {
-  const { user, recommendationType, setRecommendationType } = useUser();
-  const [showPopup, setShowPopup] = useState(false);
+  const {
+    user,
+    recommendationType,
+    setRecommendationType,
+    hasRoommateProfile,
+  } = useUser();
+  const [showRecommendationTypePopup, setShowRecommendationTypePopup] =
+    useState(false);
+  const [showCreateProfilePopup, setShowCreateProfilePopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // call the recommendation card component and have buttons below it to either Send friend request or reject the recommendation
+  // check if user has a roommate profile
+  // if not, show the create profile popup that redirects to the profile page
+  useEffect(() => {
+    if (user) {
+      if (!hasRoommateProfile) {
+        setShowCreateProfilePopup(true);
+        setIsLoading(false);
+      } else {
+        setShowCreateProfilePopup(false);
+      }
+    }
+  }, [user, hasRoommateProfile]);
+
   useEffect(() => {
     // check if the user has a recommendation type preference
     const checkRecommendationType = async () => {
-      if (user) {
+      if (user && hasRoommateProfile) {
         setIsLoading(true);
         try {
           const response = await fetch(`${getBaseUrl()}/api/users/me`, {
@@ -32,15 +51,15 @@ const Recommendations = () => {
             const userData = await response.json();
             if (userData.recommendation_type) {
               setRecommendationType(userData.recommendation_type);
-              setShowPopup(false);
+              setShowRecommendationTypePopup(false);
             } else {
-              setShowPopup(true);
+              setShowRecommendationTypePopup(true);
             }
           } else {
-            setShowPopup(true);
+            setShowRecommendationTypePopup(true);
           }
         } catch (error) {
-          setShowPopup(true);
+          setShowRecommendationTypePopup(true);
         } finally {
           setIsLoading(false);
         }
@@ -48,7 +67,7 @@ const Recommendations = () => {
     };
 
     checkRecommendationType();
-  }, [user, setRecommendationType]);
+  }, [user, hasRoommateProfile, setRecommendationType]);
 
   const handleRecommendationTypeSelect = async (type) => {
     try {
@@ -66,7 +85,7 @@ const Recommendations = () => {
 
       if (response.ok) {
         setRecommendationType(type);
-        setShowPopup(false);
+        setShowRecommendationTypePopup(false);
       }
     } catch (error) {
       throw new Error(error);
@@ -79,15 +98,20 @@ const Recommendations = () => {
         <Spinner />
       ) : (
         <>
-          {showPopup && (
+          {showCreateProfilePopup && <CreateProfilePopup />}
+          {!showCreateProfilePopup && showRecommendationTypePopup && (
             <RecommendationTypePopup
               onSelect={handleRecommendationTypeSelect}
             />
           )}
-          {!showPopup && recommendationType === "individual" && (
-            <IndividualRecommendations />
+          {!showCreateProfilePopup &&
+            !showRecommendationTypePopup &&
+            recommendationType === "individual" && (
+              <IndividualRecommendations />
           )}
-          {!showPopup && recommendationType === "group" && (
+          {!showCreateProfilePopup &&
+            !showRecommendationTypePopup &&
+            recommendationType === "group" && (
             <GroupRecommendations />
           )}
         </>

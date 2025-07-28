@@ -218,9 +218,7 @@ const RoommateRequests = () => {
       </div>
 
       {roommateRequests.length === 0 && (
-        <div className="recommendation-card-container">
-          <p>No roommate requests to display</p>
-        </div>
+        <div className="no-data-available">No roommate requests to display</div>
       )}
 
       <div className="recommendation-card-container">

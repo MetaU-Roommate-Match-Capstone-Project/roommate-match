@@ -69,7 +69,7 @@ const UserProfileDisplay = ({
         <div className="score-header">
           {similarityScore !== null && (
             <p className="similarity-score">
-              Match Score: {(similarityScore * 100).toFixed(1)}%
+              Match Score: {Math.round(similarityScore * 100)}%
             </p>
           )}
         </div>
@@ -136,9 +136,7 @@ const UserProfileDisplay = ({
                     <p className="text-red-500">{error}</p>
                   </div>
                 ) : posts.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-gray-600">No posts available.</p>
-                  </div>
+                  <div className="no-data-available">User has not created any posts.</div>
                 ) : (
                   posts.map((post) => (
                     <div key={post.id} className="post-card">

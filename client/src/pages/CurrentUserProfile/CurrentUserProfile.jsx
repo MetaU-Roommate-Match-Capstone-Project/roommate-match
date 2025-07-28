@@ -13,6 +13,7 @@ import fallbackProfilePic from "../../assets/fallback-profile-picture.png";
 import { getBaseUrl } from "../../utils/url";
 import PostPictureDisplay from "../../components/PostPictureDisplay/PostPictureDisplay.jsx";
 import Spinner from "../../components/Spinner/Spinner.jsx";
+import RoommateProfileForm from "../../components/RoommateProfileForm/RoommateProfileForm.jsx";
 
 const CurrentUserProfile = () => {
   const { user, logout } = useUser();
@@ -23,6 +24,7 @@ const CurrentUserProfile = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hasRoommateProfile, setHasRoommateProfile] = useState(null);
   const fileInputRef = useRef(null);
 
   const handleLogout = async () => {
@@ -96,14 +98,12 @@ const CurrentUserProfile = () => {
         credentials: "include",
       });
 
-      // if user has not created a profile yet, redirect to /roommate-profile-form after 10 seconds
+      // check if user has a roommate profile
       if (response.status === 404) {
+        setHasRoommateProfile(false);
         setError(
           "No profile created yet, please create one in the roommate profile tab to view your profile!",
         );
-        setTimeout(() => {
-          navigate("/roommate-profile-form");
-        }, 10000);
         setLoading(false);
         return;
       }
@@ -115,6 +115,7 @@ const CurrentUserProfile = () => {
 
       const currentUserProfile = await response.json();
       setRoommateProfile(currentUserProfile);
+      setHasRoommateProfile(true);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -233,8 +234,8 @@ const CurrentUserProfile = () => {
     fetchUserPosts();
   }, [user]);
 
-  // render spinner when loading
-  if (loading) {
+  // render spinner when loading or profile status is unknown
+  if (loading || hasRoommateProfile === null) {
     return (
       <div className="loading-container">
         <div className="loading-spinner-positioning">
@@ -244,24 +245,19 @@ const CurrentUserProfile = () => {
     );
   }
 
-  // render error message if user has not created a profile yet
-  if (error) {
+  // render roommate profile form if user has not created a profile yet
+  if (!hasRoommateProfile) {
     return (
       <>
-        <div className="profile-container">
-          <div className="profile-card">
-            <h2>Your Profile</h2>
-            <div className="error-message">{error}</div>
-          </div>
-        </div>
-        <button className="btn-primary" onClick={handleLogout}>
+        <RoommateProfileForm />
+        <button className="btn-primary mt-6" onClick={handleLogout}>
           Logout
         </button>
       </>
     );
   }
 
-  // loading message while user profile is being fetched
+  // loading spinner if roommate profile is not loaded yet
   if (!roommateProfile) {
     return (
       <div className="loading-container">
@@ -296,7 +292,7 @@ const CurrentUserProfile = () => {
   const roommatePreferencesInfo =
     getUserRoommatePreferencesInfo(roommateProfile);
 
-  // render user profile if user already logged in + created one in /roommate-profile-form
+  // render user profile if user already logged in + created a roommate profile
   return (
     <div>
       <section>
@@ -391,8 +387,8 @@ const CurrentUserProfile = () => {
           ></NewPostModal>
           <div className="post-container">
             {posts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">No posts available.</p>
+              <div className="no-data-available">
+                No posts available. Create a new post to see it here!
               </div>
             ) : (
               posts.map((post) => (
