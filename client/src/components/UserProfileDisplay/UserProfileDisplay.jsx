@@ -136,7 +136,9 @@ const UserProfileDisplay = ({
                     <p className="text-red-500">{error}</p>
                   </div>
                 ) : posts.length === 0 ? (
-                  <div className="no-data-available">User has not created any posts.</div>
+                  <div className="no-data-available">
+                    User has not created any posts.
+                  </div>
                 ) : (
                   posts.map((post) => (
                     <div key={post.id} className="post-card">

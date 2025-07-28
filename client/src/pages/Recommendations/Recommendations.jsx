@@ -15,20 +15,18 @@ const Recommendations = () => {
     setRecommendationType,
     hasRoommateProfile,
   } = useUser();
-  const [showRecommendationTypePopup, setShowRecommendationTypePopup] =
-    useState(false);
-  const [showCreateProfilePopup, setShowCreateProfilePopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [popup, setPopup] = useState(null);
 
   // check if user has a roommate profile
   // if not, show the create profile popup that redirects to the profile page
   useEffect(() => {
     if (user) {
       if (!hasRoommateProfile) {
-        setShowCreateProfilePopup(true);
+        setPopup("create-profile");
         setIsLoading(false);
       } else {
-        setShowCreateProfilePopup(false);
+        setPopup(null);
       }
     }
   }, [user, hasRoommateProfile]);
@@ -51,15 +49,15 @@ const Recommendations = () => {
             const userData = await response.json();
             if (userData.recommendation_type) {
               setRecommendationType(userData.recommendation_type);
-              setShowRecommendationTypePopup(false);
+              setPopup(null);
             } else {
-              setShowRecommendationTypePopup(true);
+              setPopup("recommendation-type");
             }
           } else {
-            setShowRecommendationTypePopup(true);
+            setPopup("recommendation-type");
           }
         } catch (error) {
-          setShowRecommendationTypePopup(true);
+          setPopup("recommendation-type");
         } finally {
           setIsLoading(false);
         }
@@ -85,37 +83,46 @@ const Recommendations = () => {
 
       if (response.ok) {
         setRecommendationType(type);
-        setShowRecommendationTypePopup(false);
+        setPopup(null);
       }
     } catch (error) {
       throw new Error(error);
     }
   };
 
+  // determine which content should be rendered based on the popup state and recommendation type
+  const displayCreateProfilePopup = popup === "create-profile";
+  const displayRecommendationTypePopup = popup === "recommendation-type";
+  const displayIndividualRecommendations =
+    popup === null && recommendationType === "individual";
+  const displayGroupRecommendations =
+    popup === null && recommendationType === "group";
+
+  const displayContent = () => {
+    if (displayCreateProfilePopup) {
+      return <CreateProfilePopup />;
+    }
+
+    if (displayRecommendationTypePopup) {
+      return (
+        <RecommendationTypePopup onSelect={handleRecommendationTypeSelect} />
+      );
+    }
+
+    if (displayIndividualRecommendations) {
+      return <IndividualRecommendations />;
+    }
+
+    if (displayGroupRecommendations) {
+      return <GroupRecommendations />;
+    }
+
+    return null;
+  };
+
   return (
     <div className="recommendations-page">
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <>
-          {showCreateProfilePopup && <CreateProfilePopup />}
-          {!showCreateProfilePopup && showRecommendationTypePopup && (
-            <RecommendationTypePopup
-              onSelect={handleRecommendationTypeSelect}
-            />
-          )}
-          {!showCreateProfilePopup &&
-            !showRecommendationTypePopup &&
-            recommendationType === "individual" && (
-              <IndividualRecommendations />
-          )}
-          {!showCreateProfilePopup &&
-            !showRecommendationTypePopup &&
-            recommendationType === "group" && (
-            <GroupRecommendations />
-          )}
-        </>
-      )}
+      {isLoading ? <Spinner /> : displayContent()}
     </div>
   );
 };
