@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBaseUrl } from "../../utils/url";
 import Spinner from "../../components/Spinner/Spinner";
+import SuccessPopup from "../../components/SuccessPopup/SuccessPopup";
 
 const CreateAccount = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const CreateAccount = () => {
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [doPasswordsMatch, setDoPasswordsMatch] = useState(false);
+  const [accountSuccess, setAccountSuccess] = useState(false);
 
   const createUser = async (userData) => {
     try {
@@ -57,6 +59,7 @@ const CreateAccount = () => {
         throw new Error(data.error || "Failed to create account");
       }
 
+      setAccountSuccess(true);
       return data;
     } catch (error) {
       throw error;
@@ -234,8 +237,6 @@ const CreateAccount = () => {
       };
 
       await createUser(userData);
-
-      navigate("/login");
     } catch (error) {
       setSubmitError(error.message);
     } finally {
@@ -243,8 +244,15 @@ const CreateAccount = () => {
     }
   };
 
+  const handlePopupContinue = (result) => {
+    if (result) {
+      navigate("/login");
+    }
+  };
+
   return (
     <>
+      {accountSuccess && <SuccessPopup onSelect={handlePopupContinue} />}
       <div className="form-container">
         <div className="form-card">
           <h2>Create Account</h2>
