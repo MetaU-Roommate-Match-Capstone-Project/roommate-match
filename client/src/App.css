@@ -628,7 +628,15 @@ hr {
 }
 
 .slider-container {
-  @apply my-2;
+  @apply my-2 relative;
+}
+
+.slider-tick-container {
+  @apply absolute w-full h-2 top-[14px] z-10 pointer-events-none;
+}
+
+.slider-tick {
+  @apply absolute w-2 h-2 bg-gray-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none;
 }
 
 .custom-slider {
@@ -645,10 +653,6 @@ hr {
 
 .slider-labels {
   @apply flex justify-between text-sm text-gray-600 mt-1;
-}
-
-.slider-value {
-  @apply text-sm text-gray-600 mt-2;
 }
 
 .custom-slider:focus {
