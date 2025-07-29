@@ -6,17 +6,7 @@ const items = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
 // reference for ranking slider: https://www.youtube.com/watch?v=zk7W2-1nq6E
 const RankingSlider = ({ label, value = 0, onChange }) => {
   const calculateIndex = (value) => {
-    const normalizedVal = value / 100;
-
-    if (normalizedVal <= 0) {
-      return 0;
-    }
-
-    if (normalizedVal >= 1) {
-      return items.length - 1;
-    }
-
-    return Math.round(normalizedVal / 0.2);
+    return Math.min(5, Math.max(0, Math.round(value / 20)));
   };
 
   const [currentIndex, setCurrentIndex] = useState(() => calculateIndex(value));
