@@ -1,43 +1,53 @@
 import { useEffect, useState } from "react";
 
-// creates array of values from 0 to 1.0 with step 0.02
-const items = Array.from({ length: 51 }, (_, i) => i * 0.02);
+// array of values from 0 to 1 with step 0.2
+const items = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
 
 // reference for ranking slider: https://www.youtube.com/watch?v=zk7W2-1nq6E
 const RankingSlider = ({ label, value = 0, onChange }) => {
-  const [sliderValue, setSliderValue] = useState(0);
+  const calculateIndex = (value) => {
+    return Math.min(5, Math.max(0, Math.round(value / 20)));
+  };
+
+  const [currentIndex, setCurrentIndex] = useState(() => calculateIndex(value));
 
   useEffect(() => {
-    setSliderValue(value);
+    setCurrentIndex(calculateIndex(value));
   }, [value]);
 
-  const handleChange = (e) => {
-    const val = parseInt(e.target.value, 10);
-    setSliderValue(val);
+  const sliderValue = currentIndex * 20;
 
-    // convert slider value (0-100) to an index in the items array (0-50)
-    const itemIndex = Math.min(Math.floor(val / 2), items.length - 1);
-    const selectedValue = items[itemIndex];
+  const handleChange = (e) => {
+    const rawVal = parseInt(e.target.value, 10);
+    const newIndex = Math.round(rawVal / 20);
+    setCurrentIndex(newIndex);
 
     if (onChange) {
-      onChange(selectedValue);
+      onChange(items[newIndex]);
     }
   };
 
-  const itemIndex = Math.min(Math.floor(sliderValue / 2), items.length - 1);
-  const displayValue = items[itemIndex]?.toFixed(2) || "0.00";
+  const tickMarks = items.map((item, index) => (
+    <div
+      key={index}
+      className="slider-tick"
+      style={{ left: `${index * 20}%` }}
+    />
+  ));
 
   return (
     <div className="ranking-slider-container">
       <label className="form-label">{label}</label>
 
       <div className="slider-container">
+        <div className="slider-tick-container">{tickMarks}</div>
+
         <input
           type="range"
           className="custom-slider"
           min={0}
           max={100}
-          step={2}
+          step={20}
           value={sliderValue}
           onChange={handleChange}
         />
@@ -47,8 +57,6 @@ const RankingSlider = ({ label, value = 0, onChange }) => {
           <span>Very Important</span>
         </div>
       </div>
-
-      <div className="slider-value">Selected value: {displayValue}</div>
     </div>
   );
 };

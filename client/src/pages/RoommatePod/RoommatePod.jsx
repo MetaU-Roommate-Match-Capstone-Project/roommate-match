@@ -165,8 +165,8 @@ const RoommatePod = () => {
 
         {pod && pod.length === 0 && (
           <div className="empty-pod-message">
-            <p>No roommates in your pod yet.</p>
-            <p>Check back later to see who's joined.</p>
+            No roommates in your pod yet. <br />
+            Check back later to see who's joined.
           </div>
         )}
 

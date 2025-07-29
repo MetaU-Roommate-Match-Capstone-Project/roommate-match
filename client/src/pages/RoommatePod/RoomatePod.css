@@ -99,6 +99,23 @@
   border-radius: 5px;
 }
 
+.empty-pod-message {
+  text-align: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: #4b5563;
+  font-size: 18px;
+  line-height: 28px;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
 @media (max-width: 768px) {
   .roommate-card {
     width: 250px;
