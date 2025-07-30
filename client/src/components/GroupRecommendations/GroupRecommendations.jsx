@@ -246,8 +246,8 @@ const GroupRecommendations = () => {
                     <img
                       src={
                         import.meta.env.DEV
-                          ? `/api/roommate-profile/profile-picture/${member.id}`
-                          : `${getBaseUrl()}/api/roommate-profile/profile-picture/${member.id}`
+                          ? `/api/roommate-profile/profile-picture/${member.userId}`
+                          : `${getBaseUrl()}/api/roommate-profile/profile-picture/${member.userId}`
                       }
                       alt={`${member.name}'s profile`}
                       onError={(e) => {
