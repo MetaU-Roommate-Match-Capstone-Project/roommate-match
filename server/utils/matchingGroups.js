@@ -283,7 +283,7 @@ function canAcceptNewMember(group, proposer, userMap) {
     return false;
   }
 
-  // check if any member of the group is more than 100 km away from the proposer
+  // check if any member of the group is more than 64 km (~40 miles) away from the proposer
   for (const member of group.members) {
     // validation for office coordinates to prevent errors
     if (
